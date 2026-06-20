@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Italiano per Tutti 🇮🇹</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+  :root {
+    --green: #009246;
+    --red: #CE2B37;
+    --bg: #f8f6f2;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --correct: #10b981;
+    --wrong: #ef4444;
+    --warning: #f59e0b;
+    --accent: #3b5bdb;
+    --accent-light: #eef2ff;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .header {
+    background: linear-gradient(135deg, var(--green) 0%, #007a3d 50%, var(--red) 100%);
+    color: white; text-align: center; padding: 32px 20px 24px; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 0,transparent 50%) 0/20px 20px;
+  }
+  .header-flag { font-size: 48px; margin-bottom: 8px; position: relative; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900; position: relative; }
+  .header p { font-size: 13px; opacity: 0.9; margin-top: 6px; position: relative; }
+
+  .tab-scroll {
+    background: white; border-bottom: 2px solid var(--border);
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .tab-scroll::-webkit-scrollbar { display: none; }
+  .tabs { display: flex; min-width: max-content; padding: 0 8px; }
+  .tab-btn {
+    padding: 14px 15px; border: none; background: none;
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--muted); cursor: pointer; white-space: nowrap;
+    border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  .section { display: none; padding: 16px; max-width: 600px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+
+  .ex-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+  }
+  .ex-card h3 {
+    font-size: 13px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--accent); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .item-num {
+    min-width: 24px; height: 24px; background: var(--accent-light); color: var(--accent);
+    border-radius: 50%; font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px;
+  }
+  .item-label { font-size: 15px; flex: 1; line-height: 1.5; min-width: 120px; }
+
+  .fill-input {
+    border: 2px solid var(--border); border-radius: 8px; padding: 6px 10px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+    color: var(--text); background: var(--bg); width: 100%; max-width: 200px;
+    transition: border-color 0.2s; outline: none;
+  }
+  .fill-input:focus { border-color: var(--accent); }
+  .fill-input.correct { border-color: var(--correct); background: #f0fdf4; color: var(--correct); }
+  .fill-input.wrong   { border-color: var(--wrong);   background: #fef2f2; color: var(--wrong); }
+  .fill-input:disabled { cursor: default; }
+
+  .mcq-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .mcq-btn {
+    padding: 8px 14px; border: 2px solid var(--border); border-radius: 10px;
+    background: white; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; color: var(--text);
+  }
+  .mcq-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .mcq-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+  .mcq-btn.correct  { border-color: var(--correct); background: #f0fdf4; color: var(--correct); }
+  .mcq-btn.wrong    { border-color: var(--wrong);   background: #fef2f2; color: var(--wrong); }
+  .mcq-btn:disabled { cursor: default; }
+
+  .tf-options { display: flex; gap: 10px; margin-top: 8px; }
+  .tf-btn {
+    padding: 8px 20px; border: 2px solid var(--border); border-radius: 10px;
+    background: white; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tf-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .tf-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+  .tf-btn.correct  { border-color: var(--correct); background: #f0fdf4; color: var(--correct); }
+  .tf-btn.wrong    { border-color: var(--wrong);   background: #fef2f2; color: var(--wrong); }
+
+  .feedback { display: none; margin-top: 5px; font-size: 13px; font-weight: 700; }
+  .feedback.show { display: block; }
+  .feedback.correct { color: var(--correct); }
+  .feedback.wrong   { color: var(--wrong); }
+
+  .theory {
+    background: linear-gradient(135deg, #eef2ff, #f0fdf4); border: 1px solid #c7d2fe;
+    border-radius: var(--radius); padding: 16px; margin-bottom: 20px;
+    font-size: 14px; line-height: 1.7;
+  }
+  .theory strong { color: var(--accent); }
+  .theory table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  .theory th, .theory td { padding: 7px 10px; text-align: left; border: 1px solid #c7d2fe; }
+  .theory th { background: #c7d2fe; font-weight: 800; }
+  .theory tr:nth-child(even) { background: rgba(99,102,241,0.04); }
+
+  .btn-check {
+    background: var(--accent); color: white; border: none; border-radius: 12px;
+    padding: 12px 28px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
+    cursor: pointer; margin-top: 16px; width: 100%;
+    box-shadow: 0 4px 12px rgba(59,91,219,0.3); transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-check:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,91,219,0.4); }
+  .btn-check:disabled { opacity: 0.5; cursor: default; }
+
+  .score-panel {
+    display: none; background: white; border-radius: var(--radius); padding: 24px;
+    margin-top: 16px; border: 2px solid var(--border); box-shadow: var(--shadow); text-align: center;
+  }
+  .score-panel.show { display: block; }
+  .score-big { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; line-height: 1; }
+  .score-big.good { color: var(--correct); }
+  .score-big.ok   { color: var(--warning); }
+  .score-big.bad  { color: var(--wrong); }
+  .score-label { font-size: 13px; color: var(--muted); margin: 6px 0 14px; font-weight: 600; }
+  .score-msg { font-size: 16px; font-weight: 800; margin-bottom: 12px; }
+  .errors-list { text-align: left; background: #fef2f2; border-radius: 10px; padding: 14px; margin-top: 12px; }
+  .errors-list h4 { font-size: 13px; color: var(--wrong); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .error-item { font-size: 13px; margin-bottom: 8px; line-height: 1.5; padding-bottom: 8px; border-bottom: 1px solid #fecaca; }
+  .error-item:last-child { border-bottom: none; margin-bottom: 0; }
+  .wrong-ans { color: var(--wrong); font-weight: 700; }
+  .right-ans { color: var(--correct); font-weight: 700; }
+  .btn-retry {
+    background: var(--bg); border: 2px solid var(--border); color: var(--text);
+    border-radius: 12px; padding: 10px 24px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 12px; transition: border-color 0.2s;
+  }
+  .btn-retry:hover { border-color: var(--accent); color: var(--accent); }
+
+  .ce-box {
+    background: linear-gradient(135deg, #fff7ed, #fef3c7); border: 2px solid #fcd34d;
+    border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
+  }
+  .ce-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; }
+  .ce-tag {
+    background: var(--warning); color: white; border-radius: 6px; padding: 4px 10px;
+    font-size: 12px; font-weight: 800; flex-shrink: 0; white-space: nowrap;
+  }
+  .ce-tag.non { background: var(--wrong); }
+  .ce-example { font-size: 14px; line-height: 1.5; }
+
+  .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .vocab-pill { background: var(--accent-light); border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+  .vocab-pill .it { font-weight: 800; color: var(--accent); display: block; }
+  .vocab-pill .fr { font-size: 11px; color: var(--muted); }
+
+  .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .home-card {
+    background: white; border-radius: var(--radius); padding: 16px;
+    border: 1px solid var(--border); box-shadow: var(--shadow);
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: center;
+  }
+  .home-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+  .home-card .emoji { font-size: 28px; margin-bottom: 8px; }
+  .home-card h3 { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+  .home-card p { font-size: 11px; color: var(--muted); }
+  .home-welcome {
+    background: linear-gradient(135deg, #009246, #007a3d); color: white;
+    border-radius: var(--radius); padding: 20px; margin-bottom: 4px;
+  }
+  .home-welcome h2 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .home-welcome p { font-size: 13px; opacity: 0.9; line-height: 1.5; }
+
+  .mcq-q { margin-bottom: 8px; font-size: 15px; line-height: 1.5; }
+  .mcq-num { display: inline-flex; min-width: 22px; height: 22px; background: var(--accent-light);
+    color: var(--accent); border-radius: 50%; font-size: 11px; font-weight: 800;
+    align-items: center; justify-content: center; margin-right: 6px; flex-shrink: 0; }
+  .mcq-block { margin-bottom: 18px; }
+
+  .sent-box {
+    background: #f8f6f2; border-radius: 8px; padding: 10px 12px;
+    font-style: italic; font-size: 14px; line-height: 1.6; margin-bottom: 8px;
+  }
+
+  @media (max-width: 380px) {
+    .home-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 20px; }
+    .score-big { font-size: 44px; }
+    .vocab-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-flag">🇮🇹</div>
+  <h1>Italiano per Tutti</h1>
+  <p>Exercices interactifs · Niveau A1 · En français</p>
+</div>
+
+<div class="tab-scroll">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showSection('home')">🏠 Accueil</button>
+    <button class="tab-btn" onclick="showSection('articles')">📝 Articles</button>
+    <button class="tab-btn" onclick="showSection('pluriel')">🔢 Pluriel</button>
+    <button class="tab-btn" onclick="showSection('terminaisons')">✏️ Terminaisons</button>
+    <button class="tab-btn" onclick="showSection('heure')">🕐 L'heure</button>
+    <button class="tab-btn" onclick="showSection('cece')">📍 C'è/Ci sono</button>
+    <button class="tab-btn" onclick="showSection('corps')">💪 Corps</button>
+    <button class="tab-btn" onclick="showSection('vraifaux')">✅ Vrai/Faux</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="section active" id="home">
+  <div class="home-welcome">
+    <h2>Benvenuto! 👋</h2>
+    <p>Choisis une catégorie ci-dessous. Chaque exercice est noté — tu verras ton score et tes erreurs à la fin. Bonne révision !</p>
+  </div>
+  <div class="home-grid">
+    <div class="home-card" onclick="showSection('articles')"><div class="emoji">📝</div><h3>Les Articles</h3><p>il, la, lo, un, una…</p></div>
+    <div class="home-card" onclick="showSection('pluriel')"><div class="emoji">🔢</div><h3>Le Pluriel</h3><p>Singulier → Pluriel</p></div>
+    <div class="home-card" onclick="showSection('terminaisons')"><div class="emoji">✏️</div><h3>Terminaisons</h3><p>-a / -e / -i / -o</p></div>
+    <div class="home-card" onclick="showSection('heure')"><div class="emoji">🕐</div><h3>L'Heure</h3><p>Che ore sono?</p></div>
+    <div class="home-card" onclick="showSection('cece')"><div class="emoji">📍</div><h3>C'è / Ci sono</h3><p>Il y a / Il n'y a pas</p></div>
+    <div class="home-card" onclick="showSection('corps')"><div class="emoji">💪</div><h3>Corps humain</h3><p>Le parti del corpo</p></div>
+    <div class="home-card" onclick="showSection('vraifaux')"><div class="emoji">✅</div><h3>Vrai / Faux</h3><p>Vero o Falso?</p></div>
+    <div class="home-card" onclick="showSection('articles')"><div class="emoji">🎯</div><h3>Commencer !</h3><p>Commence par les articles</p></div>
+  </div>
+</div>
+
+<!-- ARTICLES -->
+<div class="section" id="articles">
+  <h2 class="section-title">📝 Les Articles Italiens</h2>
+  <p class="section-sub">Articles déterminatifs (il, lo, la, l', i, gli, le) et indéterminatifs (un, uno, una, un')</p>
+
+  <div class="theory">
+    <strong>Articles DÉTERMINATIFS</strong>
+    <table>
+      <tr><th></th><th>Masc. sing.</th><th>Fém. sing.</th><th>Masc. plur.</th><th>Fém. plur.</th></tr>
+      <tr><td>Consonne</td><td>il</td><td>la</td><td>i</td><td>le</td></tr>
+      <tr><td>Voyelle</td><td>l'</td><td>l'</td><td>gli</td><td>le</td></tr>
+      <tr><td>s+cons, z, ps, gn</td><td>lo</td><td>—</td><td>gli</td><td>—</td></tr>
+    </table>
+    <br><strong>Articles INDÉTERMINATIFS</strong>
+    <table>
+      <tr><th></th><th>Masculin</th><th>Féminin</th></tr>
+      <tr><td>Consonne</td><td>un</td><td>una</td></tr>
+      <tr><td>Voyelle</td><td>un</td><td>un'</td></tr>
+      <tr><td>s+cons, z, ps</td><td>uno</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <div class="ex-card" id="ex-artdet">
+    <h3>🎯 Exercice 1 — Article déterminatif</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Écris le bon article déterminatif (il / la / l' / lo / i / le / gli).</p>
+    <div id="artdet-items"></div>
+    <button class="btn-check" onclick="checkFill('artdet', DATA.artdet)">✅ Vérifier mes réponses</button>
+    <div class="score-panel" id="artdet-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-artindet">
+    <h3>🔍 Exercice 2 — Article indéterminatif</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Écris l'article indéterminatif (un / uno / una / un').</p>
+    <div id="artindet-items"></div>
+    <button class="btn-check" onclick="checkFill('artindet', DATA.artindet)">✅ Vérifier</button>
+    <div class="score-panel" id="artindet-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-artchoix">
+    <h3>🤔 Exercice 3 — Déterminatif ou indéterminatif ?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Choisis le bon article dans chaque phrase.</p>
+    <div id="artchoix-items"></div>
+    <button class="btn-check" onclick="checkMCQ('artchoix', DATA.artchoix)">✅ Vérifier</button>
+    <div class="score-panel" id="artchoix-score"></div>
+  </div>
+</div>
+
+<!-- PLURIEL -->
+<div class="section" id="pluriel">
+  <h2 class="section-title">🔢 Le Pluriel</h2>
+  <p class="section-sub">Forme le pluriel des noms avec le bon article.</p>
+
+  <div class="theory">
+    <strong>Règles de pluriel :</strong>
+    <table>
+      <tr><th>Singulier</th><th>Pluriel</th><th>Exemple</th></tr>
+      <tr><td>-o (m)</td><td>-i</td><td>il libro → i libri</td></tr>
+      <tr><td>-a (f)</td><td>-e</td><td>la ragazza → le ragazze</td></tr>
+      <tr><td>-e (m/f)</td><td>-i</td><td>il nome → i nomi</td></tr>
+      <tr><td>-co / -go</td><td>-chi / -ghi</td><td>il parco → i parchi</td></tr>
+      <tr><td>-cia / -gia</td><td>-ce / -ge</td><td>la doccia → le docce</td></tr>
+      <tr><td>-io</td><td>-i</td><td>il figlio → i figli</td></tr>
+      <tr><td>Accentués / étrangers</td><td>= identique</td><td>la città → le città</td></tr>
+    </table>
+  </div>
+
+  <div class="ex-card" id="ex-plur1">
+    <h3>📚 Exercice 1 — Singulier → Pluriel</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Écris le pluriel avec article. Ex : <em>il libro → i libri</em></p>
+    <div id="plur1-items"></div>
+    <button class="btn-check" onclick="checkFill('plur1', DATA.plur1)">✅ Vérifier</button>
+    <div class="score-panel" id="plur1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-plur2">
+    <h3>🌟 Exercice 2 — Noms invariables</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ces mots ne changent PAS au pluriel. Écris la forme avec l'article pluriel.</p>
+    <div id="plur2-items"></div>
+    <button class="btn-check" onclick="checkFill('plur2', DATA.plur2)">✅ Vérifier</button>
+    <div class="score-panel" id="plur2-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-plur3">
+    <h3>💬 Exercice 3 — Pluriels spéciaux (QCM)</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Choisis le bon pluriel.</p>
+    <div id="plur3-items"></div>
+    <button class="btn-check" onclick="checkMCQ('plur3', DATA.plur3)">✅ Vérifier</button>
+    <div class="score-panel" id="plur3-score"></div>
+  </div>
+</div>
+
+<!-- TERMINAISONS -->
+<div class="section" id="terminaisons">
+  <h2 class="section-title">✏️ Terminaisons</h2>
+  <p class="section-sub">Complète avec la bonne terminaison ou le bon article.</p>
+
+  <div class="theory">
+    <strong>Terminaisons des noms italiens :</strong><br><br>
+    • <strong>-o</strong> → masculin singulier : <em>il libro</em><br>
+    • <strong>-a</strong> → féminin singulier : <em>la strada</em><br>
+    • <strong>-e</strong> → masc. ou fém. sing. : <em>il nome, la notte</em><br>
+    • <strong>-i</strong> → masculin pluriel : <em>i libri</em><br>
+    • <strong>-e</strong> → féminin pluriel : <em>le strade</em><br>
+    • Exceptions : <em>la mano</em> (f), <em>il problema</em> (m), <em>il programma</em> (m)
+  </div>
+
+  <div class="ex-card" id="ex-term1">
+    <h3>✏️ Exercice 1 — Complète la terminaison</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ajoute -a, -e, -i ou -o pour compléter le mot.</p>
+    <div id="term1-items"></div>
+    <button class="btn-check" onclick="checkFill('term1', DATA.term1)">✅ Vérifier</button>
+    <div class="score-panel" id="term1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-term2">
+    <h3>🔤 Exercice 2 — Quel article ? (depuis l'adjectif)</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Déduis l'article déterminatif correct depuis l'adjectif ou le contexte.</p>
+    <div id="term2-items"></div>
+    <button class="btn-check" onclick="checkFill('term2', DATA.term2)">✅ Vérifier</button>
+    <div class="score-panel" id="term2-score"></div>
+  </div>
+</div>
+
+<!-- HEURE -->
+<div class="section" id="heure">
+  <h2 class="section-title">🕐 Che ore sono ?</h2>
+  <p class="section-sub">Apprends à dire l'heure en italien.</p>
+
+  <div class="theory">
+    <strong>Comment dire l'heure :</strong><br><br>
+    • <strong>È l'una</strong> → Il est 1h (singulier !)<br>
+    • <strong>Sono le due / tre…</strong> → Il est 2h / 3h…<br>
+    • <strong>È mezzogiorno</strong> → Il est midi<br>
+    • <strong>È mezzanotte</strong> → Il est minuit<br>
+    • <strong>…e un quarto</strong> → …et quart (+15 min)<br>
+    • <strong>…e mezza</strong> → …et demie (+30 min)<br>
+    • <strong>…meno un quarto</strong> → …moins le quart (-15 min)<br>
+    • <strong>…e dieci / venti / cinque</strong> → +10 / +20 / +5 min<br>
+    • <strong>…meno dieci / venti</strong> → -10 / -20 min
+  </div>
+
+  <div class="ex-card" id="ex-heure1">
+    <h3>⌚ Exercice 1 — Écris l'heure en italien</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Écris la réponse complète. Accepte aussi la forme avec <em>meno</em>.</p>
+    <div id="heure1-items"></div>
+    <button class="btn-check" onclick="checkFill('heure1', DATA.heure1)">✅ Vérifier</button>
+    <div class="score-panel" id="heure1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-heure2">
+    <h3>🎯 Exercice 2 — QCM : Quelle heure ?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Choisis la bonne façon de dire l'heure.</p>
+    <div id="heure2-items"></div>
+    <button class="btn-check" onclick="checkMCQ('heure2', DATA.heure2)">✅ Vérifier</button>
+    <div class="score-panel" id="heure2-score"></div>
+  </div>
+</div>
+
+<!-- C'È / CI SONO -->
+<div class="section" id="cece">
+  <h2 class="section-title">📍 C'è / Ci sono</h2>
+  <p class="section-sub">Exprimer l'existence et la présence en italien.</p>
+
+  <div class="ce-box">
+    <div class="ce-row"><span class="ce-tag">C'È</span><span class="ce-example">= Il y a (singulier) → <strong>C'è un ristorante.</strong></span></div>
+    <div class="ce-row"><span class="ce-tag">CI SONO</span><span class="ce-example">= Il y a (pluriel) → <strong>Ci sono due ristoranti.</strong></span></div>
+    <div class="ce-row"><span class="ce-tag non">NON C'È</span><span class="ce-example">= Il n'y a pas (sing.) → <strong>Non c'è il bagno.</strong></span></div>
+    <div class="ce-row"><span class="ce-tag non">NON CI SONO</span><span class="ce-example">= Il n'y a pas (plur.) → <strong>Non ci sono studenti.</strong></span></div>
+  </div>
+
+  <div class="theory" style="margin-bottom:16px">
+    <strong>Autres exemples :</strong><br>
+    • In questa città <strong>c'è</strong> un museo bellissimo.<br>
+    • A Bologna <strong>ci sono</strong> molti studenti.<br>
+    • <strong>Non c'è</strong> l'autobus di notte.<br>
+    • <strong>Non ci sono</strong> ristoranti qui.<br>
+    • Nel frigorifero <strong>non c'è</strong> niente.<br>
+    • In classe <strong>ci sono</strong> venti studenti.
+  </div>
+
+  <div class="ex-card" id="ex-ce1">
+    <h3>📍 Exercice 1 — C'è ou Ci sono ?</h3>
+    <div id="ce1-items"></div>
+    <button class="btn-check" onclick="checkMCQ('ce1', DATA.ce1)">✅ Vérifier</button>
+    <div class="score-panel" id="ce1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-ce2">
+    <h3>❌ Exercice 2 — Forme négative</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Choisis la bonne forme négative.</p>
+    <div id="ce2-items"></div>
+    <button class="btn-check" onclick="checkMCQ('ce2', DATA.ce2)">✅ Vérifier</button>
+    <div class="score-panel" id="ce2-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-ce3">
+    <h3>🏙️ Exercice 3 — c'è / ci sono / non c'è / non ci sono</h3>
+    <div id="ce3-items"></div>
+    <button class="btn-check" onclick="checkMCQ('ce3', DATA.ce3)">✅ Vérifier</button>
+    <div class="score-panel" id="ce3-score"></div>
+  </div>
+</div>
+
+<!-- CORPS -->
+<div class="section" id="corps">
+  <h2 class="section-title">💪 Le Corps Humain</h2>
+  <p class="section-sub">Le parti del corpo — Vocabulaire des parties du corps.</p>
+
+  <div class="ex-card">
+    <h3>📖 Vocabulaire — Le corps</h3>
+    <div class="vocab-grid">
+      <div class="vocab-pill"><span class="it">la testa</span><span class="fr">la tête</span></div>
+      <div class="vocab-pill"><span class="it">il collo</span><span class="fr">le cou</span></div>
+      <div class="vocab-pill"><span class="it">la spalla</span><span class="fr">l'épaule</span></div>
+      <div class="vocab-pill"><span class="it">il braccio</span><span class="fr">le bras</span></div>
+      <div class="vocab-pill"><span class="it">il gomito</span><span class="fr">le coude</span></div>
+      <div class="vocab-pill"><span class="it">la mano</span><span class="fr">la main</span></div>
+      <div class="vocab-pill"><span class="it">la schiena</span><span class="fr">le dos</span></div>
+      <div class="vocab-pill"><span class="it">il petto</span><span class="fr">la poitrine</span></div>
+      <div class="vocab-pill"><span class="it">la pancia</span><span class="fr">le ventre</span></div>
+      <div class="vocab-pill"><span class="it">il sedere</span><span class="fr">les fesses</span></div>
+      <div class="vocab-pill"><span class="it">la gamba</span><span class="fr">la jambe</span></div>
+      <div class="vocab-pill"><span class="it">il ginocchio</span><span class="fr">le genou</span></div>
+      <div class="vocab-pill"><span class="it">il piede</span><span class="fr">le pied</span></div>
+      <div class="vocab-pill"><span class="it">la caviglia</span><span class="fr">la cheville</span></div>
+      <div class="vocab-pill"><span class="it">i capelli</span><span class="fr">les cheveux</span></div>
+      <div class="vocab-pill"><span class="it">la fronte</span><span class="fr">le front</span></div>
+      <div class="vocab-pill"><span class="it">l'orecchio</span><span class="fr">l'oreille</span></div>
+      <div class="vocab-pill"><span class="it">l'occhio</span><span class="fr">l'œil</span></div>
+      <div class="vocab-pill"><span class="it">il naso</span><span class="fr">le nez</span></div>
+      <div class="vocab-pill"><span class="it">la guancia</span><span class="fr">la joue</span></div>
+      <div class="vocab-pill"><span class="it">la bocca</span><span class="fr">la bouche</span></div>
+      <div class="vocab-pill"><span class="it">i denti</span><span class="fr">les dents</span></div>
+      <div class="vocab-pill"><span class="it">il mento</span><span class="fr">le menton</span></div>
+      <div class="vocab-pill"><span class="it">il polpaccio</span><span class="fr">le mollet</span></div>
+    </div>
+  </div>
+
+  <div class="ex-card" id="ex-corps1">
+    <h3>🔤 Exercice 1 — Traduis en italien (avec article)</h3>
+    <div id="corps1-items"></div>
+    <button class="btn-check" onclick="checkFill('corps1', DATA.corps1)">✅ Vérifier</button>
+    <div class="score-panel" id="corps1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-corps2">
+    <h3>🎯 Exercice 2 — QCM Corps humain</h3>
+    <div id="corps2-items"></div>
+    <button class="btn-check" onclick="checkMCQ('corps2', DATA.corps2)">✅ Vérifier</button>
+    <div class="score-panel" id="corps2-score"></div>
+  </div>
+</div>
+
+<!-- VRAI/FAUX -->
+<div class="section" id="vraifaux">
+  <h2 class="section-title">✅ Vero o Falso ?</h2>
+  <p class="section-sub">Ces phrases sont-elles grammaticalement correctes ?</p>
+
+  <div class="ex-card" id="ex-tf1">
+    <h3>🔍 Exercice 1 — Phrases à corriger</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Indique si chaque phrase est correcte (Vero) ou non (Falso).</p>
+    <div id="tf1-items"></div>
+    <button class="btn-check" onclick="checkTF('tf1', DATA.tf1)">✅ Vérifier</button>
+    <div class="score-panel" id="tf1-score"></div>
+  </div>
+
+  <div class="ex-card" id="ex-tf2">
+    <h3>📖 Exercice 2 — Compréhension écrite</h3>
+    <div class="sent-box">"Ciao! Mi chiamo Mario Bianchi, ho 30 anni e sono di Torino. Lavoro in una scuola e abito a Milano, in via Roma 15."</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Ces affirmations sur Mario sont-elles vraies ou fausses ?</p>
+    <div id="tf2-items"></div>
+    <button class="btn-check" onclick="checkTF('tf2', DATA.tf2)">✅ Vérifier</button>
+    <div class="score-panel" id="tf2-score"></div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  artdet: [
+    {label:'___ esercizio', ans:"l'", hint:"esercizio → masc. voyelle → l'"},
+    {label:'___ fratello', ans:'il', hint:'fratello → masc. consonne → il'},
+    {label:'___ madre', ans:'la', hint:'madre → fém. consonne → la'},
+    {label:'___ bambina', ans:'la', hint:'bambina → fém. consonne → la'},
+    {label:'___ fiore', ans:'il', hint:'fiore → masc. consonne → il'},
+    {label:'___ dentista', ans:'il', hint:'dentista → masc. consonne → il'},
+    {label:'___ professore', ans:'il', hint:'professore → masc. consonne → il'},
+    {label:'___ giornale', ans:'il', hint:'giornale → masc. consonne → il'},
+    {label:'___ cinema', ans:'il', hint:'cinema → masc. consonne → il'},
+    {label:'___ libertà', ans:'la', hint:'libertà → fém. consonne → la'},
+    {label:'___ televisione', ans:'la', hint:'televisione → fém. consonne → la'},
+    {label:'___ attore', ans:"l'", hint:"attore → masc. voyelle → l'"},
+    {label:'___ situazione', ans:'la', hint:'situazione → fém. consonne → la'},
+    {label:'___ rivoluzione', ans:'la', hint:'rivoluzione → fém. consonne → la'},
+    {label:'___ radio', ans:'la', hint:'radio → fém. consonne → la'},
+    {label:'___ mano', ans:'la', hint:'mano → fém. EXCEPTION → la'},
+    {label:'___ foto', ans:'la', hint:'foto → fém. invariable → la'},
+    {label:'___ problema', ans:'il', hint:'problema → masc. EXCEPTION → il'},
+    {label:'___ sport', ans:'lo', hint:'sport = sp → lo'},
+    {label:'___ psicologo', ans:'lo', hint:'psicologo = ps → lo'},
+    {label:'___ zaino', ans:'lo', hint:'zaino = z → lo'},
+    {label:'___ spazio', ans:'lo', hint:'spazio = sp → lo'},
+  ],
+
+  artindet: [
+    {label:'___ esercizio', ans:'un', hint:"masc. voyelle → un (pas uno)"},
+    {label:'___ strada', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ madre', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ fiore', ans:'un', hint:'masc. consonne → un'},
+    {label:'___ cinema', ans:'un', hint:'masc. consonne → un'},
+    {label:'___ televisione', ans:'una', hint:'fém. consonne → una'},
+    {label:"___ università", ans:"un'", hint:"fém. voyelle → un'"},
+    {label:'___ psicoterapeuta', ans:'uno', hint:'masc. ps → uno'},
+    {label:'___ spazio', ans:'uno', hint:'masc. sp → uno'},
+    {label:'___ pneumatico', ans:'uno', hint:'masc. pn → uno'},
+    {label:'___ porta', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ armadio', ans:'un', hint:"masc. voyelle → un (pas uno)"},
+    {label:'___ spugna', ans:'una', hint:'fém. consonne → una (sp ne change rien au fém.)'},
+    {label:'___ attore', ans:'un', hint:'masc. voyelle → un'},
+    {label:'___ studentessa', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ cantina', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ gatto', ans:'un', hint:'masc. consonne → un'},
+    {label:'___ uccello', ans:'un', hint:"masc. voyelle → un"},
+    {label:'___ lezione', ans:'una', hint:'fém. consonne → una'},
+    {label:'___ caffè', ans:'un', hint:'masc. consonne → un'},
+    {label:'___ ristorante', ans:'un', hint:'masc. consonne → un'},
+    {label:"___ amica", ans:"un'", hint:"fém. voyelle → un'"},
+  ],
+
+  artchoix: [
+    {q:'Ho scoperto ___ verità, finalmente.', opts:['una','la'], ans:'la', explain:'Défini : la vérité en général'},
+    {q:"Amo ___ onestà.", opts:["l'",'una'], ans:"l'", explain:"Défini + voyelle → l'onestà"},
+    {q:'Natale è ___ festa importante in Italia.', opts:['una','la'], ans:'la', explain:'Défini : la fête de Noël (connue)'},
+    {q:'Conosci ___ mio collega Davide?', opts:['un','il'], ans:'il', explain:'Défini : identifié par "mio"'},
+    {q:'Ho incontrato ___ vecchio amico stamattina.', opts:['un','il'], ans:'un', explain:'Indéfini : un ami (introduit)'},
+    {q:'___ vera ragione per cui sono qui è che dovevo parlarti.', opts:['Una','La'], ans:'La', explain:'Défini : la vraie raison (unique)'},
+    {q:'Hai messo ___ profumo molto buono oggi.', opts:['un','il'], ans:'un', explain:'Indéfini : introduit pour la 1ère fois'},
+    {q:'Questo è ___ disco che preferisco.', opts:['un','il'], ans:'il', explain:'Défini : ce disque précis (spécifique)'},
+    {q:'Capisco perché ti piaccia ___ pizza.', opts:['una','la'], ans:'la', explain:'Défini : la pizza (catégorie générale)'},
+    {q:'A Bologna c\'è ___ università importante.', opts:["un'",'la'], ans:"un'", explain:"Indéfini : une université (introduite)"},
+  ],
+
+  plur1: [
+    {label:'il libro', ans:'i libri', hint:'o→i'},
+    {label:'la ragazza', ans:'le ragazze', hint:'a→e'},
+    {label:'il problema', ans:'i problemi', hint:'masc. -a → -i'},
+    {label:"l'amico", ans:'gli amici', hint:'co→ci + gli'},
+    {label:'la penna', ans:'le penne', hint:'a→e'},
+    {label:'la pizza', ans:'le pizze', hint:'a→e'},
+    {label:"l'insegnante (m)", ans:'gli insegnanti', hint:'e→i'},
+    {label:"l'insegnante (f)", ans:'le insegnanti', hint:'e→i'},
+    {label:'lo studente', ans:'gli studenti', hint:'e→i'},
+    {label:'la stazione', ans:'le stazioni', hint:'e→i'},
+    {label:'il corso', ans:'i corsi', hint:'o→i'},
+    {label:"l'animale", ans:'gli animali', hint:'e→i'},
+    {label:'la sedia', ans:'le sedie', hint:'ia → ie (garde le e)'},
+    {label:'il quaderno', ans:'i quaderni', hint:'o→i'},
+    {label:'la bottiglia', ans:'le bottiglie', hint:'glia → glie'},
+    {label:'il figlio', ans:'i figli', hint:'io → i (double i → i)'},
+    {label:'il bacio', ans:'i baci', hint:'io → i'},
+    {label:"l'addio", ans:'gli addii', hint:'io → ii (voyelle + io)'},
+    {label:'la doccia', ans:'le docce', hint:'cia → ce'},
+    {label:'la provincia', ans:'le province', hint:'cia → ce'},
+  ],
+
+  plur2: [
+    {label:'la città', ans:'le città', hint:'Invariable : accent'},
+    {label:'lo sport', ans:'gli sport', hint:'Invariable : mot étranger'},
+    {label:"l'autobus", ans:'gli autobus', hint:'Invariable : finit par consonne'},
+    {label:"l'università", ans:'le università', hint:'Invariable : accent'},
+    {label:'il computer', ans:'i computer', hint:'Invariable : mot étranger'},
+    {label:'il re', ans:'i re', hint:'Invariable : 1 syllabe accentuée'},
+    {label:'la virtù', ans:'le virtù', hint:'Invariable : accent'},
+    {label:'il bar', ans:'i bar', hint:'Invariable : finit par consonne'},
+  ],
+
+  plur3: [
+    {q:'Qual è il plurale di "l\'amico"?', opts:['gli amici','i amici','gli amicis','le amiche'], ans:'gli amici', explain:"amico → amici (c+o → c+i) + gli devant voyelle"},
+    {q:'Qual è il plurale di "il parco"?', opts:['i parchi','i parci','gli parchi','i parcos'], ans:'i parchi', explain:'co → chi (son dur maintenu)'},
+    {q:'Qual è il plurale di "il dialogo"?', opts:['i dialogi','i dialoghi','gli dialoghi','i dialogoi'], ans:'i dialoghi', explain:'go → ghi (son dur maintenu)'},
+    {q:'Qual è il plurale di "la camicia"?', opts:['le camicias','le camice','le camicie','le camicis'], ans:'le camice', explain:'cia → ce (i disparaît car c+ia avec accent sur ca-)'},
+    {q:'Qual è il plurale di "la valigia"?', opts:['le valigie','le valige','le valigias','le valigia'], ans:'le valigie', explain:'gia → gie (accent sur vali- donc i reste)'},
+    {q:'Qual è il plurale di "lo zio"?', opts:['gli zios','gli zii','gli zi','i zii'], ans:'gli zii', explain:'io → ii (voyelle avant le i → garde les deux i)'},
+  ],
+
+  term1: [
+    {label:"L'esercizi___", ans:'o', hint:'esercizio (m. sing.)'},
+    {label:'Il fratell___', ans:'o', hint:'fratello (m. sing.)'},
+    {label:'La madr___', ans:'e', hint:'madre (f. sing.)'},
+    {label:'Il professor___', ans:'e', hint:'professore (m. sing.)'},
+    {label:'Il programm___', ans:'a', hint:'programma (m. sing., exception)'},
+    {label:'Il cinem___', ans:'a', hint:'cinema (m. sing., invariable)'},
+    {label:'La situazion___', ans:'e', hint:'situazione (f. sing.)'},
+    {label:'La rivoluzion___', ans:'e', hint:'rivoluzione (f. sing.)'},
+    {label:'I poet___', ans:'i', hint:'poeta → poeti (m. plur.)'},
+    {label:'Le strad___', ans:'e', hint:'strada → strade (f. plur.)'},
+    {label:'I fior___', ans:'i', hint:'fiore → fiori (m. plur.)'},
+    {label:'Le bambin___', ans:'e', hint:'bambina → bambine (f. plur.)'},
+    {label:'I giornali → sing. : il giornali___', ans:'', hint:'Singulier : il giornale (e)'},
+    {label:'La liberta___', ans:'', hint:'libertà → invariable, accent'},
+  ],
+
+  term2: [
+    {label:'___ città belle', ans:'le', hint:'città = fém. plur. invariable → le'},
+    {label:'___ caffè macchiati', ans:'i', hint:'caffè = masc. plur. invariable → i'},
+    {label:'___ problema complesso', ans:'il', hint:'problema = masc. sing. → il'},
+    {label:'___ specie umana', ans:'la', hint:'specie = fém. sing. → la'},
+    {label:'___ radio rotte', ans:'le', hint:'radio = fém. plur. → le'},
+    {label:'___ video lunghi', ans:'i', hint:'video = masc. plur. → i'},
+    {label:'___ e-mail diverse', ans:'le', hint:'e-mail = fém. plur. → le'},
+    {label:'___ amici curiosi', ans:'gli', hint:'amici = masc. plur. voyelle → gli'},
+    {label:'___ crisi climatica', ans:'la', hint:'crisi = fém. sing. → la'},
+    {label:'___ serie infinita', ans:'la', hint:'serie = fém. sing. → la'},
+  ],
+
+  heure1: [
+    {label:'15:30', ans:'Sono le quindici e trenta', alt:'Sono le tre e mezza', hint:'15h30 → quindici e trenta / tre e mezza'},
+    {label:'11:15', ans:'Sono le undici e un quarto', hint:'11h15 → undici e un quarto'},
+    {label:'18:45', ans:'Sono le diciotto e quarantacinque', alt:'Sono le sette meno un quarto', hint:'18h45 → diciotto e quarantacinque / sette meno un quarto'},
+    {label:'22:50', ans:'Sono le ventidue e cinquanta', alt:'Sono le undici meno dieci', hint:'22h50 → ventidue e cinquanta / undici meno dieci'},
+    {label:'1:55', ans:"È l'una e cinquantacinque", alt:'Sono le due meno cinque', hint:"1h55 → una e cinquantacinque / due meno cinque"},
+    {label:'8:40', ans:'Sono le otto e quaranta', alt:'Sono le nove meno venti', hint:'8h40 → otto e quaranta / nove meno venti'},
+    {label:'12:00', ans:'È mezzogiorno', hint:'Midi → mezzogiorno'},
+    {label:'0:00 (mezzanotte)', ans:'È mezzanotte', hint:'Minuit → mezzanotte'},
+    {label:'13:00', ans:"È l'una di pomeriggio", alt:'Sono le tredici', hint:"13h → una di pomeriggio / tredici"},
+    {label:'7:30', ans:'Sono le sette e mezza', hint:'7h30 → sette e mezza'},
+  ],
+
+  heure2: [
+    {q:'L\'horloge affiche 3h10', opts:['Sono le tre e dieci','Sono le tre meno dieci','Sono le dieci'], ans:'Sono le tre e dieci', explain:'3h10 → tre e dieci'},
+    {q:"L'horloge affiche 12h15", opts:['È mezzogiorno','È mezzogiorno meno un quarto','È mezzogiorno e un quarto'], ans:'È mezzogiorno e un quarto', explain:'12h15 → mezzogiorno e un quarto'},
+    {q:"L'horloge affiche 7h10", opts:['Sono le sette e due','Sono le sette e dieci','Sono le due'], ans:'Sono le sette e dieci', explain:'7h10 → sette e dieci'},
+    {q:"L'horloge affiche 5h30", opts:['Sono le sei','Sono le cinque e mezza','Sono le cinque meno venti'], ans:'Sono le cinque e mezza', explain:'5h30 → cinque e mezza'},
+    {q:"L'horloge affiche 9h45", opts:['Sono le nove e quarantacinque','Sono le dieci meno un quarto','Sono le dieci e un quarto'], ans:'Sono le dieci meno un quarto', explain:'9h45 → dieci meno un quarto'},
+    {q:"L'horloge affiche 1h00", opts:["È l'una","Sono le una","È uno"], ans:"È l'una", explain:"1h → È l'una (singulier !)"},
+    {q:"L'horloge affiche 4h20", opts:['Sono le quattro e venti','Sono le cinque meno venti','Sono le quattro e due'], ans:'Sono le quattro e venti', explain:'4h20 → quattro e venti'},
+    {q:"L'horloge affiche 8h50", opts:['Sono le otto e cinquanta','Sono le nove meno dieci','Sono le otto meno dieci'], ans:'Sono le nove meno dieci', explain:'8h50 = 9h - 10 min → nove meno dieci'},
+  ],
+
+  ce1: [
+    {q:'In questa stanza ___ un letto.',     opts:["c'è","ci sono"], ans:"c'è",    explain:'un letto = singulier'},
+    {q:'A Milano ___ molti ristoranti.',      opts:["c'è","ci sono"], ans:'ci sono', explain:'molti ristoranti = pluriel'},
+    {q:'Sul tavolo ___ una bottiglia.',        opts:["c'è","ci sono"], ans:"c'è",    explain:'una bottiglia = singulier'},
+    {q:'In classe ___ venti studenti.',        opts:["c'è","ci sono"], ans:'ci sono', explain:'venti studenti = pluriel'},
+    {q:"A Bologna ___ un'università importante.", opts:["c'è","ci sono"], ans:"c'è", explain:"un'università = singulier"},
+    {q:'Nel frigorifero ___ delle mele.',      opts:["c'è","ci sono"], ans:'ci sono', explain:'delle mele = pluriel'},
+    {q:'In città ___ un museo bellissimo.',     opts:["c'è","ci sono"], ans:"c'è",    explain:'un museo = singulier'},
+    {q:'In questa via ___ tre bar.',            opts:["c'è","ci sono"], ans:'ci sono', explain:'tre bar = pluriel'},
+    {q:'Nel parco ___ molti alberi.',           opts:["c'è","ci sono"], ans:'ci sono', explain:'molti alberi = pluriel'},
+    {q:'In Italia ___ il Colosseo.',            opts:["c'è","ci sono"], ans:"c'è",    explain:'il Colosseo = singulier'},
+  ],
+
+  ce2: [
+    {q:"C'è un supermercato qui vicino.", opts:["Non c'è un supermercato qui vicino.","Non ci sono un supermercato qui vicino."], ans:"Non c'è un supermercato qui vicino.", explain:"Singulier → non c'è"},
+    {q:"Ci sono studenti in classe.", opts:["Non ci sono studenti in classe.","Non c'è studenti in classe."], ans:"Non ci sono studenti in classe.", explain:"Pluriel → non ci sono"},
+    {q:"C'è un autobus alle 8.", opts:["Non c'è un autobus alle 8.","Non ci sono un autobus alle 8."], ans:"Non c'è un autobus alle 8.", explain:"Singulier → non c'è"},
+    {q:"Ci sono molti turisti oggi.", opts:["Non ci sono molti turisti oggi.","Non c'è molti turisti oggi."], ans:"Non ci sono molti turisti oggi.", explain:"Pluriel → non ci sono"},
+    {q:"C'è il pane in cucina.", opts:["Non c'è il pane in cucina.","Non ci sono il pane in cucina."], ans:"Non c'è il pane in cucina.", explain:"Singulier → non c'è"},
+    {q:"Ci sono fiori nel giardino.", opts:["Non ci sono fiori nel giardino.","Non c'è fiori nel giardino."], ans:"Non ci sono fiori nel giardino.", explain:"Pluriel → non ci sono"},
+  ],
+
+  ce3: [
+    {q:'___ un cinema in questa città?',       opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:"C'è",        explain:'cinema = singulier'},
+    {q:'___ molte persone al mercato oggi.',   opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:'Ci sono',    explain:'molte persone = pluriel'},
+    {q:'___ latte nel frigorifero. Devo comprarlo.', opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:"Non c'è", explain:'latte = singulier, sens négatif'},
+    {q:'___ fiori nel giardino in primavera.', opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:'Ci sono',    explain:'fiori = pluriel'},
+    {q:'___ nessun problema!',                 opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:"Non c'è",    explain:'problema = singulier, négatif'},
+    {q:'___ tre finestre in questa stanza.',   opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:'Ci sono',    explain:'tre finestre = pluriel'},
+    {q:'___ una farmacia vicino alla scuola.', opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:"C'è",        explain:'una farmacia = singulier'},
+    {q:'___ autobus di notte in questo quartiere.', opts:["C'è","Ci sono","Non c'è","Non ci sono"], ans:"Non ci sono", explain:'autobus (pluriel) → non ci sono'},
+    {q:'In questa scuola ___ trenta studenti.', opts:["c'è","ci sono","non c'è","non ci sono"], ans:"ci sono",   explain:'trenta studenti = pluriel'},
+    {q:'Scusa, ___ un bagno qui vicino?',      opts:["c'è","ci sono","non c'è","non ci sono"], ans:"c'è",        explain:'un bagno = singulier'},
+  ],
+
+  corps1: [
+    {label:'le bras', ans:'il braccio'},
+    {label:'la main', ans:'la mano'},
+    {label:'la jambe', ans:'la gamba'},
+    {label:'le pied', ans:'il piede'},
+    {label:"l'épaule", ans:'la spalla'},
+    {label:'le genou', ans:'il ginocchio'},
+    {label:'le nez', ans:'il naso'},
+    {label:"l'œil", ans:"l'occhio", alt:'lo occhio'},
+    {label:'la bouche', ans:'la bocca'},
+    {label:'le dos', ans:'la schiena'},
+    {label:'la cheville', ans:'la caviglia'},
+    {label:"l'oreille", ans:"l'orecchio"},
+    {label:'le menton', ans:'il mento'},
+    {label:'la joue', ans:'la guancia'},
+    {label:'les dents', ans:'i denti'},
+    {label:'les cheveux', ans:'i capelli'},
+    {label:'le front', ans:'la fronte'},
+    {label:'le cou', ans:'il collo'},
+  ],
+
+  corps2: [
+    {q:'Comment dit-on "la joue" en italien ?', opts:['la guancia','la bocca','il naso','la fronte'], ans:'la guancia'},
+    {q:'Comment dit-on "le coude" en italien ?', opts:['il gomito','il braccio','il ginocchio','la spalla'], ans:'il gomito'},
+    {q:'Comment dit-on "les dents" en italien ?', opts:['le labbra','i denti','le guance','gli occhi'], ans:'i denti'},
+    {q:'Comment dit-on "la poitrine" en italien ?', opts:['la pancia','la schiena','il petto','il collo'], ans:'il petto'},
+    {q:'Quel est le pluriel de "il braccio" ?', opts:['i bracci','le braccia','i braccie','gli bracci'], ans:'le braccia', explain:"Exception : le braccia (pluriel irrégulier)"},
+    {q:'"I capelli" signifie :', opts:['les oreilles','les cheveux','les yeux','les sourcils'], ans:'les cheveux'},
+    {q:'Comment dit-on "le menton" en italien ?', opts:['il mento','il collo','la fronte','la guancia'], ans:'il mento'},
+    {q:'Quelle partie du corps est "il polpaccio" ?', opts:['le mollet','la cheville','le talon','le genou'], ans:'le mollet'},
+    {q:'Comment dit-on "le dos" en italien ?', opts:['il petto','il sedere','la schiena','la spalla'], ans:'la schiena'},
+    {q:'"Le dita" est le pluriel de :', opts:['il dito','la dita','lo dito','il ditare'], ans:'il dito', explain:"il dito → le dita (pluriel irrégulier féminin !)"},
+  ],
+
+  tf1: [
+    {sent:"La storia infinita è morto recentemente.", ans:false, correction:"La storia infinita è morta recentemente.", explain:"'storia' est féminin → morta"},
+    {sent:"La Lombardia è una regione molto grande.", ans:true, explain:"Correct !"},
+    {sent:"La gatta di mia nonna ha tre gattini.", ans:true, explain:"Correct !"},
+    {sent:"L'italiano è una lingua difficile.", ans:true, explain:"Correct !"},
+    {sent:"La fiore che preferisco è la rosa.", ans:false, correction:"Il fiore che preferisco è la rosa.", explain:"'fiore' est masculin → il fiore"},
+    {sent:"Il mano destra mi fa male.", ans:false, correction:"La mano destra mi fa male.", explain:"'mano' est féminin (exception) → la mano"},
+    {sent:"Devo comprare una sapone per lavare i vestiti.", ans:false, correction:"Devo comprare un sapone per lavare i vestiti.", explain:"'sapone' est masculin → un sapone"},
+    {sent:"In tv c'è una serie di film molto interessanti.", ans:true, explain:"Correct !"},
+    {sent:"L'Italia si trova in una situazione difficile.", ans:true, explain:"Correct !"},
+    {sent:"L'anno prossimo vado in vacanza in Spagna.", ans:true, explain:"Correct !"},
+    {sent:"Gli studenti sono intelligenti.", ans:true, explain:"Correct ! gli devant voyelle au pluriel"},
+    {sent:"Ho comprato un' libro interessante.", ans:false, correction:"Ho comprato un libro interessante.", explain:"libro est masculin → un libro (pas un')"},
+  ],
+
+  tf2: [
+    {sent:"Mario abita a Torino.", ans:false, correction:"Mario abita a Milano.", explain:"Il habite à Milan, il est DE Turin."},
+    {sent:"Mario ha 30 anni.", ans:true, explain:"Correct !"},
+    {sent:"Mario lavora in una scuola.", ans:true, explain:"Correct !"},
+    {sent:"Mario abita in via Roma 15.", ans:true, explain:"Correct !"},
+    {sent:"Mario è di Milano.", ans:false, correction:"Mario è di Torino.", explain:"Il est originaire de Turin, pas Milan."},
+  ],
+};
+
+// ─── HELPERS ───────────────────────────────────────────
+function norm(s) {
+  return (s||'').toLowerCase().trim()
+    .replace(/è|é|ê/g,'e').replace(/à|â/g,'a')
+    .replace(/ù|û/g,'u').replace(/î|ï/g,'i')
+    .replace(/ô/g,'o').replace(/\s+/g,' ');
+}
+
+// ─── RENDER FILL ───────────────────────────────────────
+function buildFill(id, items) {
+  const c = document.getElementById(id+'-items');
+  if (!c) return;
+  c.innerHTML = '';
+  items.forEach((item,i) => {
+    const d = document.createElement('div');
+    d.className = 'item';
+    d.innerHTML = `
+      <div class="item-num">${i+1}</div>
+      <div class="item-label">${item.label}</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <input class="fill-input" id="${id}-i${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="...">
+        <div class="feedback" id="${id}-f${i}"></div>
+      </div>`;
+    c.appendChild(d);
+  });
+}
+
+// ─── RENDER MCQ ────────────────────────────────────────
+function buildMCQ(id, items) {
+  const c = document.getElementById(id+'-items');
+  if (!c) return;
+  c.innerHTML = '';
+  items.forEach((item,i) => {
+    const txt = (item.q||item.sent||'').replace(/___/g,'<strong style="color:var(--accent)">___</strong>');
+    const d = document.createElement('div');
+    d.className = 'mcq-block';
+    d.innerHTML = `
+      <div class="mcq-q"><span class="mcq-num">${i+1}</span>${txt}</div>
+      <div class="mcq-options" id="${id}-o${i}">
+        ${item.opts.map(o=>`<button class="mcq-btn" data-v="${o.replace(/"/g,'&quot;')}" onclick="selMCQ('${id}',${i},this)">${o}</button>`).join('')}
+      </div>
+      <div class="feedback" id="${id}-f${i}"></div>`;
+    c.appendChild(d);
+  });
+}
+
+// ─── RENDER TF ─────────────────────────────────────────
+function buildTF(id, items) {
+  const c = document.getElementById(id+'-items');
+  if (!c) return;
+  c.innerHTML = '';
+  items.forEach((item,i) => {
+    const d = document.createElement('div');
+    d.style.marginBottom = '18px';
+    d.innerHTML = `
+      <div class="sent-box">"${item.sent}"</div>
+      <div class="tf-options">
+        <button class="tf-btn" onclick="selTF('${id}',${i},this,true)">✅ Vero</button>
+        <button class="tf-btn" onclick="selTF('${id}',${i},this,false)">❌ Falso</button>
+      </div>
+      <div class="feedback" id="${id}-f${i}"></div>`;
+    c.appendChild(d);
+  });
+}
+
+function selMCQ(id,i,btn) {
+  document.querySelectorAll(`#${id}-o${i} .mcq-btn`).forEach(b=>{ b.classList.remove('selected'); delete b.dataset.sel; });
+  btn.classList.add('selected'); btn.dataset.sel='1';
+}
+
+function selTF(id,i,btn,val) {
+  const btns = btn.parentElement.querySelectorAll('.tf-btn');
+  btns.forEach(b=>{ b.classList.remove('selected'); delete b.dataset.v; });
+  btn.classList.add('selected'); btn.dataset.v = String(val);
+}
+
+// ─── CHECK FILL ────────────────────────────────────────
+function checkFill(id, items) {
+  let ok=0, errors=[];
+  items.forEach((item,i) => {
+    const inp = document.getElementById(`${id}-i${i}`);
+    const fb  = document.getElementById(`${id}-f${i}`);
+    if (!inp) return;
+    const val = inp.value.trim();
+    const match = norm(val)===norm(item.ans) || (item.alt && norm(val)===norm(item.alt));
+    inp.disabled = true;
+    inp.className = 'fill-input ' + (match ? 'correct' : 'wrong');
+    fb.className  = 'feedback show ' + (match ? 'correct' : 'wrong');
+    if (!val) {
+      fb.textContent = '✗ Réponse : ' + item.ans;
+      errors.push({q:item.label, wrong:'(vide)', right:item.ans});
+    } else if (match) {
+      ok++; fb.textContent = '✓ Bravo !';
+    } else {
+      fb.textContent = '✗ Correct : ' + item.ans + (item.alt ? ' / '+item.alt : '');
+      errors.push({q:item.label, wrong:val, right:item.ans});
+    }
+  });
+  showScore(id, ok, items.length, errors);
+  disableBtn(id);
+}
+
+// ─── CHECK MCQ ─────────────────────────────────────────
+function checkMCQ(id, items) {
+  let ok=0, errors=[];
+  items.forEach((item,i) => {
+    const btns = document.querySelectorAll(`#${id}-o${i} .mcq-btn`);
+    const fb   = document.getElementById(`${id}-f${i}`);
+    let sel = null;
+    btns.forEach(b=>{ if(b.dataset.sel) sel=b.dataset.v; });
+    btns.forEach(b=>{
+      b.disabled=true;
+      if(b.dataset.v===item.ans) b.classList.add('correct');
+      else if(b.dataset.sel)     b.classList.add('wrong');
+    });
+    if(sel===item.ans) {
+      ok++; fb.className='feedback show correct'; fb.textContent='✓ '+(item.explain||'Bravo !');
+    } else {
+      fb.className='feedback show wrong';
+      fb.textContent='✗ Réponse : '+item.ans+(item.explain ? ' — '+item.explain : '');
+      errors.push({q:(item.q||item.sent||'').substring(0,50), wrong:sel||'(rien)', right:item.ans});
+    }
+  });
+  showScore(id, ok, items.length, errors);
+  disableBtn(id);
+}
+
+// ─── CHECK TF ──────────────────────────────────────────
+function checkTF(id, items) {
+  let ok=0, errors=[];
+  const blocks = document.querySelectorAll(`#${id}-items > div`);
+  items.forEach((item,i) => {
+    const block = blocks[i]; if(!block) return;
+    const fb = document.getElementById(`${id}-f${i}`);
+    const btns = block.querySelectorAll('.tf-btn');
+    let selVal = null;
+    btns.forEach(b=>{ if(b.classList.contains('selected')) selVal = b.dataset.v==='true'; });
+    btns.forEach(b=>{
+      b.disabled=true;
+      const bv = b.dataset.v==='true';
+      if(bv===item.ans) b.classList.add('correct');
+      else if(b.classList.contains('selected')) b.classList.add('wrong');
+    });
+    if(selVal===item.ans) {
+      ok++; fb.className='feedback show correct'; fb.textContent='✓ '+(item.explain||'Correct !');
+    } else {
+      fb.className='feedback show wrong';
+      const fix = item.correction ? ` — Correction : "${item.correction}"` : ' — '+item.explain;
+      fb.textContent='✗ '+(item.ans?'VERO':'FALSO')+'.'+(fix||'');
+      errors.push({q:item.sent.substring(0,50), wrong:selVal===null?'(rien)':selVal?'Vero':'Falso', right:item.ans?'Vero':'Falso'});
+    }
+  });
+  showScore(id, ok, items.length, errors);
+  disableBtn(id);
+}
+
+// ─── SCORE ─────────────────────────────────────────────
+function showScore(id, ok, total, errors) {
+  const panel = document.getElementById(`${id}-score`);
+  if (!panel) return;
+  const pct = Math.round(ok/total*100);
+  const cls = pct>=80?'good':pct>=50?'ok':'bad';
+  const msg = pct===100?'🎉 Parfait ! Excellent !' : pct>=80?'🌟 Très bien ! Continue !' : pct>=50?'👍 Pas mal ! Revois tes erreurs.' : '📚 Revois le cours et réessaie !';
+  let errHtml = '';
+  if(errors.length) {
+    errHtml = `<div class="errors-list"><h4>❌ Tes erreurs (${errors.length})</h4>
+      ${errors.map(e=>`<div class="error-item"><em style="color:#9ca3af;font-size:12px">${e.q}</em><br>
+        Ta réponse : <span class="wrong-ans">${e.wrong}</span> → Correct : <span class="right-ans">${e.right}</span></div>`).join('')}
+    </div>`;
+  }
+  panel.className = 'score-panel show';
+  panel.innerHTML = `
+    <div class="score-big ${cls}">${ok}/${total}</div>
+    <div class="score-label">${pct}% de réussite</div>
+    <div class="score-msg">${msg}</div>
+    ${errHtml}
+    <button class="btn-retry" onclick="retry('${id}')">🔄 Recommencer</button>`;
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function disableBtn(id) {
+  const b = document.querySelector(`#ex-${id} .btn-check`);
+  if(b) b.disabled = true;
+}
+
+function retry(id) {
+  const panel = document.getElementById(`${id}-score`);
+  if(panel) { panel.className='score-panel'; panel.innerHTML=''; }
+  const b = document.querySelector(`#ex-${id} .btn-check`);
+  if(b) b.disabled = false;
+  renderAll();
+}
+
+// ─── NAV ───────────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const sec = document.getElementById(id);
+  if(sec) sec.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    if((b.getAttribute('onclick')||'').includes("'"+id+"'")) b.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+// ─── INIT ──────────────────────────────────────────────
+function renderAll() {
+  buildFill('artdet',    DATA.artdet);
+  buildFill('artindet',  DATA.artindet);
+  buildMCQ('artchoix',   DATA.artchoix);
+  buildFill('plur1',     DATA.plur1);
+  buildFill('plur2',     DATA.plur2);
+  buildMCQ('plur3',      DATA.plur3);
+  buildFill('term1',     DATA.term1);
+  buildFill('term2',     DATA.term2);
+  buildFill('heure1',    DATA.heure1);
+  buildMCQ('heure2',     DATA.heure2);
+  buildMCQ('ce1',        DATA.ce1);
+  buildMCQ('ce2',        DATA.ce2);
+  buildMCQ('ce3',        DATA.ce3);
+  buildFill('corps1',    DATA.corps1);
+  buildMCQ('corps2',     DATA.corps2);
+  buildTF('tf1',         DATA.tf1);
+  buildTF('tf2',         DATA.tf2);
+}
+document.addEventListener('DOMContentLoaded', renderAll);
+</script>
+</body>
+</html>
