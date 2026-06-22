@@ -118,6 +118,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <button class="tb" onclick="G('regioni')">🗺️ Régions</button>
 <button class="tb" onclick="G('corps')">💪 Corps</button>
 <button class="tb" onclick="G('vraifaux')">✅ V/F</button>
+<button class="tb" onclick="G('vocab')">🔤 Vocab</button>
+<button class="tb" onclick="G('multi')">🎮 Multi</button>
 </div></div>
 
 <!-- HOME -->
@@ -140,6 +142,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div class="hcard" onclick="G('corps')"><div class="em">💪</div><h3>Corps ⏱</h3><p>Le parti…</p></div>
 <div class="hcard" onclick="G('vraifaux')"><div class="em">✅</div><h3>Vrai/Faux</h3><p>Vero o Falso?</p></div>
 <div class="hcard" onclick="G('essere')"><div class="em">🎯</div><h3>Commencer!</h3><p>→ Essere</p></div>
+<div class="hcard" onclick="G('vocab')"><div class="em">🔤</div><h3>Vocabulaire</h3><p>IT↔FR sens</p></div>
+<div class="hcard" onclick="G('multi')"><div class="em">🎮</div><h3>Multijoueur 🏆</h3><p>Jusqu'à 4 joueurs</p></div>
 </div></div>
 
 <!-- ESSERE -->
@@ -698,6 +702,154 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div class="card" id="ex-tf2"><h3>📖 Ex.2 — Compréhension (Mario Bianchi)</h3>
 <div class="sbox">"Ciao! Mi chiamo Mario Bianchi, ho 30 anni e sono di Torino. Lavoro in una scuola e abito a Milano, in via Roma 15."</div>
 <div id="tf2-items"></div><button class="btn-go" onclick="chkT('tf2',D.tf2)">✅ Vérifier</button><div class="score" id="tf2-score"></div></div></div>
+
+
+<!-- ══ VOCAB SECTION ══ -->
+<div class="sec" id="vocab">
+<h2 class="sec-t">🔤 Vocabulaire IT↔FR</h2>
+<p class="sec-s">Traduis les mots dans les deux sens · ⏱ Le chrono démarre quand tu commences</p>
+<div class="ltabs">
+  <button class="ltab active" onclick="showVL('it2fr')">🇮🇹 → 🇫🇷 Italien vers Français</button>
+  <button class="ltab" onclick="showVL('fr2it')">🇫🇷 → 🇮🇹 Français vers Italien</button>
+</div>
+<div class="lsec active" id="vl-it2fr">
+  <div class="card" id="ex-vit1">
+    <h3>🇮🇹 Traduis en français ⏱ 2min</h3>
+    <div class="t-lbl" id="vit1-tlabel">⏱ 2:00 · démarre quand tu tapes</div>
+    <div class="t-wrap"><div class="t-bar" id="vit1-tbar" style="width:100%;background:var(--ok)"></div></div>
+    <div id="vit1-items"></div>
+    <button class="btn-go" onclick="chkF('vit1',D.vit1)">✅ Vérifier</button>
+    <div class="score" id="vit1-score"></div>
+  </div>
+  <div class="card" id="ex-vit2">
+    <h3>🎯 QCM · Que signifie ce mot en français ?</h3>
+    <div id="vit2-items"></div>
+    <button class="btn-go" onclick="chkM('vit2',D.vit2)">✅ Vérifier</button>
+    <div class="score" id="vit2-score"></div>
+  </div>
+</div>
+<div class="lsec" id="vl-fr2it">
+  <div class="card" id="ex-vfr1">
+    <h3>🇫🇷 Traduis en italien ⏱ 2min</h3>
+    <div class="t-lbl" id="vfr1-tlabel">⏱ 2:00 · démarre quand tu tapes</div>
+    <div class="t-wrap"><div class="t-bar" id="vfr1-tbar" style="width:100%;background:var(--ok)"></div></div>
+    <div id="vfr1-items"></div>
+    <button class="btn-go" onclick="chkF('vfr1',D.vfr1)">✅ Vérifier</button>
+    <div class="score" id="vfr1-score"></div>
+  </div>
+  <div class="card" id="ex-vfr2">
+    <h3>🎯 QCM · Comment dit-on en italien ?</h3>
+    <div id="vfr2-items"></div>
+    <button class="btn-go" onclick="chkM('vfr2',D.vfr2)">✅ Vérifier</button>
+    <div class="score" id="vfr2-score"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ MULTI SECTION ══ -->
+<div class="sec" id="multi">
+<h2 class="sec-t">🎮 Mode Multijoueur</h2>
+<p class="sec-s">Jusqu'à 4 joueurs · 1–6 catégories · Chrono par question · Classement final 🏆</p>
+<div id="multi-home">
+  <div class="intro">
+    <strong>Comment jouer :</strong><br>
+    1️⃣ Chaque joueur entre son prénom<br>
+    2️⃣ Choisissez ensemble jusqu'à 6 catégories<br>
+    3️⃣ Chaque question a un chrono · 4️⃣ Podium final 🏆
+  </div>
+  <div class="card">
+    <h3>👥 Joueurs (1–4)</h3>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center"><span style="font-size:18px">👤</span><input class="pinp" id="p1" placeholder="Joueur 1 *" maxlength="15"><span class="pbadge" style="background:#3b5bdb">P1</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="font-size:18px">👤</span><input class="pinp" id="p2" placeholder="Joueur 2 (optionnel)" maxlength="15"><span class="pbadge" style="background:#10b981">P2</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="font-size:18px">👤</span><input class="pinp" id="p3" placeholder="Joueur 3 (optionnel)" maxlength="15"><span class="pbadge" style="background:#f59e0b">P3</span></div>
+      <div style="display:flex;gap:8px;align-items:center"><span style="font-size:18px">👤</span><input class="pinp" id="p4" placeholder="Joueur 4 (optionnel)" maxlength="15"><span class="pbadge" style="background:#ef4444">P4</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📚 Catégories (max 6)</h3>
+    <div id="cat-select" class="cat-grid"></div>
+    <p id="cat-count" style="font-size:12px;color:var(--mu);margin-top:8px;text-align:center">0 / 6 sélectionnées</p>
+  </div>
+  <div class="card">
+    <h3>⚙️ Options</h3>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12.5px;font-weight:700">Secondes/question :</label>
+        <select id="q-time" style="border:2px solid var(--bo);border-radius:8px;padding:5px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;outline:none">
+          <option value="10">10s</option><option value="15" selected>15s</option>
+          <option value="20">20s</option><option value="30">30s</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12.5px;font-weight:700">Questions/catégorie :</label>
+        <select id="q-count" style="border:2px solid var(--bo);border-radius:8px;padding:5px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;outline:none">
+          <option value="5">5</option><option value="8" selected>8</option><option value="10">10</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <button class="btn-go" onclick="startMulti()">🎮 Lancer la partie !</button>
+</div>
+<div id="multi-game" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+    <div id="mg-cat-label" style="font-size:11.5px;font-weight:700;color:var(--mu)"></div>
+    <div id="mg-progress" style="font-size:12px;font-weight:800;color:var(--ac)"></div>
+  </div>
+  <div style="text-align:center;margin-bottom:6px" id="mg-turn"></div>
+  <div class="t-lbl" id="mg-tlabel" style="font-size:22px">⏱ 15</div>
+  <div class="t-wrap" style="height:8px;margin-bottom:12px"><div class="t-bar" id="mg-tbar" style="width:100%;background:var(--ok)"></div></div>
+  <div class="card" id="mg-qcard">
+    <div id="mg-q" style="font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.5"></div>
+    <div id="mg-opts" class="mopts"></div>
+    <div id="mg-fb" style="display:none;text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:800;font-size:14px"></div>
+  </div>
+  <div id="mg-scores" style="margin-top:10px"></div>
+</div>
+<div id="multi-results" style="display:none">
+  <div id="mr-podium"></div>
+  <button class="btn-go" onclick="resetMulti()" style="margin-top:12px">🔄 Rejouer</button>
+</div>
+</div>
+
+<style>
+.pinp{border:2px solid var(--bo);border-radius:9px;padding:8px 12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;flex:1;outline:none;-webkit-appearance:none;min-width:0}
+.pinp:focus{border-color:var(--ac)}
+.pbadge{color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:800;flex-shrink:0}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.cat-btn{padding:7px 10px;border:2px solid var(--bo);border-radius:10px;background:#fff;font-family:'Nunito',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s;color:var(--tx);text-align:center;-webkit-tap-highlight-color:transparent}
+.cat-btn.sel{border-color:var(--ac);background:var(--al);color:var(--ac)}
+.cat-btn:disabled{opacity:.5;cursor:default}
+.sc-board{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sc-card{flex:1;min-width:70px;background:#fff;border:2px solid var(--bo);border-radius:10px;padding:9px;text-align:center}
+.sc-name{font-size:11px;font-weight:800;margin-bottom:3px}
+.sc-pts{font-size:20px;font-weight:900;font-family:'Playfair Display',serif}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:14px 0}
+.pod{text-align:center;border-radius:12px 12px 0 0;padding:10px 8px;min-width:65px}
+.pod-1{background:linear-gradient(135deg,#ffd700,#ffb700);height:110px;order:2}
+.pod-2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);height:80px;order:1}
+.pod-3{background:linear-gradient(135deg,#cd7f32,#b06820);height:60px;order:3}
+.pod-name{font-size:11px;font-weight:800;color:#fff;margin-bottom:3px;word-break:break-word}
+.pod-pts{font-size:16px;font-weight:900;color:#fff}.pod-rank{font-size:22px}
+.cnt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999}
+.cnt-overlay.show{display:flex}
+.cnt-num{font-family:'Playfair Display',serif;font-size:clamp(80px,25vw,130px);font-weight:900;color:#fff;animation:cpop .85s ease}
+@keyframes cpop{0%{transform:scale(1.6);opacity:0}40%{transform:scale(1);opacity:1}100%{transform:scale(.7);opacity:0}}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:8888;padding:16px}
+.modal-ov.show{display:flex}
+.modal-box{background:#fff;border-radius:var(--rd);padding:22px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box h3{font-size:16px;font-weight:800;margin-bottom:8px}
+.modal-box p{font-size:12.5px;color:var(--mu);margin-bottom:14px;line-height:1.5}
+.mbtns{display:flex;gap:8px;flex-direction:column}
+.mbtn{padding:11px;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-size:13.5px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mbtn.prim{background:var(--ac);color:#fff}.mbtn.sec{background:var(--bg);border:2px solid var(--bo);color:var(--tx)}
+.streak-badge{position:fixed;top:58px;right:10px;background:var(--wa);color:#fff;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;z-index:500;box-shadow:0 3px 10px rgba(0,0,0,.2);display:none;animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+.xp-wrap{background:var(--bo);border-radius:4px;height:5px;overflow:hidden;margin-top:5px}
+.xp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--ac),var(--ok));transition:width .6s ease}
+.lsec{display:none}.lsec.active{display:block}
+@media(max-width:380px){.cat-grid{grid-template-columns:1fr 1fr}.pod{min-width:55px}}
+</style>
 
 <script>
 const D={
@@ -1262,63 +1414,252 @@ reg2:[
 ],
 });
 
-// ── REGIONS ──
-const RG=[
-  {n:"Piemonte",c:"Torino",ci:["Torino","Novara","Alessandria","Asti","Cuneo"],i:"Nord-ouest, frontière France/Suisse. Truffe blanc, Barolo, Fiat.",f:"🏔️"},
-  {n:"Valle d'Aosta",c:"Aosta",ci:["Aosta","Courmayeur","Châtillon","Saint-Vincent","Pont-Saint-Martin"],i:"Plus petite région. Bilingue fr/it. Mont-Blanc, châteaux.",f:"⛰️"},
-  {n:"Lombardia",c:"Milano",ci:["Milano","Bergamo","Brescia","Como","Pavia"],i:"Région la plus peuplée. Capitale économique et de la mode.",f:"🏙️"},
-  {n:"Trentino-Alto Adige",c:"Trento",ci:["Trento","Bolzano","Merano","Rovereto","Bressanone"],i:"Bilingue it/de. Dolomites, sports d'hiver.",f:"🎿"},
-  {n:"Veneto",c:"Venezia",ci:["Venezia","Verona","Padova","Vicenza","Treviso"],i:"Venezia (lagune), Verona (Roméo et Juliette), Prosecco.",f:"🚣"},
-  {n:"Friuli-Venezia Giulia",c:"Trieste",ci:["Trieste","Udine","Pordenone","Gorizia","Monfalcone"],i:"Frontière Slovénie/Autriche. Trieste : grand port adriatique.",f:"⚓"},
-  {n:"Liguria",c:"Genova",ci:["Genova","La Spezia","Imperia","Savona","Sanremo"],i:"Riviera ligure. Cinque Terre. Pesto alla genovese.",f:"🌊"},
-  {n:"Emilia-Romagna",c:"Bologna",ci:["Bologna","Parma","Modena","Ferrara","Ravenna"],i:"Capitale gastronomique : parmigiano, prosciutto, pasta. Ferrari !",f:"🍝"},
-  {n:"Toscana",c:"Firenze",ci:["Firenze","Pisa","Siena","Livorno","Arezzo"],i:"Renaissance, art, Chianti. Uffizi, Torre di Pisa, Duomo.",f:"🎨"},
-  {n:"Umbria",c:"Perugia",ci:["Perugia","Terni","Assisi","Orvieto","Spoleto"],i:"Cœur vert de l'Italie. Saint François d'Assise. Chocolat Baci.",f:"🍫"},
-  {n:"Marche",c:"Ancona",ci:["Ancona","Pesaro","Urbino","Macerata","Ascoli Piceno"],i:"Entre Apennins et Adriatique. Raphael est né à Urbino.",f:"🎭"},
-  {n:"Lazio",c:"Roma",ci:["Roma","Viterbo","Latina","Frosinone","Rieti"],i:"Capitale nationale. Colosseo, Vatican, Panthéon, Fontaine de Trevi.",f:"🏛️"},
-  {n:"Abruzzo",c:"L'Aquila",ci:["L'Aquila","Pescara","Chieti","Teramo","Lanciano"],i:"Parc Gran Sasso. Entre Adriatique et montagnes.",f:"🐺"},
-  {n:"Molise",c:"Campobasso",ci:["Campobasso","Isernia","Termoli","Venafro","Bojano"],i:"2ème plus petite région. Très rurale, traditions préservées.",f:"🌾"},
-  {n:"Campania",c:"Napoli",ci:["Napoli","Salerno","Caserta","Benevento","Avellino"],i:"Pizza napolitaine, Pompei, Amalfi, Capri.",f:"🍕"},
-  {n:"Puglia",c:"Bari",ci:["Bari","Taranto","Lecce","Foggia","Brindisi"],i:"Talon de la botte. Trulli d'Alberobello, orecchiette, olives.",f:"🫒"},
-  {n:"Basilicata",c:"Potenza",ci:["Potenza","Matera","Melfi","Lagonegro","Pisticci"],i:"Matera (Sassi) : Capitale Européenne de la Culture 2019.",f:"🗿"},
-  {n:"Calabria",c:"Catanzaro",ci:["Catanzaro","Reggio Calabria","Cosenza","Crotone","Vibo Valentia"],i:"Bout de la botte. Peperoncino omniprésent. Beauté sauvage.",f:"🌶️"},
-  {n:"Sicilia",c:"Palermo",ci:["Palermo","Catania","Messina","Agrigento","Siracusa"],i:"Plus grande île. Etna, cannoli, influences arabes.",f:"🌋"},
-  {n:"Sardegna",c:"Cagliari",ci:["Cagliari","Sassari","Nuoro","Olbia","Oristano"],i:"2ème grande île. Eaux turquoise, nuraghi, pecorino sardo.",f:"🏝️"},
-];
 
-// ── TIMERS ──
-const TMS={};
-function startT(id,sec){
+Object.assign(D,{
+vit1:[
+  {label:"il medico",ans:"le médecin"},{label:"la finestra",ans:"la fenêtre"},
+  {label:"il ginocchio",ans:"le genou"},{label:"la nuvola",ans:"le nuage"},
+  {label:"lo zaino",ans:"le sac à dos"},{label:"il tramonto",ans:"le coucher du soleil"},
+  {label:"la tosse",ans:"la toux"},{label:"il marciapiede",ans:"le trottoir"},
+  {label:"la moglie",ans:"la femme (épouse)"},{label:"il cugino",ans:"le cousin"},
+  {label:"la lavagna",ans:"le tableau"},{label:"il frigorifero",ans:"le réfrigérateur"},
+  {label:"il semaforo",ans:"le feu de circulation"},{label:"la spalla",ans:"l'épaule"},
+  {label:"il nonno",ans:"le grand-père"},{label:"la padella",ans:"la poêle"},
+  {label:"il temporale",ans:"l'orage"},{label:"la farmacia",ans:"la pharmacie"},
+  {label:"lo specchio",ans:"le miroir"},{label:"il polpaccio",ans:"le mollet"},
+  {label:"la ricetta",ans:"l'ordonnance"},{label:"il ponte",ans:"le pont"},
+  {label:"la stazione",ans:"la gare"},{label:"il bagno",ans:"la salle de bain"},
+  {label:"il fratello",ans:"le frère"},{label:"la sorella",ans:"la soeur"},
+],
+vit2:[
+  {q:"Que signifie 'il ponte' ?",opts:["la route","le pont","le carrefour","le trottoir"],ans:"le pont"},
+  {q:"Que signifie 'la tosse' ?",opts:["la fievre","l'allergie","la toux","le rhume"],ans:"la toux"},
+  {q:"Que signifie 'il nonno' ?",opts:["l'oncle","le pere","le grand-pere","le cousin"],ans:"le grand-père"},
+  {q:"Que signifie 'la nuvola' ?",opts:["la pluie","le nuage","la neige","le vent"],ans:"le nuage"},
+  {q:"Que signifie 'lo zaino' ?",opts:["le crayon","la gomme","le stylo","le sac a dos"],ans:"le sac à dos"},
+  {q:"Que signifie 'il tramonto' ?",opts:["l'aube","le midi","le coucher du soleil","la nuit"],ans:"le coucher du soleil"},
+  {q:"Que signifie 'la spalla' ?",opts:["le bras","le coude","l'epaule","le poignet"],ans:"l'épaule"},
+  {q:"Que signifie 'la padella' ?",opts:["la casserole","la poele","le four","l'assiette"],ans:"la poêle"},
+  {q:"Que signifie 'il marciapiede' ?",opts:["la route","le pont","le trottoir","le carrefour"],ans:"le trottoir"},
+  {q:"Que signifie 'la moglie' ?",opts:["la soeur","la tante","la fille","la femme (epouse)"],ans:"la femme (épouse)"},
+  {q:"Que signifie 'il semaforo' ?",opts:["le panneau","le feu de circulation","le pont","le radar"],ans:"le feu de circulation"},
+  {q:"Que signifie 'la lavagna' ?",opts:["le livre","le cahier","le tableau","la craie"],ans:"le tableau"},
+  {q:"Que signifie 'il frigorifero' ?",opts:["le four","le micro-ondes","le refrigerateur","la cuisiniere"],ans:"le réfrigérateur"},
+  {q:"Que signifie 'il temporale' ?",opts:["le vent","la neige","l'orage","la pluie"],ans:"l'orage"},
+  {q:"Que signifie 'il polpaccio' ?",opts:["le genou","la cheville","le talon","le mollet"],ans:"le mollet"},
+  {q:"Que signifie 'la ricetta' ?",opts:["la recette","l'ordonnance","la facture","le rapport"],ans:"l'ordonnance"},
+  {q:"Que signifie 'il corridoio' ?",opts:["la cuisine","le couloir","le salon","la chambre"],ans:"le couloir"},
+  {q:"Que signifie 'lo specchio' ?",opts:["la lampe","le rideau","le miroir","la fenetre"],ans:"le miroir"},
+  {q:"Que signifie 'la stazione' ?",opts:["le stade","la gare","l'aeroport","le port"],ans:"la gare"},
+  {q:"Que signifie 'i gemelli' ?",opts:["les cousins","les jumeaux","les freres","les fils"],ans:"les jumeaux"},
+],
+vfr1:[
+  {label:"la fenetre",ans:"la finestra"},{label:"le trottoir",ans:"il marciapiede"},
+  {label:"le genou",ans:"il ginocchio"},{label:"le nuage",ans:"la nuvola"},
+  {label:"le sac a dos",ans:"lo zaino"},{label:"le coucher du soleil",ans:"il tramonto"},
+  {label:"la toux",ans:"la tosse"},{label:"le refrigerateur",ans:"il frigorifero"},
+  {label:"la femme (epouse)",ans:"la moglie"},{label:"le cousin",ans:"il cugino"},
+  {label:"le tableau (ecole)",ans:"la lavagna"},{label:"la pharmacie",ans:"la farmacia"},
+  {label:"le feu de circulation",ans:"il semaforo"},{label:"l epaule",ans:"la spalla"},
+  {label:"le grand-pere",ans:"il nonno"},{label:"la poele",ans:"la padella"},
+  {label:"l orage",ans:"il temporale"},{label:"le pont",ans:"il ponte"},
+  {label:"le miroir",ans:"lo specchio"},{label:"le mollet",ans:"il polpaccio"},
+  {label:"la gare",ans:"la stazione"},{label:"la salle de bain",ans:"il bagno"},
+  {label:"le frere",ans:"il fratello"},{label:"la soeur",ans:"la sorella"},
+  {label:"le couloir",ans:"il corridoio"},{label:"les jumeaux",ans:"i gemelli"},
+],
+vfr2:[
+  {q:"Comment dit-on 'le pont' ?",opts:["la strada","il ponte","il semaforo","il marciapiede"],ans:"il ponte"},
+  {q:"Comment dit-on 'la toux' ?",opts:["la febbre","l'allergia","la tosse","il raffreddore"],ans:"la tosse"},
+  {q:"Comment dit-on 'le grand-pere' ?",opts:["lo zio","il padre","il nonno","il cugino"],ans:"il nonno"},
+  {q:"Comment dit-on 'le nuage' ?",opts:["la pioggia","la nuvola","la neve","il vento"],ans:"la nuvola"},
+  {q:"Comment dit-on 'le sac a dos' ?",opts:["la matita","la gomma","la penna","lo zaino"],ans:"lo zaino"},
+  {q:"Comment dit-on 'le coucher du soleil' ?",opts:["l'alba","il mezzogiorno","il tramonto","la notte"],ans:"il tramonto"},
+  {q:"Comment dit-on 'l epaule' ?",opts:["il braccio","il gomito","la spalla","il polso"],ans:"la spalla"},
+  {q:"Comment dit-on 'la poele' ?",opts:["la pentola","la padella","il forno","il lavello"],ans:"la padella"},
+  {q:"Comment dit-on 'le trottoir' ?",opts:["la strada","il ponte","il marciapiede","l'incrocio"],ans:"il marciapiede"},
+  {q:"Comment dit-on 'la femme (epouse)' ?",opts:["la sorella","la zia","la figlia","la moglie"],ans:"la moglie"},
+  {q:"Comment dit-on 'le feu de circulation' ?",opts:["il pannello","il semaforo","il ponte","il radar"],ans:"il semaforo"},
+  {q:"Comment dit-on 'le tableau (ecole)' ?",opts:["il libro","il quaderno","la lavagna","la matita"],ans:"la lavagna"},
+  {q:"Comment dit-on 'le refrigerateur' ?",opts:["il forno","il microonde","il frigorifero","la lavastoviglie"],ans:"il frigorifero"},
+  {q:"Comment dit-on 'l orage' ?",opts:["il vento","la neve","il temporale","la pioggia"],ans:"il temporale"},
+  {q:"Comment dit-on 'le mollet' ?",opts:["il ginocchio","la caviglia","il tallone","il polpaccio"],ans:"il polpaccio"},
+  {q:"Comment dit-on 'l ordonnance' ?",opts:["la fattura","la ricetta","il documento","il modulo"],ans:"la ricetta"},
+  {q:"Comment dit-on 'la gare' ?",opts:["l'aeroporto","il porto","la stazione","il terminal"],ans:"la stazione"},
+  {q:"Comment dit-on 'les jumeaux' ?",opts:["i fratelli","i cugini","i gemelli","i nipoti"],ans:"i gemelli"},
+  {q:"Comment dit-on 'le couloir' ?",opts:["il salotto","la cucina","il corridoio","il bagno"],ans:"il corridoio"},
+  {q:"Comment dit-on 'le miroir' ?",opts:["la lampada","il quadro","lo specchio","la finestra"],ans:"lo specchio"},
+],
+});
+
+Object.assign(D,{
+vit1:[
+  {label:"il medico",ans:"le médecin"},{label:"la finestra",ans:"la fenêtre"},
+  {label:"il ginocchio",ans:"le genou"},{label:"la nuvola",ans:"le nuage"},
+  {label:"lo zaino",ans:"le sac à dos"},{label:"il tramonto",ans:"le coucher du soleil"},
+  {label:"la tosse",ans:"la toux"},{label:"il marciapiede",ans:"le trottoir"},
+  {label:"la moglie",ans:"la femme (épouse)"},{label:"il cugino",ans:"le cousin"},
+  {label:"la lavagna",ans:"le tableau"},{label:"il frigorifero",ans:"le réfrigérateur"},
+  {label:"il semaforo",ans:"le feu de circulation"},{label:"la spalla",ans:"l'épaule"},
+  {label:"il nonno",ans:"le grand-père"},{label:"la padella",ans:"la poêle"},
+  {label:"il temporale",ans:"l'orage"},{label:"la farmacia",ans:"la pharmacie"},
+  {label:"lo specchio",ans:"le miroir"},{label:"il polpaccio",ans:"le mollet"},
+  {label:"la ricetta",ans:"l'ordonnance"},{label:"il ponte",ans:"le pont"},
+  {label:"la stazione",ans:"la gare"},{label:"il bagno",ans:"la salle de bain"},
+  {label:"il fratello",ans:"le frère"},{label:"la sorella",ans:"la sœur"},
+],
+vit2:[
+  {q:"Que signifie 'il ponte' ?",opts:["la route","le pont","le carrefour","le trottoir"],ans:"le pont"},
+  {q:"Que signifie 'la tosse' ?",opts:["la fièvre","l'allergie","la toux","le rhume"],ans:"la toux"},
+  {q:"Que signifie 'il nonno' ?",opts:["l'oncle","le père","le grand-père","le cousin"],ans:"le grand-père"},
+  {q:"Que signifie 'la nuvola' ?",opts:["la pluie","le nuage","la neige","le vent"],ans:"le nuage"},
+  {q:"Que signifie 'lo zaino' ?",opts:["le crayon","la gomme","le stylo","le sac à dos"],ans:"le sac à dos"},
+  {q:"Que signifie 'il tramonto' ?",opts:["l'aube","le midi","le coucher du soleil","la nuit"],ans:"le coucher du soleil"},
+  {q:"Que signifie 'la spalla' ?",opts:["le bras","le coude","l'épaule","le poignet"],ans:"l'épaule"},
+  {q:"Que signifie 'la padella' ?",opts:["la casserole","la poêle","le four","l'assiette"],ans:"la poêle"},
+  {q:"Que signifie 'il marciapiede' ?",opts:["la route","le pont","le trottoir","le carrefour"],ans:"le trottoir"},
+  {q:"Que signifie 'la moglie' ?",opts:["la sœur","la tante","la fille","la femme (épouse)"],ans:"la femme (épouse)"},
+  {q:"Que signifie 'il semaforo' ?",opts:["le panneau","le feu de circulation","le pont","le radar"],ans:"le feu de circulation"},
+  {q:"Que signifie 'la lavagna' ?",opts:["le livre","le cahier","le tableau","la craie"],ans:"le tableau"},
+  {q:"Que signifie 'il frigorifero' ?",opts:["le four","le micro-ondes","le réfrigérateur","la cuisinière"],ans:"le réfrigérateur"},
+  {q:"Que signifie 'il temporale' ?",opts:["le vent","la neige","l'orage","la pluie"],ans:"l'orage"},
+  {q:"Que signifie 'il polpaccio' ?",opts:["le genou","la cheville","le talon","le mollet"],ans:"le mollet"},
+  {q:"Que signifie 'la ricetta' ?",opts:["la recette de cuisine","l'ordonnance","la facture","le rapport"],ans:"l'ordonnance"},
+  {q:"Que signifie 'il corridoio' ?",opts:["la cuisine","le couloir","le salon","la chambre"],ans:"le couloir"},
+  {q:"Que signifie 'lo specchio' ?",opts:["la lampe","le rideau","le miroir","la fenêtre"],ans:"le miroir"},
+  {q:"Que signifie 'la stazione' ?",opts:["le stade","la gare","l'aéroport","le port"],ans:"la gare"},
+  {q:"Que signifie 'i gemelli' ?",opts:["les cousins","les jumeaux","les frères","les fils"],ans:"les jumeaux"},
+],
+vfr1:[
+  {label:"la fenêtre",ans:"la finestra"},{label:"le trottoir",ans:"il marciapiede"},
+  {label:"le genou",ans:"il ginocchio"},{label:"le nuage",ans:"la nuvola"},
+  {label:"le sac à dos",ans:"lo zaino"},{label:"le coucher du soleil",ans:"il tramonto"},
+  {label:"la toux",ans:"la tosse"},{label:"le réfrigérateur",ans:"il frigorifero"},
+  {label:"la femme (épouse)",ans:"la moglie"},{label:"le cousin",ans:"il cugino"},
+  {label:"le tableau (école)",ans:"la lavagna"},{label:"la pharmacie",ans:"la farmacia"},
+  {label:"le feu de circulation",ans:"il semaforo"},{label:"l'épaule",ans:"la spalla"},
+  {label:"le grand-père",ans:"il nonno"},{label:"la poêle",ans:"la padella"},
+  {label:"l'orage",ans:"il temporale"},{label:"le pont",ans:"il ponte"},
+  {label:"le miroir",ans:"lo specchio"},{label:"le mollet",ans:"il polpaccio"},
+  {label:"la gare",ans:"la stazione"},{label:"la salle de bain",ans:"il bagno"},
+  {label:"le frère",ans:"il fratello"},{label:"la sœur",ans:"la sorella"},
+  {label:"le couloir",ans:"il corridoio"},{label:"les jumeaux",ans:"i gemelli"},
+],
+vfr2:[
+  {q:"Comment dit-on 'le pont' ?",opts:["la strada","il ponte","il semaforo","il marciapiede"],ans:"il ponte"},
+  {q:"Comment dit-on 'la toux' ?",opts:["la febbre","l'allergia","la tosse","il raffreddore"],ans:"la tosse"},
+  {q:"Comment dit-on 'le grand-père' ?",opts:["lo zio","il padre","il nonno","il cugino"],ans:"il nonno"},
+  {q:"Comment dit-on 'le nuage' ?",opts:["la pioggia","la nuvola","la neve","il vento"],ans:"la nuvola"},
+  {q:"Comment dit-on 'le sac à dos' ?",opts:["la matita","la gomma","la penna","lo zaino"],ans:"lo zaino"},
+  {q:"Comment dit-on 'le coucher du soleil' ?",opts:["l'alba","il mezzogiorno","il tramonto","la notte"],ans:"il tramonto"},
+  {q:"Comment dit-on 'l'épaule' ?",opts:["il braccio","il gomito","la spalla","il polso"],ans:"la spalla"},
+  {q:"Comment dit-on 'la poêle' ?",opts:["la pentola","la padella","il forno","il lavello"],ans:"la padella"},
+  {q:"Comment dit-on 'le trottoir' ?",opts:["la strada","il ponte","il marciapiede","l'incrocio"],ans:"il marciapiede"},
+  {q:"Comment dit-on 'la femme (épouse)' ?",opts:["la sorella","la zia","la figlia","la moglie"],ans:"la moglie"},
+  {q:"Comment dit-on 'le feu de circulation' ?",opts:["il pannello","il semaforo","il ponte","il radar"],ans:"il semaforo"},
+  {q:"Comment dit-on 'le tableau (école)' ?",opts:["il libro","il quaderno","la lavagna","la matita"],ans:"la lavagna"},
+  {q:"Comment dit-on 'le réfrigérateur' ?",opts:["il forno","il microonde","il frigorifero","la lavastoviglie"],ans:"il frigorifero"},
+  {q:"Comment dit-on 'l'orage' ?",opts:["il vento","la neve","il temporale","la pioggia"],ans:"il temporale"},
+  {q:"Comment dit-on 'le mollet' ?",opts:["il ginocchio","la caviglia","il tallone","il polpaccio"],ans:"il polpaccio"},
+  {q:"Comment dit-on 'l'ordonnance' ?",opts:["la fattura","la ricetta","il documento","il modulo"],ans:"la ricetta"},
+  {q:"Comment dit-on 'la gare' ?",opts:["l'aeroporto","il porto","la stazione","il terminal"],ans:"la stazione"},
+  {q:"Comment dit-on 'les jumeaux' ?",opts:["i fratelli","i cugini","i gemelli","i nipoti"],ans:"i gemelli"},
+  {q:"Comment dit-on 'le couloir' ?",opts:["il salotto","la cucina","il corridoio","il bagno"],ans:"il corridoio"},
+  {q:"Comment dit-on 'le miroir' ?",opts:["la lampada","il quadro","lo specchio","la finestra"],ans:"lo specchio"},
+],
+});
+</script>
+<script>
+// ── SOUND ENGINE ──────────────────────────
+const AC=new(window.AudioContext||window.webkitAudioContext)();
+function tone(f,d,t='sine',v=0.28){
+  try{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);
+  o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+const SFX={
+  correct:()=>{tone(523,.08);setTimeout(()=>tone(659,.1),90);setTimeout(()=>tone(784,.18),180);},
+  wrong:()=>tone(220,.3,'sawtooth',.18),
+  tick:()=>tone(880,.05,'square',.1),
+  timesup:()=>{tone(180,.4,'sawtooth',.25);setTimeout(()=>tone(130,.5,'sawtooth',.25),450);},
+  win:()=>{[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.22),i*90));},
+  click:()=>tone(600,.04,.18),
+  countdown:()=>tone(440,.1,'sine',.2),
+  levelup:()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.2),i*110));}
+};
+document.addEventListener('click',()=>{if(AC.state==='suspended')AC.resume();},{once:true});
+
+// ── XP SYSTEM ─────────────────────────────
+let XP=parseInt(localStorage.getItem('ital_xp')||'0');
+function addXP(n){XP+=n;localStorage.setItem('ital_xp',XP);renderXP();if(n>=10){SFX.levelup();showBadge('+'+n+' XP ⭐');}}
+function renderXP(){
+  const el=document.getElementById('xp-display');if(!el)return;
+  const lv=Math.floor(XP/100)+1,p=XP%100;
+  el.innerHTML=`<div style="max-width:680px;margin:0 auto;padding:0 12px 16px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--mu)"><span>⭐ Niveau ${lv}</span><span>${XP} XP total</span></div>
+    <div class="xp-wrap"><div class="xp-fill" style="width:${p}%"></div></div>
+    <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:2px">${p}/100 XP pour le niveau ${lv+1}</div></div>`;}
+function showBadge(msg){const el=document.getElementById('streak-badge');if(!el)return;el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+
+// ── TIMER SYSTEM (starts on first interaction) ─
+const TMS={},T_SEC={},T_DONE={};
+function setupTimer(id,sec){
+  T_SEC[id]=sec;
+  const lb=document.getElementById(id+'-tlabel');
+  const bar=document.getElementById(id+'-tbar');
+  if(!lb||!bar)return;
+  const m=Math.floor(sec/60),s=sec%60;
+  lb.textContent='⏱ '+m+':'+(s<10?'0':'')+s+' · démarre quand tu commences';
+  lb.className='t-lbl';bar.style.width='100%';bar.style.background='var(--ok)';
+  const exEl=document.getElementById('ex-'+id)||document.getElementById(id+'-items');
+  if(!exEl)return;
+  let started=false;
+  const start=()=>{if(!started&&!TMS[id]){started=true;runTimer(id,sec);}};
+  exEl.addEventListener('input',start,{once:true});
+  exEl.addEventListener('click',start,{once:true});
+}
+function runTimer(id,sec){
   if(TMS[id])return;
   let r=sec;
   const lb=document.getElementById(id+'-tlabel');
   const bar=document.getElementById(id+'-tbar');
-  if(!lb||!bar)return;
   TMS[id]=setInterval(()=>{
     r--;
     const m=Math.floor(r/60),s=r%60;
     lb.textContent='⏱ '+m+':'+(s<10?'0':'')+s;
     bar.style.width=(r/sec*100)+'%';
-    if(r<=10){bar.style.background='var(--ko)';lb.className='t-lbl danger';}
-    else if(r<=30){bar.style.background='var(--wa)';lb.className='t-lbl warn';}
+    if(r<=5){SFX.tick();bar.style.background='var(--ko)';lb.className='t-lbl danger';}
+    else if(r<=15){bar.style.background='var(--wa)';lb.className='t-lbl warn';}
     if(r<=0){
-      clearInterval(TMS[id]);
+      clearInterval(TMS[id]);delete TMS[id];SFX.timesup();
       lb.textContent='⏱ Temps écoulé !';lb.className='t-lbl danger';bar.style.width='0%';
+      T_DONE[id]=true;
       const btn=document.querySelector('#ex-'+id+' .btn-go');
       if(btn&&!btn.disabled)btn.click();
     }
   },1000);
 }
 
-// ── HELPERS ──
-function nm(s){
-  return(s||'').toLowerCase().trim()
-    .replace(/[èéêë]/g,'e').replace(/[àâä]/g,'a')
-    .replace(/[ùûü]/g,'u').replace(/[îï]/g,'i')
-    .replace(/[ôö]/g,'o').replace(/['''`]/g,"'").replace(/\s+/g,' ');
+// ── RESTART MODAL ─────────────────────────
+let pendingId=null;
+function retry(id){
+  SFX.click();
+  if(T_DONE[id]){pendingId=id;document.getElementById('restart-modal').classList.add('show');}
+  else doRetry(id,true);
+}
+function closeModal(){document.getElementById('restart-modal').classList.remove('show');}
+function doRetry(id,withTimer){
+  closeModal();
+  const p=document.getElementById(id+'-score');if(p){p.className='score';p.innerHTML='';}
+  const b=document.querySelector('#ex-'+id+' .btn-go');if(b)b.disabled=false;
+  delete TMS[id];delete T_DONE[id];
+  renderAll();
+  if(withTimer&&T_SEC[id])setTimeout(()=>setupTimer(id,T_SEC[id]),80);
 }
 
-// ── BUILD FILL ──
+// ── HELPERS ───────────────────────────────
+function nm(s){return(s||'').toLowerCase().trim().replace(/[èéêë]/g,'e').replace(/[àâä]/g,'a').replace(/[ùûü]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/['''`]/g,"'").replace(/\s+/g,' ');}
+
+// ── BUILD FILL ────────────────────────────
 function bF(id,items){
   const c=document.getElementById(id+'-items');if(!c)return;c.innerHTML='';
   items.forEach((it,i)=>{
@@ -1327,185 +1668,340 @@ function bF(id,items){
       <div class="ilbl">${it.label||it.word||it.sing||it.fr||''}</div>
       <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:130px">
         <input class="fi" id="${id}-i${i}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="...">
-        <div class="fb" id="${id}-f${i}"></div>
-      </div>`;
+        <div class="fb" id="${id}-f${i}"></div></div>`;
     c.appendChild(d);
   });
 }
 
-// ── BUILD MCQ ──
+// ── BUILD MCQ ─────────────────────────────
 function bM(id,items){
   const c=document.getElementById(id+'-items');if(!c)return;c.innerHTML='';
   items.forEach((it,i)=>{
     const txt=(it.q||it.sent||'').replace(/___/g,'<strong style="color:var(--ac)">___</strong>');
     const d=document.createElement('div');d.className='mblk';
     d.innerHTML=`<div class="mq"><span class="mn">${i+1}</span>${txt}</div>
-      <div class="mopts" id="${id}-o${i}">
-        ${it.opts.map(o=>`<button class="mb" data-v="${o.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" onclick="sM('${id}',${i},this)">${o}</button>`).join('')}
-      </div><div class="fb" id="${id}-f${i}"></div>`;
+      <div class="mopts" id="${id}-o${i}">${it.opts.map(o=>`<button class="mb" data-v="${o.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" onclick="sM('${id}',${i},this)">${o}</button>`).join('')}</div>
+      <div class="fb" id="${id}-f${i}"></div>`;
     c.appendChild(d);
   });
 }
 
-// ── BUILD TF ──
+// ── BUILD TF ──────────────────────────────
 function bT(id,items){
   const c=document.getElementById(id+'-items');if(!c)return;c.innerHTML='';
   items.forEach((it,i)=>{
     const d=document.createElement('div');d.style.marginBottom='14px';
     d.innerHTML=`<div class="sbox">"${it.sent}"</div>
-      <div class="tfopts">
-        <button class="tfb" onclick="sT('${id}',${i},this,true)">✅ Vero</button>
-        <button class="tfb" onclick="sT('${id}',${i},this,false)">❌ Falso</button>
-      </div><div class="fb" id="${id}-f${i}"></div>`;
+      <div class="tfopts"><button class="tfb" onclick="sTF('${id}',${i},this,true)">✅ Vero</button><button class="tfb" onclick="sTF('${id}',${i},this,false)">❌ Falso</button></div>
+      <div class="fb" id="${id}-f${i}"></div>`;
     c.appendChild(d);
   });
 }
 
-function sM(id,i,btn){document.querySelectorAll(`#${id}-o${i} .mb`).forEach(b=>{b.classList.remove('sel');delete b.dataset.sel;});btn.classList.add('sel');btn.dataset.sel='1';}
-function sT(id,i,btn,v){const bs=btn.parentElement.querySelectorAll('.tfb');bs.forEach(b=>{b.classList.remove('sel');delete b.dataset.v;});btn.classList.add('sel');btn.dataset.v=String(v);}
+function sM(id,i,btn){SFX.click();document.querySelectorAll(`#${id}-o${i} .mb`).forEach(b=>{b.classList.remove('sel');delete b.dataset.sel;});btn.classList.add('sel');btn.dataset.sel='1';}
+function sTF(id,i,btn,v){SFX.click();const bs=btn.parentElement.querySelectorAll('.tfb');bs.forEach(b=>{b.classList.remove('sel');delete b.dataset.v;});btn.classList.add('sel');btn.dataset.v=String(v);}
 
-// ── CHECK FILL ──
+// ── CHECK FUNCTIONS ───────────────────────
 function chkF(id,items){
   let ok=0,errs=[];
   items.forEach((it,i)=>{
-    const inp=document.getElementById(`${id}-i${i}`);
-    const fb=document.getElementById(`${id}-f${i}`);
-    if(!inp)return;
-    const v=inp.value.trim();
-    const match=nm(v)===nm(it.ans)||(it.alt&&nm(v)===nm(it.alt));
-    inp.disabled=true;inp.className='fi '+(match?'ok':'ko');
-    fb.className='fb show '+(match?'ok':'ko');
+    const inp=document.getElementById(`${id}-i${i}`),fb=document.getElementById(`${id}-f${i}`);if(!inp)return;
+    const v=inp.value.trim(),match=nm(v)===nm(it.ans)||(it.alt&&nm(v)===nm(it.alt));
+    inp.disabled=true;inp.className='fi '+(match?'ok':'ko');fb.className='fb show '+(match?'ok':'ko');
     if(!v){fb.textContent='✗ Réponse: '+it.ans;errs.push({q:it.label||'',w:'(vide)',r:it.ans});}
     else if(match){ok++;fb.textContent='✓ Bravo!';}
     else{fb.textContent='✗ Correct: '+it.ans+(it.alt?' / '+it.alt:'');errs.push({q:it.label||'',w:v,r:it.ans});}
   });
-  showSc(id,ok,items.length,errs);disB(id);
-  if(TMS[id])clearInterval(TMS[id]);
+  finEx(id,ok,items.length,errs);
 }
-
-// ── CHECK MCQ ──
 function chkM(id,items){
   let ok=0,errs=[];
   items.forEach((it,i)=>{
-    const btns=document.querySelectorAll(`#${id}-o${i} .mb`);
-    const fb=document.getElementById(`${id}-f${i}`);
+    const btns=document.querySelectorAll(`#${id}-o${i} .mb`),fb=document.getElementById(`${id}-f${i}`);
     let sel=null;btns.forEach(b=>{if(b.dataset.sel)sel=b.dataset.v;});
     btns.forEach(b=>{b.disabled=true;if(b.dataset.v===it.ans)b.classList.add('ok');else if(b.dataset.sel)b.classList.add('ko');});
     if(sel===it.ans){ok++;fb.className='fb show ok';fb.textContent='✓ '+(it.explain||'Bravo!');}
     else{fb.className='fb show ko';fb.textContent='✗ Réponse: '+it.ans+(it.explain?' — '+it.explain:'');errs.push({q:(it.q||it.sent||'').substring(0,55),w:sel||'(rien)',r:it.ans});}
   });
-  showSc(id,ok,items.length,errs);disB(id);
+  finEx(id,ok,items.length,errs);
 }
-
-// ── CHECK TF ──
 function chkT(id,items){
   let ok=0,errs=[];
   const blks=document.querySelectorAll(`#${id}-items > div`);
   items.forEach((it,i)=>{
     const blk=blks[i];if(!blk)return;
-    const fb=document.getElementById(`${id}-f${i}`);
-    const bs=blk.querySelectorAll('.tfb');
+    const fb=document.getElementById(`${id}-f${i}`),bs=blk.querySelectorAll('.tfb');
     let sv=null;bs.forEach(b=>{if(b.classList.contains('sel'))sv=b.dataset.v==='true';});
     bs.forEach(b=>{b.disabled=true;if((b.dataset.v==='true')===it.ans)b.classList.add('ok');else if(b.classList.contains('sel'))b.classList.add('ko');});
     if(sv===it.ans){ok++;fb.className='fb show ok';fb.textContent='✓ '+(it.explain||'Correct!');}
-    else{fb.className='fb show ko';const fix=it.correction?' — Correction: "'+it.correction+'"':' — '+(it.explain||'');fb.textContent='✗ '+(it.ans?'VERO':'FALSO')+fix;errs.push({q:it.sent.substring(0,55),w:sv===null?'(rien)':sv?'Vero':'Falso',r:it.ans?'Vero':'Falso'});}
+    else{fb.className='fb show ko';const fix=it.correction?' — "'+it.correction+'"':' — '+(it.explain||'');fb.textContent='✗ '+(it.ans?'VERO':'FALSO')+fix;errs.push({q:it.sent.substring(0,55),w:sv===null?'(rien)':sv?'Vero':'Falso',r:it.ans?'Vero':'Falso'});}
   });
-  showSc(id,ok,items.length,errs);disB(id);
+  finEx(id,ok,items.length,errs);
 }
-
-// ── SCORE ──
-function showSc(id,ok,total,errs){
-  const p=document.getElementById(`${id}-score`);if(!p)return;
+function finEx(id,ok,total,errs){
+  if(TMS[id]){clearInterval(TMS[id]);delete TMS[id];}
+  T_DONE[id]=true;
   const pct=Math.round(ok/total*100);
-  const cls=pct>=80?'good':pct>=50?'meh':'bad';
-  const msg=pct===100?'🎉 Parfait!':pct>=80?'🌟 Très bien!':pct>=50?'👍 Pas mal! Revois tes erreurs.':'📚 Revois le cours et réessaie!';
+  if(pct===100)SFX.win();else if(ok>0)SFX.correct();else SFX.wrong();
+  addXP(ok*2);showSc(id,ok,total,errs);
+  const b=document.querySelector('#ex-'+id+' .btn-go');if(b)b.disabled=true;
+}
+function showSc(id,ok,total,errs){
+  const p=document.getElementById(id+'-score');if(!p)return;
+  const pct=Math.round(ok/total*100),cls=pct>=80?'good':pct>=50?'meh':'bad';
+  const emoji=pct===100?'🏆':pct>=80?'🌟':pct>=50?'👍':'📚';
+  const msg=pct===100?'Parfait ! Tu es imbattable !':pct>=80?'Très bien ! Continue comme ça !':pct>=50?'Pas mal ! Revois tes erreurs.':'Revois le cours et réessaie !';
   let eh='';
   if(errs.length){eh=`<div class="errs"><h4>❌ Tes erreurs (${errs.length})</h4>${errs.map(e=>`<div class="ei"><em style="color:#9ca3af;font-size:10.5px">${e.q}</em><br>Ta réponse: <span class="wa">${e.w}</span> → Correct: <span class="ra">${e.r}</span></div>`).join('')}</div>`;}
   p.className='score show';
-  p.innerHTML=`<div class="sbig ${cls}">${ok}/${total}</div><div class="slbl">${pct}% de réussite</div><div class="smsg">${msg}</div>${eh}<button class="btn-retry" onclick="retry('${id}')">🔄 Recommencer</button>`;
+  p.innerHTML=`<div class="sbig ${cls}">${ok}/${total}</div><div style="font-size:26px;margin:3px 0">${emoji}</div><div class="slbl">${pct}% · +${ok*2} XP</div><div class="smsg">${msg}</div>${eh}<button class="btn-retry" onclick="retry('${id}')">🔄 Recommencer</button>`;
   p.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function disB(id){const b=document.querySelector(`#ex-${id} .btn-go`);if(b)b.disabled=true;}
-function retry(id){
-  const p=document.getElementById(`${id}-score`);if(p){p.className='score';p.innerHTML='';}
-  const b=document.querySelector(`#ex-${id} .btn-go`);if(b)b.disabled=false;
-  delete TMS[id];renderAll();
-}
 
-// ── NAVIGATION ──
+// ── NAVIGATION ────────────────────────────
 function G(id){
+  SFX.click();
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
   const s=document.getElementById(id);if(s)s.classList.add('active');
   document.querySelectorAll('.tb').forEach(b=>{if((b.getAttribute('onclick')||'').includes("'"+id+"'"))b.classList.add('active');});
   window.scrollTo(0,0);
-  if(id==='heure')startT('heure1',90);
-  if(id==='numeri')startT('num1',120);
-  if(id==='corps')startT('corps1',120);
+  const tm={heure:{i:'heure1',s:90},numeri:{i:'num1',s:120},corps:{i:'corps1',s:120}};
+  if(tm[id])setupTimer(tm[id].i,tm[id].s);
 }
 function sL(n){
+  SFX.click();
   document.querySelectorAll('.lsec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
   const s=document.getElementById('lex-'+n);if(s)s.classList.add('active');
   document.querySelectorAll('.ltab').forEach(b=>{if((b.getAttribute('onclick')||'').includes("'"+n+"'"))b.classList.add('active');});
   const m={casa:'lcasa1',cucina:'lcucina1',strada:'lstrada1',prof:'lprof1',fam:'lfam1',scuola:'lscuola1',osp:'losp1',cielo:'lcielo1'};
-  if(m[n])startT(m[n],90);
+  if(m[n])setupTimer(m[n],90);
+}
+function showVL(n){
+  SFX.click();
+  document.querySelectorAll('.lsec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
+  const s=document.getElementById('vl-'+n);if(s)s.classList.add('active');
+  document.querySelectorAll('.ltab').forEach(b=>{if((b.getAttribute('onclick')||'').includes("'"+n+"'"))b.classList.add('active');});
+  const t={it2fr:'vit1',fr2it:'vfr1'};
+  if(t[n])setupTimer(t[n],120);
 }
 
-// ── REGIONS UI ──
+// ── REGIONS UI ────────────────────────────
+const RG=[
+  {n:"Piemonte",c:"Torino",ci:["Torino","Novara","Alessandria","Asti","Cuneo"],i:"Nord-ouest, frontière France/Suisse. Truffe blanc, Barolo, Fiat.",f:"🏔️"},
+  {n:"Valle d'Aosta",c:"Aosta",ci:["Aosta","Courmayeur","Châtillon","Saint-Vincent","Pont-Saint-Martin"],i:"Plus petite région. Bilingue fr/it. Mont-Blanc.",f:"⛰️"},
+  {n:"Lombardia",c:"Milano",ci:["Milano","Bergamo","Brescia","Como","Pavia"],i:"Région la plus peuplée. Capitale économique et mode.",f:"🏙️"},
+  {n:"Trentino-Alto Adige",c:"Trento",ci:["Trento","Bolzano","Merano","Rovereto","Bressanone"],i:"Bilingue it/de. Dolomites, sports d'hiver.",f:"🎿"},
+  {n:"Veneto",c:"Venezia",ci:["Venezia","Verona","Padova","Vicenza","Treviso"],i:"Venezia (lagune), Verona (Roméo & Juliette), Prosecco.",f:"🚣"},
+  {n:"Friuli-Venezia Giulia",c:"Trieste",ci:["Trieste","Udine","Pordenone","Gorizia","Monfalcone"],i:"Frontière Slovénie/Autriche. Grand port adriatique.",f:"⚓"},
+  {n:"Liguria",c:"Genova",ci:["Genova","La Spezia","Imperia","Savona","Sanremo"],i:"Riviera ligure. Cinque Terre. Pesto alla genovese.",f:"🌊"},
+  {n:"Emilia-Romagna",c:"Bologna",ci:["Bologna","Parma","Modena","Ferrara","Ravenna"],i:"Capitale gastronomique: parmigiano, prosciutto, pasta. Ferrari!",f:"🍝"},
+  {n:"Toscana",c:"Firenze",ci:["Firenze","Pisa","Siena","Livorno","Arezzo"],i:"Renaissance, art, Chianti. Uffizi, Torre di Pisa, Duomo.",f:"🎨"},
+  {n:"Umbria",c:"Perugia",ci:["Perugia","Terni","Assisi","Orvieto","Spoleto"],i:"Cœur vert de l'Italie. Saint François. Chocolat Baci.",f:"🍫"},
+  {n:"Marche",c:"Ancona",ci:["Ancona","Pesaro","Urbino","Macerata","Ascoli Piceno"],i:"Entre Apennins et Adriatique. Raphael est né à Urbino.",f:"🎭"},
+  {n:"Lazio",c:"Roma",ci:["Roma","Viterbo","Latina","Frosinone","Rieti"],i:"Capitale. Colosseo, Vatican, Panthéon, Fontaine de Trevi.",f:"🏛️"},
+  {n:"Abruzzo",c:"L'Aquila",ci:["L'Aquila","Pescara","Chieti","Teramo","Lanciano"],i:"Parc Gran Sasso. Entre mer Adriatique et montagnes.",f:"🐺"},
+  {n:"Molise",c:"Campobasso",ci:["Campobasso","Isernia","Termoli","Venafro","Bojano"],i:"2ème plus petite région. Très rurale, traditions préservées.",f:"🌾"},
+  {n:"Campania",c:"Napoli",ci:["Napoli","Salerno","Caserta","Benevento","Avellino"],i:"Pizza napolitaine, Pompei, Amalfi, Capri.",f:"🍕"},
+  {n:"Puglia",c:"Bari",ci:["Bari","Taranto","Lecce","Foggia","Brindisi"],i:"Talon de la botte. Trulli d'Alberobello, orecchiette, olives.",f:"🫒"},
+  {n:"Basilicata",c:"Potenza",ci:["Potenza","Matera","Melfi","Lagonegro","Pisticci"],i:"Matera (Sassi): Capitale Européenne Culture 2019.",f:"🗿"},
+  {n:"Calabria",c:"Catanzaro",ci:["Catanzaro","Reggio Calabria","Cosenza","Crotone","Vibo Valentia"],i:"Bout de la botte. Peperoncino omniprésent. Beauté sauvage.",f:"🌶️"},
+  {n:"Sicilia",c:"Palermo",ci:["Palermo","Catania","Messina","Agrigento","Siracusa"],i:"Plus grande île méditerranéenne. Etna, cannoli, influences arabes.",f:"🌋"},
+  {n:"Sardegna",c:"Cagliari",ci:["Cagliari","Sassari","Nuoro","Olbia","Oristano"],i:"2ème grande île. Eaux turquoise, nuraghi, pecorino sardo.",f:"🏝️"},
+];
 function buildReg(){
   const list=document.getElementById('rg-list');if(!list||list.children.length)return;
-  RG.forEach((r,i)=>{
-    const d=document.createElement('div');d.className='rcard';
-    d.innerHTML=`<h4>${r.f} ${r.n}</h4><p>★ ${r.c}</p>`;
-    d.onclick=()=>showReg(i);list.appendChild(d);
-  });
+  RG.forEach((r,i)=>{const d=document.createElement('div');d.className='rcard';d.innerHTML=`<h4>${r.f} ${r.n}</h4><p>★ ${r.c}</p>`;d.onclick=()=>showReg(i);list.appendChild(d);});
 }
 function showReg(i){
-  const r=RG[i];const det=document.getElementById('rg-det');if(!det)return;
+  const r=RG[i],det=document.getElementById('rg-det');if(!det)return;
   det.className='rdet show';
-  det.innerHTML=`<h3>${r.f} ${r.n}</h3>
-    <div class="ctags">${r.ci.map((c,j)=>`<span class="ctag ${j===0?'cap':''}">${j===0?'★ '+c:c}</span>`).join('')}</div>
-    <div class="rinfo">${r.i}</div>
-    <button class="btn-retry" style="margin-top:8px" onclick="document.getElementById('rg-det').className='rdet'">✕ Fermer</button>`;
+  det.innerHTML=`<h3>${r.f} ${r.n}</h3><div class="ctags">${r.ci.map((c,j)=>`<span class="ctag ${j===0?'cap':''}">${j===0?'★ '+c:c}</span>`).join('')}</div><div class="rinfo">${r.i}</div><button class="btn-retry" style="margin-top:8px" onclick="document.getElementById('rg-det').className='rdet'">✕ Fermer</button>`;
   det.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ── RENDER ALL ──
+// ── MULTIPLAYER ───────────────────────────
+const CATS={
+  essere:{l:'🔵 Essere',d:()=>D.ess2.concat(D.ess4)},
+  avere:{l:'🟢 Avere',d:()=>D.av2},
+  stare:{l:'🟡 Stare',d:()=>D.st2.concat(D.st3)},
+  articles:{l:'📝 Articles',d:()=>D.artchoix.concat(D.artform)},
+  pluriel:{l:'🔢 Pluriel',d:()=>D.plur3.concat(D.plur4)},
+  heure:{l:'🕐 L\'heure',d:()=>D.heure2},
+  cece:{l:'📍 C\'è/Ci sono',d:()=>D.ce1.concat(D.ce3)},
+  ogni:{l:'🔁 Ogni/Qualche',d:()=>D.ogni1.concat(D.ogni3)},
+  dimostrativi:{l:'👆 Dimostrativi',d:()=>D.dim3.concat(D.dim4)},
+  numeri:{l:'🔢 Chiffres',d:()=>D.num2},
+  famiglia:{l:'👨‍👩‍👧 Famille',d:()=>D.lfam2},
+  scuola:{l:'📚 École',d:()=>D.lscuola2},
+  corpo:{l:'💪 Corps',d:()=>D.corps2},
+  vocab:{l:'🔤 Vocabulaire',d:()=>D.vit2.concat(D.vfr2)},
+  regioni:{l:'🗺️ Régions',d:()=>D.reg1.concat(D.reg2)},
+  truefaux:{l:'✅ Vrai/Faux',d:()=>D.tf1},
+};
+let MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null};
+function shuf(a){return[...a].sort(()=>Math.random()-.5);}
+
+function buildCatSelect(){
+  const g=document.getElementById('cat-select');if(!g||g.children.length)return;
+  Object.entries(CATS).forEach(([k,v])=>{const b=document.createElement('button');b.className='cat-btn';b.dataset.cat=k;b.textContent=v.l;b.onclick=()=>togCat(b);g.appendChild(b);});
+}
+function togCat(btn){
+  SFX.click();
+  const sel=[...document.querySelectorAll('.cat-btn.sel')];
+  if(btn.classList.contains('sel'))btn.classList.remove('sel');
+  else if(sel.length<6)btn.classList.add('sel');
+  const n=[...document.querySelectorAll('.cat-btn.sel')].length;
+  document.getElementById('cat-count').textContent=n+' / 6 sélectionnées';
+  document.querySelectorAll('.cat-btn:not(.sel)').forEach(b=>b.disabled=n>=6);
+  document.querySelectorAll('.cat-btn.sel').forEach(b=>b.disabled=false);
+}
+function startMulti(){
+  SFX.click();
+  const p1=document.getElementById('p1').value.trim();
+  if(!p1){alert('Entre au moins le prénom du Joueur 1 !');return;}
+  const cats=[...document.querySelectorAll('.cat-btn.sel')].map(b=>b.dataset.cat);
+  if(!cats.length){alert('Sélectionne au moins 1 catégorie !');return;}
+  MG.pl=[p1,document.getElementById('p2').value.trim(),document.getElementById('p3').value.trim(),document.getElementById('p4').value.trim()].filter(Boolean);
+  MG.sc={};MG.pl.forEach(p=>MG.sc[p]=0);
+  MG.cats=cats;
+  MG.qT=parseInt(document.getElementById('q-time').value);
+  MG.qC=parseInt(document.getElementById('q-count').value);
+  MG.qs=[];
+  cats.forEach(cat=>{let pool=CATS[cat].d().filter(q=>q.opts);pool=shuf(pool).slice(0,MG.qC);pool.forEach(q=>MG.qs.push({...q,_cat:CATS[cat].l}));});
+  MG.qs=shuf(MG.qs);MG.qi=0;MG.pi=0;
+  document.getElementById('multi-home').style.display='none';
+  document.getElementById('multi-game').style.display='block';
+  cntDown(3,()=>showMQ());
+}
+function cntDown(n,cb){
+  const ov=document.getElementById('cnt-overlay'),num=document.getElementById('cnt-num');
+  ov.classList.add('show');let i=n;
+  const go=()=>{SFX.countdown();num.textContent=i>0?i:'GO! 🇮🇹';num.style.animation='none';num.offsetHeight;num.style.animation='cpop .85s ease';
+    if(i===0)setTimeout(()=>{ov.classList.remove('show');cb();},900);else{i--;setTimeout(go,1000);}};go();
+}
+function showMQ(){
+  if(MG.qi>=MG.qs.length){endMulti();return;}
+  const q=MG.qs[MG.qi],pl=MG.pl[MG.pi%MG.pl.length];
+  const colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
+  const pc=colors[MG.pl.indexOf(pl)%4];
+  document.getElementById('mg-cat-label').textContent=q._cat;
+  document.getElementById('mg-progress').textContent='Q'+(MG.qi+1)+'/'+MG.qs.length;
+  document.getElementById('mg-turn').innerHTML=`<span style="background:${pc};color:#fff;padding:4px 14px;border-radius:20px;font-weight:800;font-size:13px">👤 ${pl}</span>`;
+  document.getElementById('mg-q').textContent=q.q||q.sent||'';
+  document.getElementById('mg-fb').style.display='none';
+  const od=document.getElementById('mg-opts');od.innerHTML='';
+  shuf(q.opts).forEach(o=>{const b=document.createElement('button');b.className='mb';b.textContent=o;b.onclick=()=>answerMG(o,q.ans,pl,b);od.appendChild(b);});
+  updateMGSc();startMGT();
+}
+function startMGT(){
+  if(MG.tm)clearInterval(MG.tm);let r=MG.qT;
+  const lb=document.getElementById('mg-tlabel'),bar=document.getElementById('mg-tbar');
+  bar.style.width='100%';bar.style.background='var(--ok)';lb.className='t-lbl';
+  MG.tm=setInterval(()=>{
+    r--;lb.textContent='⏱ '+r;bar.style.width=(r/MG.qT*100)+'%';
+    if(r<=3){SFX.tick();bar.style.background='var(--ko)';lb.className='t-lbl danger';}
+    else if(r<=7){bar.style.background='var(--wa)';lb.className='t-lbl warn';}
+    if(r<=0){clearInterval(MG.tm);SFX.timesup();timeoutMG();}
+  },1000);
+}
+function answerMG(chosen,correct,pl,btn){
+  clearInterval(MG.tm);
+  document.querySelectorAll('#mg-opts .mb').forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn&&chosen!==correct)b.classList.add('ko');});
+  const ok=chosen===correct;const fb=document.getElementById('mg-fb');
+  if(ok){MG.sc[pl]=(MG.sc[pl]||0)+10;SFX.correct();fb.style.cssText='display:block;background:#f0fdf4;color:var(--ok)';fb.textContent='✓ Correct ! +10 pts 🎉';}
+  else{SFX.wrong();fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='✗ Raté ! Réponse : '+correct;}
+  updateMGSc();setTimeout(()=>nextMQ(),1800);
+}
+function timeoutMG(){
+  const q=MG.qs[MG.qi];const fb=document.getElementById('mg-fb');
+  document.querySelectorAll('#mg-opts .mb').forEach(b=>{b.disabled=true;if(b.textContent===q.ans)b.classList.add('ok');});
+  fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='⏱ Temps ! Réponse : '+q.ans;
+  setTimeout(()=>nextMQ(),1600);
+}
+function nextMQ(){MG.qi++;MG.pi++;if(MG.qi>=MG.qs.length)endMulti();else showMQ();}
+function updateMGSc(){
+  const colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
+  document.getElementById('mg-scores').innerHTML='<div class="sc-board">'+MG.pl.map((p,i)=>`<div class="sc-card" style="border-color:${colors[i]}"><div class="sc-name" style="color:${colors[i]}">${p}</div><div class="sc-pts" style="color:${colors[i]}">${MG.sc[p]||0}</div></div>`).join('')+'</div>';
+}
+function endMulti(){
+  if(MG.tm)clearInterval(MG.tm);SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
+  document.getElementById('multi-game').style.display='none';
+  document.getElementById('multi-results').style.display='block';
+  const sorted=[...MG.pl].sort((a,b)=>(MG.sc[b]||0)-(MG.sc[a]||0));
+  const colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
+  const medals=['🥇','🥈','🥉','4️⃣'];
+  let h=`<div style="text-align:center;margin-bottom:14px"><div style="font-size:36px">🏆</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900">Partie terminée !</div><div style="font-size:13px;color:var(--mu);margin-top:4px">Gagnant : <strong style="color:var(--wa)">${sorted[0]}</strong> — ${MG.sc[sorted[0]]||0} points !</div></div>`;
+  h+=`<div class="podium">`;
+  const ord=sorted.length>=2?[sorted[1]||null,sorted[0],sorted[2]||null].filter(Boolean):[sorted[0]];
+  const pcls=sorted.length>=3?['pod pod-2','pod pod-1','pod pod-3']:sorted.length===2?['pod pod-2','pod pod-1']:['pod pod-1'];
+  ord.forEach((p,i)=>{const rank=sorted.indexOf(p);h+=`<div class="${pcls[i]}"><div class="pod-rank">${medals[rank]}</div><div class="pod-name">${p}</div><div class="pod-pts">${MG.sc[p]||0} pts</div></div>`;});
+  h+=`</div>`;
+  if(sorted.length>3){sorted.slice(3).forEach((p,i)=>{h+=`<div style="display:flex;justify-content:space-between;padding:7px 12px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-weight:700"><span>${medals[i+3]} ${p}</span><span>${MG.sc[p]||0} pts</span></div>`;});}
+  document.getElementById('mr-podium').innerHTML=h;
+}
+function resetMulti(){SFX.click();MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null};document.getElementById('multi-home').style.display='block';document.getElementById('multi-game').style.display='none';document.getElementById('multi-results').style.display='none';}
+
+// ── RENDER ALL ────────────────────────────
 function renderAll(){
   const fills=[
-    ['ess1',D.ess1],['av1',D.av1],['av3',D.av3],['st1',D.st1],
+    ['ess1',D.ess1],['ess3',D.ess3],['av1',D.av1],['av3',D.av3],['st1',D.st1],
     ['artdet',D.artdet],['artindet',D.artindet],['artfood',D.artfood],
-    ['plur1',D.plur1],['plur2',D.plur2],
-    ['term1',D.term1],['term2',D.term2],['term3',D.term3],
-    ['heure1',D.heure1],['ogni2',D.ogni2],
-    ['dim1',D.dim1],['dim2',D.dim2],
+    ['plur1',D.plur1],['plur2',D.plur2],['term1',D.term1],['term2',D.term2],['term3',D.term3],
+    ['heure1',D.heure1],['ogni2',D.ogni2],['dim1',D.dim1],['dim2',D.dim2],
     ['num1',D.num1],['num3',D.num3],
     ['lcasa1',D.lcasa1],['lcucina1',D.lcucina1],['lstrada1',D.lstrada1],
     ['lprof1',D.lprof1],['lfam1',D.lfam1],['lscuola1',D.lscuola1],
     ['losp1',D.losp1],['lcielo1',D.lcielo1],['corps1',D.corps1],
+    ['vit1',D.vit1],['vfr1',D.vfr1],
   ];
   fills.forEach(([id,dat])=>bF(id,dat));
   const mcqs=[
-    ['ess2',D.ess2],['ess3',D.ess3],['ess4',D.ess4],
-    ['av2',D.av2],['st2',D.st2],['st3',D.st3],
-    ['artchoix',D.artchoix],['artform',D.artform],
-    ['plur3',D.plur3],['plur4',D.plur4],
-    ['heure2',D.heure2],
-    ['ce1',D.ce1],['ce2',D.ce2],['ce3',D.ce3],['ce4',D.ce4],
-    ['ogni1',D.ogni1],['ogni3',D.ogni3],
-    ['dim3',D.dim3],['dim4',D.dim4],
-    ['num2',D.num2],
+    ['ess2',D.ess2],['ess4',D.ess4],['av2',D.av2],['st2',D.st2],['st3',D.st3],
+    ['artchoix',D.artchoix],['artform',D.artform],['plur3',D.plur3],['plur4',D.plur4],
+    ['heure2',D.heure2],['ce1',D.ce1],['ce2',D.ce2],['ce3',D.ce3],['ce4',D.ce4],
+    ['ogni1',D.ogni1],['ogni3',D.ogni3],['dim3',D.dim3],['dim4',D.dim4],['num2',D.num2],
     ['lcasa2',D.lcasa2],['lcucina2',D.lcucina2],['lstrada2',D.lstrada2],
     ['lprof2',D.lprof2],['lfam2',D.lfam2],['lscuola2',D.lscuola2],
     ['losp2',D.losp2],['lcielo2',D.lcielo2],['corps2',D.corps2],
-    ['reg1',D.reg1],['reg2',D.reg2],
+    ['reg1',D.reg1],['reg2',D.reg2],['vit2',D.vit2],['vfr2',D.vfr2],
+    ['ess3',D.ess3],
   ];
   mcqs.forEach(([id,dat])=>bM(id,dat));
   bT('tf1',D.tf1);bT('tf2',D.tf2);
-  buildReg();
+  buildReg();buildCatSelect();renderXP();
 }
-document.addEventListener('DOMContentLoaded',renderAll);
+document.addEventListener('DOMContentLoaded',()=>{
+  renderAll();
+  const today=new Date().toDateString(),last=localStorage.getItem('ital_last')||'';
+  if(last&&last!==today){const s=parseInt(localStorage.getItem('ital_str')||'0')+1;localStorage.setItem('ital_str',s);showBadge('🔥 Série de '+s+' jours consécutifs !');}
+  localStorage.setItem('ital_last',today);
+});
 </script>
-</body>
-</html>
+
+<!-- RESTART MODAL -->
+<div class="modal-ov" id="restart-modal">
+<div class="modal-box">
+  <h3>🔄 Recommencer ?</h3>
+  <p>Tu as déjà terminé cet exercice.<br>Veux-tu le refaire avec ou sans chronomètre ?</p>
+  <div class="mbtns">
+    <button class="mbtn prim" onclick="doRetry(pendingId,true)">⏱ Avec chronomètre</button>
+    <button class="mbtn sec" onclick="doRetry(pendingId,false)">🚫 Sans chronomètre</button>
+    <button class="mbtn sec" onclick="closeModal()">↩️ Annuler</button>
+  </div>
+</div></div>
+
+<!-- COUNTDOWN OVERLAY -->
+<div class="cnt-overlay" id="cnt-overlay">
+  <div class="cnt-num" id="cnt-num" style="font-family:'Playfair Display',serif;font-size:clamp(80px,25vw,130px);font-weight:900;color:#fff">3</div>
+</div>
+
+<!-- STREAK BADGE -->
+<div class="streak-badge" id="streak-badge">🔥</div>
+
+<!-- XP BAR (always visible) -->
+<div id="xp-display"></div>
+
+</body></html>
