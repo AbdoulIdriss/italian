@@ -1609,10 +1609,13 @@ function cntDown(n,cb){
 var FB_URL='https://italian-ff05c-default-rtdb.europe-west1.firebasedatabase.app/';
 var OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
 
+// Guard flags to prevent double-initialization and double-ending
+var _gameStarted=false;
+var _gameEnded=false;
+
 function genCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},function(){return c[Math.floor(Math.random()*c.length)];}).join('');}
 function sanitize(s){return(s||'').replace(/[.#$[\]/]/g,'_');}
 
-// FIX: show/do separation for create flow
 function olShowCreate(){
   SFX.click();
   document.getElementById('ol-action-btns').style.display='none';
@@ -1626,12 +1629,14 @@ function olShowJoin(){
   document.getElementById('ol-join-row').style.display='block';
   document.getElementById('ol-host-row').style.display='none';
 }
+
 async function olDoCreate(){
   SFX.click();
   var nameEl=document.getElementById('ol-host-name'),name=nameEl.value.trim();
   if(!name){nameEl.style.borderColor='var(--ko)';nameEl.focus();return;}
   nameEl.style.borderColor='';
   var code=genCode();OL.roomCode=code;OL.isHost=true;OL.myName=name;
+  _gameStarted=false;_gameEnded=false;
   var roomData={host:name,code:code,status:'lobby',players:{},settings:{qT:15,qC:8,cats:[]},createdAt:Date.now()};
   roomData.players[sanitize(name)]={name:name,score:0,ready:true,isHost:true};
   try{
@@ -1643,12 +1648,14 @@ async function olDoCreate(){
     document.getElementById('ol-start-btn').disabled=true;
   }catch(e){alert('Erreur Firebase: '+e.message);}
 }
+
 async function olJoin(){
   SFX.click();
   var code=document.getElementById('ol-join-code').value.trim().toUpperCase();
   var name=document.getElementById('ol-join-name').value.trim();
   if(!code||code.length<4){alert('Entre le code du salon !');return;}
   if(!name){alert('Entre ton prénom !');return;}
+  _gameStarted=false;_gameEnded=false;
   try{
     var room=await fbGet('rooms/'+code);
     if(!room){alert('Salon introuvable. Vérifie le code !');return;}
@@ -1662,6 +1669,8 @@ async function olJoin(){
     olPollRoom(code);
   }catch(e){alert('Erreur: '+e.message);}
 }
+
+// FIX: olPollRoom only handles lobby/waiting state — stops itself when game starts
 function olPollRoom(code){
   if(OL.pollInterval)clearInterval(OL.pollInterval);
   OL.pollInterval=setInterval(async function(){
@@ -1673,14 +1682,24 @@ function olPollRoom(code){
         var btn=document.getElementById('ol-start-btn');
         if(pList.length>=2){btn.disabled=false;btn.style.opacity='1';btn.textContent='🎮 Lancer la partie !';}
         else{btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ En attente (min 2)...';}
-      }else renderWaitingPlayers(pList);
-      if(room.status==='playing'&&document.getElementById('multi-game').style.display==='none')olStartAsGuest(room);
-      if(room.status==='ended'){clearInterval(OL.pollInterval);if(document.getElementById('multi-game').style.display==='block')olShowResults(room);}
+      }else{
+        renderWaitingPlayers(pList);
+      }
+      // FIX: only trigger start once, and stop this poll immediately
+      if(room.status==='playing'&&!_gameStarted){
+        _gameStarted=true;
+        clearInterval(OL.pollInterval); // FIX: stop lobby poll before starting game
+        OL.pollInterval=null;
+        olStartAsGuest(room);
+      }
+      // FIX: ended state handled only by olPollAnswers, not here
     }catch(e){}
   },2000);
 }
+
 function renderLobbyPlayers(pList){var el=document.getElementById('ol-players-list');if(!el)return;el.innerHTML=pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700;flex:1">'+p.name+(p.isHost?' 👑 (hôte)':'')+'</div><div style="font-size:11px;color:var(--ok)">✓ connecté</div></div>';}).join('');}
 function renderWaitingPlayers(pList){var el=document.getElementById('ol-wait-players');if(!el)return;el.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px">Joueurs dans le salon :</div>'+pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700">'+p.name+(p.isHost?' 👑':'')+'</div></div>';}).join('');}
+
 async function olStartGame(){
   SFX.click();
   var cats=[].slice.call(document.querySelectorAll('#ol-cat-select .cat-btn.sel')).map(function(b){return b.dataset.cat;});
@@ -1689,80 +1708,169 @@ async function olStartGame(){
   var qs=buildQuestions(cats,qC);
   var qsS=qs.map(function(q){return {q:q.q||q.sent||'',opts:q.opts,ans:q.ans,_cat:q._cat};});
   try{
-    await fbSet('rooms/'+OL.roomCode+'/status','playing');
+    // FIX: write all data first, then set status to 'playing' last
+    // so guests don't start with incomplete data
     await fbSet('rooms/'+OL.roomCode+'/settings',{qT:qT,qC:qC,cats:cats});
     await fbSet('rooms/'+OL.roomCode+'/questions',qsS);
     await fbSet('rooms/'+OL.roomCode+'/qi',0);
+    await fbSet('rooms/'+OL.roomCode+'/answers',null); // clear any old answers
+    await fbSet('rooms/'+OL.roomCode+'/status','playing'); // trigger guests last
+    // Host starts locally without re-fetching (already has data)
+    _gameStarted=true;
+    clearInterval(OL.pollInterval);OL.pollInterval=null;
+    MG.pl=[];MG.sc={};
     var room=await fbGet('rooms/'+OL.roomCode);
     olStartAsGuest(room);
   }catch(e){alert('Erreur lancement: '+e.message);}
 }
+
+// FIX: guard against double-call
 function olStartAsGuest(room){
-  clearInterval(OL.pollInterval);
+  if(document.getElementById('multi-game').style.display==='block')return; // already started
+  clearInterval(OL.pollInterval);OL.pollInterval=null;
+  if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   var players=Object.values(room.players||{});
   MG.pl=players.map(function(p){return p.name;});
   MG.sc={};MG.pl.forEach(function(p){MG.sc[p]=0;});
   MG.qs=room.questions||[];MG.qT=(room.settings&&room.settings.qT)||15;MG.qC=(room.settings&&room.settings.qC)||8;
-  MG.qi=0;MG.pi=0;MG.mode='online';
-  document.getElementById('ol-lobby').style.display='none';document.getElementById('ol-waiting').style.display='none';
+  MG.qi=0;MG.pi=0;MG.mode='online';_gameEnded=false;
+  document.getElementById('ol-lobby').style.display='none';
+  document.getElementById('ol-waiting').style.display='none';
   document.getElementById('multi-game').style.display='block';
-  cntDown(3,function(){olShowQ();});olPollAnswers();
+  cntDown(3,function(){olShowQ();});
+  olPollAnswers(); // FIX: start answer poll only after game confirmed started
 }
+
 function olShowQ(){
-  if(MG.qi>=MG.qs.length){endMulti();return;}
+  if(MG.qi>=MG.qs.length){olFinish();return;}
   var q=MG.qs[MG.qi];
   document.getElementById('mg-cat-label').textContent=q._cat||'';
   document.getElementById('mg-progress').textContent='Q'+(MG.qi+1)+'/'+MG.qs.length;
   document.getElementById('mg-turn').innerHTML='<span style="background:var(--ac);color:#fff;padding:4px 14px;border-radius:20px;font-weight:800;font-size:13px">🌐 Tout le monde répond !</span>';
-  document.getElementById('mg-q').textContent=q.q||'';document.getElementById('mg-opts').innerHTML='';document.getElementById('mg-fb').style.display='none';
+  document.getElementById('mg-q').textContent=q.q||'';
+  document.getElementById('mg-opts').innerHTML='';
+  document.getElementById('mg-fb').style.display='none';
   var ap=document.getElementById('ol-answer-panel');ap.style.display='block';
   document.getElementById('ol-ap-title').textContent='📱 Ta réponse — '+OL.myName;
-  document.getElementById('ol-ap-q').textContent=q.q||'';document.getElementById('ol-ap-fb').style.display='none';
+  document.getElementById('ol-ap-q').textContent=q.q||'';
+  document.getElementById('ol-ap-fb').style.display='none';
   var apO=document.getElementById('ol-ap-opts');apO.innerHTML='';
-  shuf(q.opts).forEach(function(o){var b=document.createElement('button');b.className='mb';b.textContent=o;b.onclick=function(){olAnswer(o,q.ans,b);};apO.appendChild(b);});
+  // FIX: track if this player already answered this question
+  var _answered=false;
+  shuf(q.opts).forEach(function(o){
+    var b=document.createElement('button');b.className='mb';b.textContent=o;
+    b.onclick=function(){
+      if(_answered)return; // FIX: prevent double-answer
+      _answered=true;
+      olAnswer(o,q.ans,b);
+    };
+    apO.appendChild(b);
+  });
   updateMGSc();startMGT();
 }
+
 async function olAnswer(chosen,correct,btn){
-  clearInterval(MG.tm);
-  document.querySelectorAll('#ol-ap-opts .mb').forEach(function(b){b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn&&chosen!==correct)b.classList.add('ko');});
+  clearInterval(MG.tm); // stop timer
+  // disable all buttons immediately
+  document.querySelectorAll('#ol-ap-opts .mb').forEach(function(b){
+    b.disabled=true;
+    if(b.textContent===correct)b.classList.add('ok');
+    else if(b===btn&&chosen!==correct)b.classList.add('ko');
+  });
   var ok=chosen===correct,fb=document.getElementById('ol-ap-fb');
   if(ok){SFX.correct();fb.style.cssText='display:block;background:#f0fdf4;color:var(--ok)';fb.textContent='✓ Correct ! +10 pts 🎉';}
   else{SFX.wrong();fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='✗ Raté ! Réponse : '+correct;}
-  try{await fbSet('rooms/'+OL.roomCode+'/answers/q'+MG.qi+'/'+sanitize(OL.myName),{chosen:chosen,correct:ok,ts:Date.now()});}catch(e){}
+  // FIX: push to Firebase — olPollAnswers will advance the question for everyone
+  try{
+    await fbSet('rooms/'+OL.roomCode+'/answers/q'+MG.qi+'/'+sanitize(OL.myName),{chosen:chosen,correct:ok,ts:Date.now()});
+  }catch(e){}
+  // FIX: do NOT advance MG.qi here — olPollAnswers does it when ALL players answered
 }
+
 var olAnswerPoll=null;
+var _advancingQ=false; // FIX: guard against double-advance
+
 function olPollAnswers(){
-  if(olAnswerPoll)clearInterval(olAnswerPoll);var lastQi=-1;
+  if(olAnswerPoll)clearInterval(olAnswerPoll);
   olAnswerPoll=setInterval(async function(){
+    if(_gameEnded)return;
     try{
       var room=await fbGet('rooms/'+OL.roomCode);if(!room)return;
-      if(room.status==='ended'){clearInterval(olAnswerPoll);return;}
       var players=Object.values(room.players||{}),total=players.length;
-      var qA=(room.answers||{})['q'+MG.qi]||{},answered=Object.keys(qA).length;
-      Object.keys(qA).forEach(function(pKey){
-        var pn=players.find(function(p){return sanitize(p.name)===pKey;});
-        if(pn&&qA[pKey].correct&&!(MG.sc[pn.name]>=(MG.qi+1)*10))MG.sc[pn.name]=(MG.sc[pn.name]||0)+10;
+      var allAnswers=room.answers||{};
+      var qKey='q'+MG.qi;
+      var qA=allAnswers[qKey]||{};
+      var answered=Object.keys(qA).length;
+
+      // Update scores from Firebase answers (authoritative source)
+      players.forEach(function(p){
+        var pa=qA[sanitize(p.name)];
+        if(pa&&pa.correct){
+          var maxForQ=(MG.qi+1)*10;
+          if((MG.sc[p.name]||0)<maxForQ)MG.sc[p.name]=(MG.sc[p.name]||0)+10;
+        }
       });
       updateMGSc();
-      if(answered>=total&&lastQi!==MG.qi){
-        lastQi=MG.qi;if(MG.tm)clearInterval(MG.tm);
-        setTimeout(function(){MG.qi++;if(MG.qi>=MG.qs.length)endMulti();else olShowQ();},1800);
+
+      // FIX: advance only when ALL players answered OR timer expired AND not already advancing
+      var timerDone=!MG.tm; // timer cleared means it expired or player answered
+      if((answered>=total||timerDone)&&!_advancingQ&&qKey===('q'+MG.qi)){
+        _advancingQ=true;
+        clearInterval(MG.tm);MG.tm=null;
+        setTimeout(function(){
+          MG.qi++;
+          _advancingQ=false;
+          if(MG.qi>=MG.qs.length){
+            olFinish();
+          }else{
+            olShowQ();
+          }
+        },1800);
       }
     }catch(e){}
   },1500);
 }
-async function olEndGame(){try{await fbSet('rooms/'+OL.roomCode+'/status','ended');}catch(e){}if(olAnswerPoll)clearInterval(olAnswerPoll);}
-function olShowResults(room){
-  var players=Object.values(room.players||{});
-  players.forEach(function(p){var pts=0;Object.values(room.answers||{}).forEach(function(qA){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)pts+=10;});MG.sc[p.name]=pts;});
-  MG.pl=players.map(function(p){return p.name;});endMulti();
+
+// FIX: single finish function to avoid double endMulti
+function olFinish(){
+  if(_gameEnded)return;
+  _gameEnded=true;
+  if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
+  if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+  olEndGame(); // tell Firebase
+  endMulti(); // show results
 }
+
+async function olEndGame(){
+  try{await fbSet('rooms/'+OL.roomCode+'/status','ended');}catch(e){}
+}
+
+function olShowResults(room){
+  if(_gameEnded)return; // FIX: guard
+  var players=Object.values(room.players||{});
+  players.forEach(function(p){
+    var pts=0;
+    Object.values(room.answers||{}).forEach(function(qA){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)pts+=10;});
+    MG.sc[p.name]=pts;
+  });
+  MG.pl=players.map(function(p){return p.name;});
+  endMulti();
+}
+
 function olLeave(){
-  if(OL.pollInterval)clearInterval(OL.pollInterval);if(olAnswerPoll)clearInterval(olAnswerPoll);
+  if(OL.pollInterval){clearInterval(OL.pollInterval);OL.pollInterval=null;}
+  if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   if(OL.roomCode&&OL.myName)fbDel('rooms/'+OL.roomCode+'/players/'+sanitize(OL.myName)).catch(function(){});
   OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
+  _gameStarted=false;_gameEnded=false;_advancingQ=false;
 }
-function copyRoomCode(){SFX.click();var code=OL.roomCode||'';if(navigator.clipboard)navigator.clipboard.writeText(code).then(function(){showBadge('📋 Code '+code+' copié !');});else showBadge('Code: '+code);}
+
+function copyRoomCode(){
+  SFX.click();var code=OL.roomCode||'';
+  if(navigator.clipboard)navigator.clipboard.writeText(code).then(function(){showBadge('📋 Code '+code+' copié !');});
+  else showBadge('Code: '+code);
+}
+
 
 // ── Firebase REST helpers ──
 async function fbSet(path,val){var r=await fetch(FB_URL+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)});if(!r.ok)throw new Error('PUT failed:'+r.status);return r.json();}
