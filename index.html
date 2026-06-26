@@ -562,11 +562,20 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
       <button class="btn-go" onclick="olShowCreate()" style="font-size:13px">🏠 Créer un salon</button>
       <button class="btn-go" onclick="olShowJoin()" style="font-size:13px;background:var(--ok)">🚪 Rejoindre</button>
     </div>
+    <div id="ol-spectate-btn-row" style="margin-bottom:12px">
+      <button class="btn-go" onclick="olShowSpectate()" style="font-size:13px;background:#6b7280">👁️ Regarder (spectateur)</button>
+    </div>
     <div id="ol-host-row" style="display:none"><input class="pinp" id="ol-host-name" placeholder="Ton prénom (hôte) *" maxlength="15" style="margin-bottom:8px"><button class="btn-go" style="background:var(--ok);margin-top:0" onclick="olDoCreate()">🏠 Créer le salon →</button></div>
     <div id="ol-join-row" style="display:none">
       <input class="pinp" id="ol-join-code" placeholder="Code du salon (ex: ALFA7)" maxlength="6" style="text-transform:uppercase;margin-bottom:8px;font-size:18px;text-align:center;letter-spacing:4px">
       <input class="pinp" id="ol-join-name" placeholder="Ton prénom *" maxlength="15" style="margin-bottom:8px">
       <button class="btn-go" style="background:var(--ok)" onclick="olJoin()">✅ Rejoindre</button>
+    </div>
+    <div id="ol-spectate-row" style="display:none">
+      <p style="font-size:12px;color:var(--mu);margin-bottom:8px;line-height:1.5">👁️ Mode spectateur : tu vois la partie en temps réel mais tu ne réponds pas aux questions.</p>
+      <input class="pinp" id="ol-spectate-code" placeholder="Code du salon (ex: ALFA7)" maxlength="6" style="text-transform:uppercase;margin-bottom:8px;font-size:18px;text-align:center;letter-spacing:4px">
+      <input class="pinp" id="ol-spectate-name" placeholder="Ton pseudo spectateur *" maxlength="15" style="margin-bottom:8px">
+      <button class="btn-go" style="background:#6b7280" onclick="olJoinSpectate()">👁️ Regarder la partie</button>
     </div>
   </div>
   <div style="display:flex;gap:8px"><button class="btn-go" style="background:var(--bg);border:2px solid var(--bo);color:var(--tx)" onclick="pickMode(null)">← Retour</button></div>
@@ -595,10 +604,36 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
   <div id="ol-wait-code" style="font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--ac);letter-spacing:6px;margin-bottom:8px"></div>
   <p style="font-size:12.5px;color:var(--mu);margin-bottom:14px">En attente que l'hôte lance la partie…</p><div id="ol-wait-players"></div></div>
 </div>
+<div id="ol-spectating" style="display:none">
+  <div class="card" style="text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">👁️</div>
+    <h3 style="font-size:16px;margin-bottom:6px">Mode Spectateur</h3>
+    <div id="ol-spec-code" style="font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:#6b7280;letter-spacing:6px;margin-bottom:8px"></div>
+    <p style="font-size:12px;color:var(--mu);margin-bottom:10px">Tu regardes la partie en direct 🍿</p>
+    <div id="ol-spec-players" style="margin-bottom:10px"></div>
+    <div id="ol-spec-status" style="font-size:12px;font-weight:700;color:var(--mu)">⏳ En attente du lancement…</div>
+  </div>
+  <div id="ol-spec-game" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div id="ol-spec-cat" style="font-size:11.5px;font-weight:700;color:var(--mu)"></div>
+        <div id="ol-spec-progress" style="font-size:12px;font-weight:800;color:var(--ac)"></div>
+      </div>
+      <div class="t-wrap"><div class="t-bar" id="ol-spec-tbar" style="width:100%;background:var(--ok)"></div></div>
+      <div id="ol-spec-q" style="font-size:15px;font-weight:700;margin-bottom:10px;line-height:1.5"></div>
+      <div id="ol-spec-opts" class="mopts"></div>
+    </div>
+    <div id="ol-spec-scores" style="margin-top:10px"></div>
+  </div>
+  <div style="margin-top:10px">
+    <button class="btn-go" onclick="olLeaveSpectate()" style="background:var(--bg);border:2px solid var(--bo);color:var(--tx)">← Quitter</button>
+  </div>
+</div>
 <div id="multi-game" style="display:none">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
     <div id="mg-cat-label" style="font-size:11.5px;font-weight:700;color:var(--mu)"></div>
     <div id="mg-progress" style="font-size:12px;font-weight:800;color:var(--ac)"></div>
+    <button id="mg-cancel-btn" onclick="cancelGame()" style="display:none;padding:4px 10px;border:2px solid var(--ko);background:#fef2f2;color:var(--ko);border-radius:8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Arrêter</button>
   </div>
   <div style="text-align:center;margin-bottom:6px" id="mg-turn"></div>
   <div class="t-lbl" id="mg-tlabel" style="font-size:22px">⏱ 15</div>
@@ -1472,7 +1507,17 @@ function pickMode(m){
   document.getElementById('multi-mode-sel').style.display=m?'none':'block';
   document.getElementById('hs-setup').style.display=m==='hotseat'?'block':'none';
   document.getElementById('ol-setup').style.display=m==='online'?'block':'none';
-  ['ol-lobby','ol-waiting','multi-game','multi-results'].forEach(function(id){document.getElementById(id).style.display='none';});
+  ['ol-lobby','ol-waiting','ol-spectating','multi-game','multi-results'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  // Reset online setup inner rows so they're always fresh when re-entering
+  if(m==='online'){
+    document.getElementById('ol-action-btns').style.display='grid';
+    var sbr=document.getElementById('ol-spectate-btn-row');if(sbr)sbr.style.display='block';
+    document.getElementById('ol-host-row').style.display='none';
+    document.getElementById('ol-join-row').style.display='none';
+    var sr=document.getElementById('ol-spectate-row');if(sr)sr.style.display='none';
+  }
   if(m){document.getElementById('mc-'+m).classList.add('active');SFX.click();}
   else{document.querySelectorAll('.mode-card').forEach(function(c){c.classList.remove('active');});}
   if(m==='hotseat')buildCatSelect();
@@ -1535,13 +1580,18 @@ function showMQ(){
 }
 function startMGT(){
   if(MG.tm)clearInterval(MG.tm);var r=MG.qT;
+  if(typeof _timerExpired!=='undefined')_timerExpired=false; // reset for new question
   var lb=document.getElementById('mg-tlabel'),bar=document.getElementById('mg-tbar');
   bar.style.width='100%';bar.style.background='var(--ok)';lb.className='t-lbl';
   MG.tm=setInterval(function(){
     r--;lb.textContent='⏱ '+r;bar.style.width=(r/MG.qT*100)+'%';
     if(r<=3){SFX.tick();bar.style.background='var(--ko)';lb.className='t-lbl danger';}
     else if(r<=7){bar.style.background='var(--wa)';lb.className='t-lbl warn';}
-    if(r<=0){clearInterval(MG.tm);SFX.timesup();timeoutMG();}
+    if(r<=0){
+      clearInterval(MG.tm);MG.tm=null;SFX.timesup();
+      if(typeof _timerExpired!=='undefined')_timerExpired=true; // signal poll to advance
+      if(MG.mode==='hotseat')timeoutMG(); // hotseat handles its own timeout
+    }
   },1000);
 }
 function answerMG(chosen,correct,pl,btn){
@@ -1587,9 +1637,13 @@ function endMulti(){
   if(MG.mode==='online'&&OL.roomCode)olEndGame();
 }
 function resetMulti(){
-  SFX.click();if(MG.tm)clearInterval(MG.tm);
+  SFX.click();
+  if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+  if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
+  if(typeof _spectatorPoll!=='undefined'&&_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
   if(OL.roomCode)olLeave();
   MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
+  _gameStarted=false;_gameEnded=false;_advancingQ=false;_timerExpired=false;
   pickMode(null);
 }
 
@@ -1609,35 +1663,54 @@ function cntDown(n,cb){
 var FB_URL='https://italian-ff05c-default-rtdb.europe-west1.firebasedatabase.app/';
 var OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
 
-// Guard flags to prevent double-initialization and double-ending
+// Guard flags
 var _gameStarted=false;
 var _gameEnded=false;
+var _advancingQ=false;
+var _isSpectator=false;
+var _spectatorPoll=null;
+var _specQi=-1; // last question spectator rendered
 
 function genCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},function(){return c[Math.floor(Math.random()*c.length)];}).join('');}
 function sanitize(s){return(s||'').replace(/[.#$[\]/]/g,'_');}
 
+// ── UI SHOW HELPERS ──
 function olShowCreate(){
   SFX.click();
   document.getElementById('ol-action-btns').style.display='none';
+  document.getElementById('ol-spectate-btn-row').style.display='none';
   document.getElementById('ol-host-row').style.display='block';
   document.getElementById('ol-join-row').style.display='none';
+  document.getElementById('ol-spectate-row').style.display='none';
   document.getElementById('ol-host-name').focus();
 }
 function olShowJoin(){
   SFX.click();
   document.getElementById('ol-action-btns').style.display='none';
+  document.getElementById('ol-spectate-btn-row').style.display='none';
   document.getElementById('ol-join-row').style.display='block';
   document.getElementById('ol-host-row').style.display='none';
+  document.getElementById('ol-spectate-row').style.display='none';
+}
+function olShowSpectate(){
+  SFX.click();
+  document.getElementById('ol-action-btns').style.display='none';
+  document.getElementById('ol-spectate-btn-row').style.display='none';
+  document.getElementById('ol-spectate-row').style.display='block';
+  document.getElementById('ol-host-row').style.display='none';
+  document.getElementById('ol-join-row').style.display='none';
+  document.getElementById('ol-spectate-code').focus();
 }
 
+// ── CREATE ROOM ──
 async function olDoCreate(){
   SFX.click();
   var nameEl=document.getElementById('ol-host-name'),name=nameEl.value.trim();
   if(!name){nameEl.style.borderColor='var(--ko)';nameEl.focus();return;}
   nameEl.style.borderColor='';
-  var code=genCode();OL.roomCode=code;OL.isHost=true;OL.myName=name;
+  var code=genCode();OL.roomCode=code;OL.isHost=true;OL.myName=name;_isSpectator=false;
   _gameStarted=false;_gameEnded=false;
-  var roomData={host:name,code:code,status:'lobby',players:{},settings:{qT:15,qC:8,cats:[]},createdAt:Date.now()};
+  var roomData={host:name,code:code,status:'lobby',players:{},spectators:{},settings:{qT:15,qC:8,cats:[]},createdAt:Date.now()};
   roomData.players[sanitize(name)]={name:name,score:0,ready:true,isHost:true};
   try{
     await fbSet('rooms/'+code,roomData);
@@ -1649,20 +1722,20 @@ async function olDoCreate(){
   }catch(e){alert('Erreur Firebase: '+e.message);}
 }
 
+// ── JOIN AS PLAYER ──
 async function olJoin(){
   SFX.click();
   var code=document.getElementById('ol-join-code').value.trim().toUpperCase();
   var name=document.getElementById('ol-join-name').value.trim();
   if(!code||code.length<4){alert('Entre le code du salon !');return;}
   if(!name){alert('Entre ton prénom !');return;}
-  _gameStarted=false;_gameEnded=false;
+  _gameStarted=false;_gameEnded=false;_isSpectator=false;
   try{
     var room=await fbGet('rooms/'+code);
     if(!room){alert('Salon introuvable. Vérifie le code !');return;}
     if(room.status!=='lobby'){alert('La partie a déjà commencé !');return;}
     OL.roomCode=code;OL.isHost=false;OL.myName=name;
-    var pl={name:name,score:0,ready:true,isHost:false};
-    await fbSet('rooms/'+code+'/players/'+sanitize(name),pl);
+    await fbSet('rooms/'+code+'/players/'+sanitize(name),{name:name,score:0,ready:true,isHost:false});
     document.getElementById('ol-setup').style.display='none';
     document.getElementById('ol-waiting').style.display='block';
     document.getElementById('ol-wait-code').textContent=code;
@@ -1670,36 +1743,173 @@ async function olJoin(){
   }catch(e){alert('Erreur: '+e.message);}
 }
 
-// FIX: olPollRoom only handles lobby/waiting state — stops itself when game starts
+// ── JOIN AS SPECTATOR ──
+async function olJoinSpectate(){
+  SFX.click();
+  var code=document.getElementById('ol-spectate-code').value.trim().toUpperCase();
+  var name=document.getElementById('ol-spectate-name').value.trim();
+  if(!code||code.length<4){alert('Entre le code du salon !');return;}
+  if(!name){alert('Entre ton pseudo !');return;}
+  try{
+    var room=await fbGet('rooms/'+code);
+    if(!room){alert('Salon introuvable. Vérifie le code !');return;}
+    OL.roomCode=code;OL.isHost=false;OL.myName=name;_isSpectator=true;
+    _gameStarted=false;_gameEnded=false;_specQi=-1;
+    // Register as spectator (separate from players so doesn't affect answer count)
+    await fbSet('rooms/'+code+'/spectators/'+sanitize(name),{name:name,ts:Date.now()});
+    document.getElementById('ol-setup').style.display='none';
+    document.getElementById('ol-spectating').style.display='block';
+    document.getElementById('ol-spec-code').textContent=code;
+    olStartSpectatorPoll();
+  }catch(e){alert('Erreur: '+e.message);}
+}
+
+// ── SPECTATOR POLL ──
+function olStartSpectatorPoll(){
+  if(_spectatorPoll)clearInterval(_spectatorPoll);
+  _spectatorPoll=setInterval(async function(){
+    try{
+      var room=await fbGet('rooms/'+OL.roomCode);if(!room)return;
+      var players=Object.values(room.players||{});
+      var specs=Object.values(room.spectators||{});
+
+      // Show player + spectator list
+      var pListEl=document.getElementById('ol-spec-players');
+      if(pListEl){
+        pListEl.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:6px">Joueurs :</div>'
+          +players.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:12.5px;font-weight:700;flex:1">'+p.name+(p.isHost?' 👑':'')+'</div></div>';}).join('')
+          +(specs.length?'<div style="font-size:12px;font-weight:700;color:var(--mu);margin:6px 0 4px">Spectateurs :</div>'
+            +specs.map(function(s){return '<div class="player-row"><div style="font-size:14px">👁️</div><div style="font-size:12.5px;color:var(--mu);flex:1">'+s.name+'</div></div>';}).join(''):'');
+      }
+
+      if(room.status==='lobby'){
+        document.getElementById('ol-spec-status').textContent='⏳ En attente du lancement…';
+        document.getElementById('ol-spec-game').style.display='none';
+      } else if(room.status==='playing'){
+        document.getElementById('ol-spec-status').style.display='none';
+        document.getElementById('ol-spec-game').style.display='block';
+        var qs=room.questions||[];
+        var qi=room.qi||0;
+        // Sync spectator to current question index from Firebase
+        if(qs.length>0&&qi!==_specQi){
+          _specQi=qi;
+          specRenderQuestion(qs,qi,room.settings&&room.settings.qT||15);
+        }
+        // Update live scores
+        specUpdateScores(players,room.answers||{},qs.length);
+      } else if(room.status==='ended'){
+        clearInterval(_spectatorPoll);
+        document.getElementById('ol-spec-status').style.display='block';
+        document.getElementById('ol-spec-status').textContent='🏁 Partie terminée !';
+        specShowFinalScores(players,room.answers||{},(room.questions||[]).length);
+      }
+    }catch(e){}
+  },1500);
+}
+
+function specRenderQuestion(qs,qi,qT){
+  if(qi>=qs.length)return;
+  var q=qs[qi];
+  document.getElementById('ol-spec-cat').textContent=q._cat||'';
+  document.getElementById('ol-spec-progress').textContent='Q'+(qi+1)+'/'+qs.length;
+  document.getElementById('ol-spec-q').textContent=q.q||'';
+  // Show options (read-only, no onclick)
+  var optsEl=document.getElementById('ol-spec-opts');
+  optsEl.innerHTML=q.opts.map(function(o){
+    return '<button class="mb" disabled style="cursor:default;opacity:.85">'+o+'</button>';
+  }).join('');
+  // Animate timer bar (visual only, resets each question)
+  var bar=document.getElementById('ol-spec-tbar');
+  bar.style.transition='none';bar.style.width='100%';bar.style.background='var(--ok)';
+  setTimeout(function(){
+    bar.style.transition='width '+qT+'s linear, background '+qT+'s linear';
+    bar.style.width='0%';bar.style.background='var(--ko)';
+  },100);
+}
+
+function specUpdateScores(players,answers,totalQ){
+  var sc={};
+  players.forEach(function(p){sc[p.name]=0;});
+  Object.values(answers).forEach(function(qA){
+    players.forEach(function(p){
+      var pa=qA[sanitize(p.name)];if(pa&&pa.correct)sc[p.name]=(sc[p.name]||0)+10;
+    });
+  });
+  var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
+  var colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
+  document.getElementById('ol-spec-scores').innerHTML='<div class="sc-board">'+sorted.map(function(p,i){
+    var isL=i===0&&sc[p.name]>0;
+    return '<div class="sc-card'+(isL?' leader':'')+'"><div class="sc-name" style="color:'+colors[i%4]+'">'+p.name+(isL?' 👑':'')+'</div><div class="sc-pts" style="color:'+colors[i%4]+'">'+(sc[p.name]||0)+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function specShowFinalScores(players,answers,totalQ){
+  var sc={};
+  players.forEach(function(p){sc[p.name]=0;});
+  Object.values(answers).forEach(function(qA){
+    players.forEach(function(p){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)sc[p.name]=(sc[p.name]||0)+10;});
+  });
+  var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
+  var medals=['🥇','🥈','🥉','4️⃣'];
+  var h='<div class="card" style="text-align:center"><h3 style="margin-bottom:12px">🏆 Résultats finaux</h3>';
+  sorted.forEach(function(p,i){
+    h+='<div style="display:flex;justify-content:space-between;padding:8px 12px;background:'+(i===0?'#fffbeb':'var(--bg)')+';border-radius:9px;margin-bottom:6px;font-weight:800">'
+      +'<span>'+medals[i]+' '+p.name+'</span><span>'+(sc[p.name]||0)+' pts</span></div>';
+  });
+  h+='</div>';
+  document.getElementById('ol-spec-game').innerHTML=h;
+}
+
+function olLeaveSpectate(){
+  SFX.click();
+  if(_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
+  if(OL.roomCode&&OL.myName)fbDel('rooms/'+OL.roomCode+'/spectators/'+sanitize(OL.myName)).catch(function(){});
+  OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
+  _isSpectator=false;_specQi=-1;
+  document.getElementById('ol-spectating').style.display='none';
+  pickMode('online');
+}
+
+// ── LOBBY POLL (players only) ──
 function olPollRoom(code){
   if(OL.pollInterval)clearInterval(OL.pollInterval);
   OL.pollInterval=setInterval(async function(){
     try{
       var room=await fbGet('rooms/'+code);if(!room)return;
       var pList=Object.values(room.players||{});
+      var specList=Object.values(room.spectators||{});
       if(OL.isHost){
-        renderLobbyPlayers(pList);
+        renderLobbyPlayers(pList,specList);
         var btn=document.getElementById('ol-start-btn');
         if(pList.length>=2){btn.disabled=false;btn.style.opacity='1';btn.textContent='🎮 Lancer la partie !';}
         else{btn.disabled=true;btn.style.opacity='.5';btn.textContent='⏳ En attente (min 2)...';}
       }else{
-        renderWaitingPlayers(pList);
+        renderWaitingPlayers(pList,specList);
       }
-      // FIX: only trigger start once, and stop this poll immediately
       if(room.status==='playing'&&!_gameStarted){
         _gameStarted=true;
-        clearInterval(OL.pollInterval); // FIX: stop lobby poll before starting game
-        OL.pollInterval=null;
+        clearInterval(OL.pollInterval);OL.pollInterval=null;
         olStartAsGuest(room);
       }
-      // FIX: ended state handled only by olPollAnswers, not here
     }catch(e){}
   },2000);
 }
 
-function renderLobbyPlayers(pList){var el=document.getElementById('ol-players-list');if(!el)return;el.innerHTML=pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700;flex:1">'+p.name+(p.isHost?' 👑 (hôte)':'')+'</div><div style="font-size:11px;color:var(--ok)">✓ connecté</div></div>';}).join('');}
-function renderWaitingPlayers(pList){var el=document.getElementById('ol-wait-players');if(!el)return;el.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px">Joueurs dans le salon :</div>'+pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700">'+p.name+(p.isHost?' 👑':'')+'</div></div>';}).join('');}
+function renderLobbyPlayers(pList,specList){
+  var el=document.getElementById('ol-players-list');if(!el)return;
+  var html=pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700;flex:1">'+p.name+(p.isHost?' 👑 (hôte)':'')+'</div><div style="font-size:11px;color:var(--ok)">✓ joueur</div></div>';}).join('');
+  if(specList&&specList.length)html+=specList.map(function(s){return '<div class="player-row"><div style="font-size:16px;line-height:1">👁️</div><div style="font-size:12.5px;color:var(--mu);flex:1">'+s.name+'</div><div style="font-size:11px;color:var(--mu)">spectateur</div></div>';}).join('');
+  el.innerHTML=html;
+}
+function renderWaitingPlayers(pList,specList){
+  var el=document.getElementById('ol-wait-players');if(!el)return;
+  var html='<div style="font-size:12px;font-weight:700;color:var(--mu);margin-bottom:8px">Dans le salon :</div>'
+    +pList.map(function(p){return '<div class="player-row"><div class="player-dot '+(p.isHost?'host':'online')+'"></div><div style="font-size:13px;font-weight:700">'+p.name+(p.isHost?' 👑':'')+'</div></div>';}).join('');
+  if(specList&&specList.length)html+=specList.map(function(s){return '<div class="player-row"><div style="font-size:16px;line-height:1">👁️</div><div style="font-size:12.5px;color:var(--mu)">'+s.name+' (spectateur)</div></div>';}).join('');
+  el.innerHTML=html;
+}
 
+// ── START GAME (host) ──
 async function olStartGame(){
   SFX.click();
   var cats=[].slice.call(document.querySelectorAll('#ol-cat-select .cat-btn.sel')).map(function(b){return b.dataset.cat;});
@@ -1708,25 +1918,21 @@ async function olStartGame(){
   var qs=buildQuestions(cats,qC);
   var qsS=qs.map(function(q){return {q:q.q||q.sent||'',opts:q.opts,ans:q.ans,_cat:q._cat};});
   try{
-    // FIX: write all data first, then set status to 'playing' last
-    // so guests don't start with incomplete data
     await fbSet('rooms/'+OL.roomCode+'/settings',{qT:qT,qC:qC,cats:cats});
     await fbSet('rooms/'+OL.roomCode+'/questions',qsS);
     await fbSet('rooms/'+OL.roomCode+'/qi',0);
-    await fbSet('rooms/'+OL.roomCode+'/answers',null); // clear any old answers
-    await fbSet('rooms/'+OL.roomCode+'/status','playing'); // trigger guests last
-    // Host starts locally without re-fetching (already has data)
+    await fbSet('rooms/'+OL.roomCode+'/answers',null);
+    await fbSet('rooms/'+OL.roomCode+'/status','playing');
     _gameStarted=true;
     clearInterval(OL.pollInterval);OL.pollInterval=null;
-    MG.pl=[];MG.sc={};
     var room=await fbGet('rooms/'+OL.roomCode);
     olStartAsGuest(room);
   }catch(e){alert('Erreur lancement: '+e.message);}
 }
 
-// FIX: guard against double-call
+// ── INIT GAME (all players) ──
 function olStartAsGuest(room){
-  if(document.getElementById('multi-game').style.display==='block')return; // already started
+  if(document.getElementById('multi-game').style.display==='block')return;
   clearInterval(OL.pollInterval);OL.pollInterval=null;
   if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   var players=Object.values(room.players||{});
@@ -1737,12 +1943,19 @@ function olStartAsGuest(room){
   document.getElementById('ol-lobby').style.display='none';
   document.getElementById('ol-waiting').style.display='none';
   document.getElementById('multi-game').style.display='block';
+  // Show cancel button for host only
+  var cancelBtn=document.getElementById('mg-cancel-btn');
+  if(cancelBtn)cancelBtn.style.display=OL.isHost?'block':'none';
   cntDown(3,function(){olShowQ();});
-  olPollAnswers(); // FIX: start answer poll only after game confirmed started
+  olPollAnswers();
 }
 
+// ── SHOW QUESTION ──
 function olShowQ(){
   if(MG.qi>=MG.qs.length){olFinish();return;}
+  _timerExpired=false; // reset for each new question
+  // Update Firebase qi so spectators can follow
+  if(OL.isHost)fbSet('rooms/'+OL.roomCode+'/qi',MG.qi).catch(function(){});
   var q=MG.qs[MG.qi];
   document.getElementById('mg-cat-label').textContent=q._cat||'';
   document.getElementById('mg-progress').textContent='Q'+(MG.qi+1)+'/'+MG.qs.length;
@@ -1755,23 +1968,19 @@ function olShowQ(){
   document.getElementById('ol-ap-q').textContent=q.q||'';
   document.getElementById('ol-ap-fb').style.display='none';
   var apO=document.getElementById('ol-ap-opts');apO.innerHTML='';
-  // FIX: track if this player already answered this question
   var _answered=false;
   shuf(q.opts).forEach(function(o){
     var b=document.createElement('button');b.className='mb';b.textContent=o;
-    b.onclick=function(){
-      if(_answered)return; // FIX: prevent double-answer
-      _answered=true;
-      olAnswer(o,q.ans,b);
-    };
+    b.onclick=function(){if(_answered)return;_answered=true;olAnswer(o,q.ans,b);};
     apO.appendChild(b);
   });
   updateMGSc();startMGT();
 }
 
+// ── ANSWER ──
 async function olAnswer(chosen,correct,btn){
-  clearInterval(MG.tm); // stop timer
-  // disable all buttons immediately
+  clearInterval(MG.tm);MG.tm=null;
+  // NOTE: do NOT set _timerExpired here — poll advances only when all players answered
   document.querySelectorAll('#ol-ap-opts .mb').forEach(function(b){
     b.disabled=true;
     if(b.textContent===correct)b.classList.add('ok');
@@ -1780,89 +1989,121 @@ async function olAnswer(chosen,correct,btn){
   var ok=chosen===correct,fb=document.getElementById('ol-ap-fb');
   if(ok){SFX.correct();fb.style.cssText='display:block;background:#f0fdf4;color:var(--ok)';fb.textContent='✓ Correct ! +10 pts 🎉';}
   else{SFX.wrong();fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='✗ Raté ! Réponse : '+correct;}
-  // FIX: push to Firebase — olPollAnswers will advance the question for everyone
-  try{
-    await fbSet('rooms/'+OL.roomCode+'/answers/q'+MG.qi+'/'+sanitize(OL.myName),{chosen:chosen,correct:ok,ts:Date.now()});
-  }catch(e){}
-  // FIX: do NOT advance MG.qi here — olPollAnswers does it when ALL players answered
+  // Try up to 3 times to write the answer to Firebase
+  var _written=false;
+  for(var _attempt=0;_attempt<3&&!_written;_attempt++){
+    try{
+      await fbSet('rooms/'+OL.roomCode+'/answers/q'+MG.qi+'/'+sanitize(OL.myName),{chosen:chosen,correct:ok,ts:Date.now()});
+      _written=true;
+    }catch(e){
+      if(_attempt===2){
+        // All retries failed — show error but don't block game
+        var fb2=document.getElementById('ol-ap-fb');
+        fb2.style.cssText='display:block;background:#fff3cd;color:#92400e';
+        fb2.textContent='⚠️ Réponse enregistrée localement (connexion instable)';
+        // Force advance after delay so game doesn't freeze
+        if(!_timerExpired&&!_advancingQ){_timerExpired=true;}
+      } else {
+        await new Promise(function(r){setTimeout(r,500);});
+      }
+    }
+  }
 }
 
+// ── ANSWER POLL ──
 var olAnswerPoll=null;
-var _advancingQ=false; // FIX: guard against double-advance
+var _timerExpired=false; // true only when the countdown hits 0, not when player answers
 
 function olPollAnswers(){
   if(olAnswerPoll)clearInterval(olAnswerPoll);
+  _timerExpired=false;
   olAnswerPoll=setInterval(async function(){
     if(_gameEnded)return;
     try{
       var room=await fbGet('rooms/'+OL.roomCode);if(!room)return;
+      // Check if host cancelled
+      if(room.status==='cancelled'){
+        _gameEnded=true;
+        clearInterval(olAnswerPoll);olAnswerPoll=null;
+        if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+        showCancelledScreen();
+        return;
+      }
       var players=Object.values(room.players||{}),total=players.length;
-      var allAnswers=room.answers||{};
       var qKey='q'+MG.qi;
-      var qA=allAnswers[qKey]||{};
+      var qA=(room.answers||{})[qKey]||{};
       var answered=Object.keys(qA).length;
-
-      // Update scores from Firebase answers (authoritative source)
+      // Update scores
       players.forEach(function(p){
         var pa=qA[sanitize(p.name)];
-        if(pa&&pa.correct){
-          var maxForQ=(MG.qi+1)*10;
-          if((MG.sc[p.name]||0)<maxForQ)MG.sc[p.name]=(MG.sc[p.name]||0)+10;
-        }
+        if(pa&&pa.correct){var max=(MG.qi+1)*10;if((MG.sc[p.name]||0)<max)MG.sc[p.name]=(MG.sc[p.name]||0)+10;}
       });
       updateMGSc();
-
-      // FIX: advance only when ALL players answered OR timer expired AND not already advancing
-      var timerDone=!MG.tm; // timer cleared means it expired or player answered
-      if((answered>=total||timerDone)&&!_advancingQ&&qKey===('q'+MG.qi)){
+      // Only advance when: all answered OR timer truly expired (not just because player answered)
+      if((answered>=total||_timerExpired)&&!_advancingQ){
         _advancingQ=true;
-        clearInterval(MG.tm);MG.tm=null;
+        _timerExpired=false;
+        if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
         setTimeout(function(){
-          MG.qi++;
           _advancingQ=false;
-          if(MG.qi>=MG.qs.length){
-            olFinish();
-          }else{
-            olShowQ();
-          }
+          if(_gameEnded)return; // game was cancelled/finished during the delay
+          MG.qi++;
+          if(MG.qi>=MG.qs.length)olFinish();else olShowQ();
         },1800);
       }
     }catch(e){}
   },1500);
 }
 
-// FIX: single finish function to avoid double endMulti
+// ── CANCEL GAME (host only) ──
+function cancelGame(){
+  SFX.click();
+  if(!OL.isHost){alert('Seul l\'hôte peut arrêter la partie.');return;}
+  if(!confirm('Arrêter la partie en cours ? Tous les joueurs seront renvoyés au menu.'))return;
+  _gameEnded=true;
+  if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
+  if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+  // Notify Firebase so all guests get the cancellation
+  fbSet('rooms/'+OL.roomCode+'/status','cancelled').catch(function(){});
+  document.getElementById('multi-game').style.display='none';
+  resetMulti();
+}
+
+function showCancelledScreen(){
+  if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+  document.getElementById('multi-game').style.display='none';
+  document.getElementById('multi-results').style.display='block';
+  document.getElementById('mr-podium').innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:48px">🛑</div><div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:900;margin:10px 0">Partie annulée</div><p style="font-size:13px;color:var(--mu)">L\'hôte a mis fin à la partie.</p></div>';
+}
+
+// ── FINISH ──
 function olFinish(){
   if(_gameEnded)return;
   _gameEnded=true;
   if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
-  olEndGame(); // tell Firebase
-  endMulti(); // show results
+  olEndGame();
+  endMulti();
 }
-
-async function olEndGame(){
-  try{await fbSet('rooms/'+OL.roomCode+'/status','ended');}catch(e){}
-}
+async function olEndGame(){try{await fbSet('rooms/'+OL.roomCode+'/status','ended');}catch(e){}}
 
 function olShowResults(room){
-  if(_gameEnded)return; // FIX: guard
+  if(_gameEnded)return;
   var players=Object.values(room.players||{});
-  players.forEach(function(p){
-    var pts=0;
-    Object.values(room.answers||{}).forEach(function(qA){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)pts+=10;});
-    MG.sc[p.name]=pts;
-  });
-  MG.pl=players.map(function(p){return p.name;});
-  endMulti();
+  players.forEach(function(p){var pts=0;Object.values(room.answers||{}).forEach(function(qA){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)pts+=10;});MG.sc[p.name]=pts;});
+  MG.pl=players.map(function(p){return p.name;});endMulti();
 }
 
 function olLeave(){
   if(OL.pollInterval){clearInterval(OL.pollInterval);OL.pollInterval=null;}
   if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
-  if(OL.roomCode&&OL.myName)fbDel('rooms/'+OL.roomCode+'/players/'+sanitize(OL.myName)).catch(function(){});
+  if(_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
+  if(OL.roomCode&&OL.myName){
+    var path=_isSpectator?'spectators':'players';
+    fbDel('rooms/'+OL.roomCode+'/'+path+'/'+sanitize(OL.myName)).catch(function(){});
+  }
   OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
-  _gameStarted=false;_gameEnded=false;_advancingQ=false;
+  _gameStarted=false;_gameEnded=false;_advancingQ=false;_isSpectator=false;_specQi=-1;
 }
 
 function copyRoomCode(){

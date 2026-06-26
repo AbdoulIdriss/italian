@@ -1,0 +1,1 @@
+firebaase realtime database url = 'https://italian-ff05c-default-rtdb.europe-west1.firebasedatabase.app/'
