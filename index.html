@@ -1638,6 +1638,7 @@ function endMulti(){
 }
 function resetMulti(){
   SFX.click();
+  _cntDownId++; // cancel any running countdown
   if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
   if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   if(typeof _spectatorPoll!=='undefined'&&_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
@@ -1648,13 +1649,19 @@ function resetMulti(){
 }
 
 // ── COUNTDOWN ──
+var _cntDownId=0; // incremented each new countdown to cancel stale ones
 function cntDown(n,cb){
   var ov=document.getElementById('cnt-overlay'),num=document.getElementById('cnt-num');
   ov.classList.add('show');var i=n;
+  var myId=++_cntDownId; // capture current countdown id
   function go(){
+    if(myId!==_cntDownId){ov.classList.remove('show');return;} // stale countdown cancelled
     SFX.countdown();num.textContent=i>0?i:'GO! 🇮🇹';
     num.style.animation='none';num.offsetHeight;num.style.animation='cpop .85s ease';
-    if(i===0)setTimeout(function(){ov.classList.remove('show');cb();},900);
+    if(i===0)setTimeout(function(){
+      if(myId!==_cntDownId)return; // cancelled during final delay
+      ov.classList.remove('show');cb();
+    },900);
     else{i--;setTimeout(go,1000);}
   }go();
 }
@@ -2021,12 +2028,20 @@ function olPollAnswers(){
     if(_gameEnded)return;
     try{
       var room=await fbGet('rooms/'+OL.roomCode);if(!room)return;
-      // Check if host cancelled
+      // Check if host cancelled or ended the game
       if(room.status==='cancelled'){
         _gameEnded=true;
         clearInterval(olAnswerPoll);olAnswerPoll=null;
         if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
         showCancelledScreen();
+        return;
+      }
+      if(room.status==='ended'&&!OL.isHost){
+        // Host finished — sync final scores from Firebase then show results
+        _gameEnded=true;
+        clearInterval(olAnswerPoll);olAnswerPoll=null;
+        if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+        olShowResults(room);
         return;
       }
       var players=Object.values(room.players||{}),total=players.length;
@@ -2061,6 +2076,7 @@ function cancelGame(){
   if(!OL.isHost){alert('Seul l\'hôte peut arrêter la partie.');return;}
   if(!confirm('Arrêter la partie en cours ? Tous les joueurs seront renvoyés au menu.'))return;
   _gameEnded=true;
+  _cntDownId++; // cancel any running countdown
   if(olAnswerPoll){clearInterval(olAnswerPoll);olAnswerPoll=null;}
   if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
   // Notify Firebase so all guests get the cancellation
