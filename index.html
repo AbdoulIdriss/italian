@@ -2045,13 +2045,18 @@ function olPollAnswers(){
         return;
       }
       var players=Object.values(room.players||{}),total=players.length;
+      var allAnswers=room.answers||{};
       var qKey='q'+MG.qi;
-      var qA=(room.answers||{})[qKey]||{};
+      var qA=allAnswers[qKey]||{};
       var answered=Object.keys(qA).length;
-      // Update scores
+      // Recompute scores from ALL questions answered so far (authoritative, no drift)
       players.forEach(function(p){
-        var pa=qA[sanitize(p.name)];
-        if(pa&&pa.correct){var max=(MG.qi+1)*10;if((MG.sc[p.name]||0)<max)MG.sc[p.name]=(MG.sc[p.name]||0)+10;}
+        var pts=0;
+        Object.values(allAnswers).forEach(function(qAnswers){
+          var pa=qAnswers[sanitize(p.name)];
+          if(pa&&pa.correct)pts+=10;
+        });
+        MG.sc[p.name]=pts;
       });
       updateMGSc();
       // Only advance when: all answered OR timer truly expired (not just because player answered)
