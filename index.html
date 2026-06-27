@@ -565,6 +565,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
     <div id="ol-spectate-btn-row" style="margin-bottom:12px">
       <button class="btn-go" onclick="olShowSpectate()" style="font-size:13px;background:#6b7280">👁️ Regarder (spectateur)</button>
     </div>
+    <div id="ol-error-msg" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:10px 12px;font-size:12.5px;font-weight:700;color:var(--ko);margin-bottom:8px"></div>
     <div id="ol-host-row" style="display:none"><input class="pinp" id="ol-host-name" placeholder="Ton prénom (hôte) *" maxlength="15" style="margin-bottom:8px"><button class="btn-go" style="background:var(--ok);margin-top:0" onclick="olDoCreate()">🏠 Créer le salon →</button></div>
     <div id="ol-join-row" style="display:none">
       <input class="pinp" id="ol-join-code" placeholder="Code du salon (ex: ALFA7)" maxlength="6" style="text-transform:uppercase;margin-bottom:8px;font-size:18px;text-align:center;letter-spacing:4px">
@@ -1689,7 +1690,7 @@ function olShowCreate(){
   document.getElementById('ol-host-row').style.display='block';
   document.getElementById('ol-join-row').style.display='none';
   document.getElementById('ol-spectate-row').style.display='none';
-  document.getElementById('ol-host-name').focus();
+  // No focus() — on mobile it triggers keyboard scroll before user sees the form
 }
 function olShowJoin(){
   SFX.click();
@@ -1713,8 +1714,12 @@ function olShowSpectate(){
 async function olDoCreate(){
   SFX.click();
   var nameEl=document.getElementById('ol-host-name'),name=nameEl.value.trim();
-  if(!name){nameEl.style.borderColor='var(--ko)';nameEl.focus();return;}
+  if(!name){nameEl.style.borderColor='var(--ko)';nameEl.placeholder='Entre ton prénom !';return;}
   nameEl.style.borderColor='';
+  // Show loading state on button
+  var btn=document.querySelector('#ol-host-row .btn-go');
+  var origText=btn.textContent;
+  btn.textContent='⏳ Connexion…';btn.disabled=true;
   var code=genCode();OL.roomCode=code;OL.isHost=true;OL.myName=name;_isSpectator=false;
   _gameStarted=false;_gameEnded=false;
   var roomData={host:name,code:code,status:'lobby',players:{},spectators:{},settings:{qT:15,qC:8,cats:[]},createdAt:Date.now()};
@@ -1726,7 +1731,19 @@ async function olDoCreate(){
     document.getElementById('ol-code-display').textContent=code;
     buildOlCatSelect();olPollRoom(code);
     document.getElementById('ol-start-btn').disabled=true;
-  }catch(e){alert('Erreur Firebase: '+e.message);}
+  }catch(e){
+    // Reset button so user can try again
+    btn.textContent=origText;btn.disabled=false;
+    OL.roomCode=null;OL.isHost=false;OL.myName='';
+    var msg=e.message||'Erreur inconnue';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('network')){
+      showOlError('❌ Pas de connexion internet. Vérifie ton WiFi ou data mobile.');
+    } else if(msg.includes('400')||msg.includes('401')||msg.includes('403')){
+      showOlError('❌ Firebase non configuré. Change FB_URL dans le code HTML.');
+    } else {
+      showOlError('❌ Erreur: '+msg);
+    }
+  }
 }
 
 // ── JOIN AS PLAYER ──
@@ -1734,20 +1751,37 @@ async function olJoin(){
   SFX.click();
   var code=document.getElementById('ol-join-code').value.trim().toUpperCase();
   var name=document.getElementById('ol-join-name').value.trim();
-  if(!code||code.length<4){alert('Entre le code du salon !');return;}
-  if(!name){alert('Entre ton prénom !');return;}
+  if(!code||code.length<4){showOlError('Entre le code du salon !');return;}
+  if(!name){showOlError('Entre ton prénom !');return;}
   _gameStarted=false;_gameEnded=false;_isSpectator=false;
+  var btn=document.querySelector('#ol-join-row .btn-go');
+  var origText=btn.textContent;
+  btn.textContent='⏳ Connexion…';btn.disabled=true;
   try{
     var room=await fbGet('rooms/'+code);
-    if(!room){alert('Salon introuvable. Vérifie le code !');return;}
-    if(room.status!=='lobby'){alert('La partie a déjà commencé !');return;}
+    if(!room){
+      btn.textContent=origText;btn.disabled=false;
+      showOlError('❌ Salon introuvable. Vérifie le code !');return;
+    }
+    if(room.status!=='lobby'){
+      btn.textContent=origText;btn.disabled=false;
+      showOlError('❌ La partie a déjà commencé !');return;
+    }
     OL.roomCode=code;OL.isHost=false;OL.myName=name;
     await fbSet('rooms/'+code+'/players/'+sanitize(name),{name:name,score:0,ready:true,isHost:false});
     document.getElementById('ol-setup').style.display='none';
     document.getElementById('ol-waiting').style.display='block';
     document.getElementById('ol-wait-code').textContent=code;
     olPollRoom(code);
-  }catch(e){alert('Erreur: '+e.message);}
+  }catch(e){
+    btn.textContent=origText;btn.disabled=false;
+    var msg=e.message||'';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')){
+      showOlError('❌ Pas de connexion internet.');
+    } else {
+      showOlError('❌ Erreur: '+msg);
+    }
+  }
 }
 
 // ── JOIN AS SPECTATOR ──
@@ -1755,11 +1789,13 @@ async function olJoinSpectate(){
   SFX.click();
   var code=document.getElementById('ol-spectate-code').value.trim().toUpperCase();
   var name=document.getElementById('ol-spectate-name').value.trim();
-  if(!code||code.length<4){alert('Entre le code du salon !');return;}
-  if(!name){alert('Entre ton pseudo !');return;}
+  if(!code||code.length<4){showOlError('Entre le code du salon !');return;}
+  if(!name){showOlError('Entre ton pseudo !');return;}
+  var btn=document.querySelector('#ol-spectate-row .btn-go');
+  var origText=btn.textContent;btn.textContent='⏳ Connexion…';btn.disabled=true;
   try{
     var room=await fbGet('rooms/'+code);
-    if(!room){alert('Salon introuvable. Vérifie le code !');return;}
+    if(!room){btn.textContent=origText;btn.disabled=false;showOlError('❌ Salon introuvable. Vérifie le code !');return;}
     OL.roomCode=code;OL.isHost=false;OL.myName=name;_isSpectator=true;
     _gameStarted=false;_gameEnded=false;_specQi=-1;
     // Register as spectator (separate from players so doesn't affect answer count)
@@ -1768,7 +1804,10 @@ async function olJoinSpectate(){
     document.getElementById('ol-spectating').style.display='block';
     document.getElementById('ol-spec-code').textContent=code;
     olStartSpectatorPoll();
-  }catch(e){alert('Erreur: '+e.message);}
+  }catch(e){
+    btn.textContent=origText;btn.disabled=false;
+    showOlError('❌ Erreur: '+(e.message||'Connexion échouée'));
+  }
 }
 
 // ── SPECTATOR POLL ──
@@ -1865,6 +1904,14 @@ function specShowFinalScores(players,answers,totalQ){
   });
   h+='</div>';
   document.getElementById('ol-spec-game').innerHTML=h;
+}
+
+function showOlError(msg){
+  var el=document.getElementById('ol-error-msg');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.display='block';
+  setTimeout(function(){el.style.display='none';},4000);
 }
 
 function olLeaveSpectate(){
