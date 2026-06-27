@@ -1736,10 +1736,12 @@ async function olDoCreate(){
     btn.textContent=origText;btn.disabled=false;
     OL.roomCode=null;OL.isHost=false;OL.myName='';
     var msg=e.message||'Erreur inconnue';
-    if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('network')){
+    if(msg==='TIMEOUT'||msg.includes('TIMEOUT')){
+      showOlError('❌ Firebase introuvable. Vérifie que FB_URL est bien configuré dans le code HTML.');
+    } else if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('Load failed')||msg.includes('network')){
       showOlError('❌ Pas de connexion internet. Vérifie ton WiFi ou data mobile.');
     } else if(msg.includes('400')||msg.includes('401')||msg.includes('403')){
-      showOlError('❌ Firebase non configuré. Change FB_URL dans le code HTML.');
+      showOlError('❌ Firebase refusé. Vérifie les règles de sécurité dans la console Firebase.');
     } else {
       showOlError('❌ Erreur: '+msg);
     }
@@ -1755,6 +1757,7 @@ async function olJoin(){
   if(!name){showOlError('Entre ton prénom !');return;}
   _gameStarted=false;_gameEnded=false;_isSpectator=false;
   var btn=document.querySelector('#ol-join-row .btn-go');
+
   var origText=btn.textContent;
   btn.textContent='⏳ Connexion…';btn.disabled=true;
   try{
@@ -2182,8 +2185,21 @@ function copyRoomCode(){
 
 
 // ── Firebase REST helpers ──
-async function fbSet(path,val){var r=await fetch(FB_URL+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)});if(!r.ok)throw new Error('PUT failed:'+r.status);return r.json();}
-async function fbGet(path){var r=await fetch(FB_URL+'/'+path+'.json');if(!r.ok)throw new Error('GET failed:'+r.status);return r.json();}
+function fbTimeout(ms){return new Promise(function(_,rej){setTimeout(function(){rej(new Error('TIMEOUT'));},ms);});}
+async function fbSet(path,val){
+  var r=await Promise.race([
+    fetch(FB_URL+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)}),
+    fbTimeout(8000)
+  ]);
+  if(!r.ok)throw new Error('PUT failed:'+r.status);return r.json();
+}
+async function fbGet(path){
+  var r=await Promise.race([
+    fetch(FB_URL+'/'+path+'.json'),
+    fbTimeout(8000)
+  ]);
+  if(!r.ok)throw new Error('GET failed:'+r.status);return r.json();
+}
 async function fbDel(path){return fetch(FB_URL+'/'+path+'.json',{method:'DELETE'});}
 
 // ── RENDER ALL — each exercise rendered exactly once ──
