@@ -2139,15 +2139,16 @@ function olPollAnswers(){
       var allAnswers=room.answers||{};
       var qKey='q'+MG.qi;
       var qA=allAnswers[qKey]||{};
-      var answered=Object.keys(qA).length;
-      // Recompute scores from ALL questions answered so far (authoritative, no drift)
-      players.forEach(function(p){
-        var pts=0;
-        Object.values(allAnswers).forEach(function(qAnswers){
-          var pa=qAnswers[sanitize(p.name)];
-          if(pa&&pa.correct)pts+=10;
+      // Count only real answers (objects with a .correct field)
+      var answered=Object.values(qA).filter(function(a){return a&&typeof a.correct!=='undefined';}).length;
+      // Recompute scores by iterating Firebase keys directly (avoids sanitize mismatch)
+      var scMap={};
+      players.forEach(function(p){scMap[sanitize(p.name)]=p.name;MG.sc[p.name]=0;});
+      Object.values(allAnswers).forEach(function(qAnswers){
+        Object.keys(qAnswers).forEach(function(key){
+          var ans=qAnswers[key];
+          if(ans&&ans.correct&&scMap[key])MG.sc[scMap[key]]=(MG.sc[scMap[key]]||0)+10;
         });
-        MG.sc[p.name]=pts;
       });
       updateMGSc();
       // Only advance when: all answered OR timer truly expired (not just because player answered)
