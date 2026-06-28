@@ -1670,7 +1670,7 @@ function cntDown(n,cb){
 }
 
 // ── ONLINE MODE ──
-var FB_URL='https://italian-ff05c-default-rtdb.europe-west1.firebasedatabase.app/';
+var FB_URL='https://italian-ff05c-default-rtdb.europe-west1.firebasedatabase.app';
 var OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
 
 // Guard flags
@@ -1920,16 +1920,18 @@ async function testFirebase(){
   res.style.display='none';
   try{
     var url=FB_URL.replace(/\/$/,'')+'/ping.json';
-    var r=await Promise.race([
-      fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:'"ok"'}),
-      new Promise(function(_,rej){setTimeout(function(){rej(new Error('TIMEOUT'));},10000);})
-    ]);
+    var ac2=new AbortController();
+    var tid2=setTimeout(function(){ac2.abort();},10000);
+    var r;
+    try{r=await fetch(url,{method:'PUT',signal:ac2.signal,headers:{'Content-Type':'application/json'},body:'"ok"'});}
+    catch(e2){clearTimeout(tid2);if(e2.name==='AbortError')throw new Error('TIMEOUT');throw e2;}
+    clearTimeout(tid2);
     var body=await r.text();
     if(r.ok){
       res.style.cssText='display:block;background:#f0fdf4;border:1px solid #86efac;color:#166534';
       res.textContent='✅ Firebase connecté ! ('+r.status+') Tu peux créer un salon.';
       // Clean up ping
-      fetch(FB_URL.replace(/\/$/,'')+'/ping.json',{method:'DELETE'});
+      fbDel('ping');
     } else if(r.status===401||r.status===403||body.includes('Permission denied')){
       res.style.cssText='display:block;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b';
       res.innerHTML='❌ Firebase répond mais accès refusé ('+r.status+').<br>Va dans Firebase Console → Realtime Database → <strong>Règles</strong> et mets :<br><code style="font-size:11px">{"rules":{".read":true,".write":true}}</code>';
@@ -2222,28 +2224,37 @@ function copyRoomCode(){
 
 
 // ── Firebase REST helpers ──
-function fbTimeout(ms){return new Promise(function(_,rej){setTimeout(function(){rej(new Error('TIMEOUT'));},ms);});}
+function fbUrl(path){return FB_URL.replace(/\/$/,'')+'/'+path+'.json';}
 async function fbSet(path,val){
-  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
-  var r=await Promise.race([
-    fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)}),
-    fbTimeout(15000)
-  ]);
-  if(!r.ok){var txt=await r.text().catch(function(){return r.status;});throw new Error('PUT '+r.status+': '+txt);}
-  return r.json().catch(function(){return null;});
+  var ac=new AbortController();
+  var tid=setTimeout(function(){ac.abort();},12000);
+  try{
+    var r=await fetch(fbUrl(path),{method:'PUT',signal:ac.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify(val)});
+    clearTimeout(tid);
+    if(!r.ok){var txt=await r.text().catch(function(){return ''+r.status;});throw new Error('PUT '+r.status+': '+txt);}
+    return r.json().catch(function(){return null;});
+  }catch(e){
+    clearTimeout(tid);
+    if(e.name==='AbortError')throw new Error('TIMEOUT');
+    throw e;
+  }
 }
 async function fbGet(path){
-  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
-  var r=await Promise.race([
-    fetch(url),
-    fbTimeout(15000)
-  ]);
-  if(!r.ok){var txt=await r.text().catch(function(){return r.status;});throw new Error('GET '+r.status+': '+txt);}
-  return r.json().catch(function(){return null;});
+  var ac=new AbortController();
+  var tid=setTimeout(function(){ac.abort();},12000);
+  try{
+    var r=await fetch(fbUrl(path),{signal:ac.signal});
+    clearTimeout(tid);
+    if(!r.ok){var txt=await r.text().catch(function(){return ''+r.status;});throw new Error('GET '+r.status+': '+txt);}
+    return r.json().catch(function(){return null;});
+  }catch(e){
+    clearTimeout(tid);
+    if(e.name==='AbortError')throw new Error('TIMEOUT');
+    throw e;
+  }
 }
 async function fbDel(path){
-  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
-  return fetch(url,{method:'DELETE'});
+  try{await fetch(fbUrl(path),{method:'DELETE'});}catch(e){}
 }
 
 // ── RENDER ALL — each exercise rendered exactly once ──
