@@ -1725,7 +1725,7 @@ async function olDoCreate(){
   var code=genCode();OL.roomCode=code;OL.isHost=true;OL.myName=name;_isSpectator=false;
   _gameStarted=false;_gameEnded=false;
   var roomData={host:name,code:code,status:'lobby',players:{},spectators:{},settings:{qT:15,qC:8,cats:[]},createdAt:Date.now()};
-  roomData.players[sanitize(name)]={name:name,score:0,ready:true,isHost:true};
+  roomData.players[sanitize(name)]={name:name,key:sanitize(name),score:0,ready:true,isHost:true};
   try{
     await fbSet('rooms/'+code,roomData);
     document.getElementById('ol-setup').style.display='none';
@@ -1775,7 +1775,7 @@ async function olJoin(){
       showOlError('❌ La partie a déjà commencé !');return;
     }
     OL.roomCode=code;OL.isHost=false;OL.myName=name;
-    await fbSet('rooms/'+code+'/players/'+sanitize(name),{name:name,score:0,ready:true,isHost:false});
+    await fbSet('rooms/'+code+'/players/'+sanitize(name),{name:name,key:sanitize(name),score:0,ready:true,isHost:false});
     document.getElementById('ol-setup').style.display='none';
     document.getElementById('ol-waiting').style.display='block';
     document.getElementById('ol-wait-code').textContent=code;
@@ -1881,11 +1881,11 @@ function specRenderQuestion(qs,qi,qT){
 }
 
 function specUpdateScores(players,answers,totalQ){
-  var sc={};
-  players.forEach(function(p){sc[p.name]=0;});
+  var sc={};var scMap={};
+  players.forEach(function(p){sc[p.name]=0;scMap[sanitize(p.name)]=p.name;});
   Object.values(answers).forEach(function(qA){
-    players.forEach(function(p){
-      var pa=qA[sanitize(p.name)];if(pa&&pa.correct)sc[p.name]=(sc[p.name]||0)+10;
+    Object.keys(qA).forEach(function(key){
+      var ans=qA[key];if(ans&&ans.correct&&scMap[key])sc[scMap[key]]=(sc[scMap[key]]||0)+10;
     });
   });
   var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
@@ -1897,10 +1897,12 @@ function specUpdateScores(players,answers,totalQ){
 }
 
 function specShowFinalScores(players,answers,totalQ){
-  var sc={};
-  players.forEach(function(p){sc[p.name]=0;});
+  var sc={};var scMap={};
+  players.forEach(function(p){sc[p.name]=0;scMap[sanitize(p.name)]=p.name;});
   Object.values(answers).forEach(function(qA){
-    players.forEach(function(p){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)sc[p.name]=(sc[p.name]||0)+10;});
+    Object.keys(qA).forEach(function(key){
+      var ans=qA[key];if(ans&&ans.correct&&scMap[key])sc[scMap[key]]=(sc[scMap[key]]||0)+10;
+    });
   });
   var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
   var medals=['🥇','🥈','🥉','4️⃣'];
@@ -2200,7 +2202,15 @@ async function olEndGame(){try{await fbSet('rooms/'+OL.roomCode+'/status','ended
 function olShowResults(room){
   if(_gameEnded)return;
   var players=Object.values(room.players||{});
-  players.forEach(function(p){var pts=0;Object.values(room.answers||{}).forEach(function(qA){var pa=qA[sanitize(p.name)];if(pa&&pa.correct)pts+=10;});MG.sc[p.name]=pts;});
+  var allAnswers=room.answers||{};
+  var scMap={};
+  players.forEach(function(p){scMap[sanitize(p.name)]=p.name;MG.sc[p.name]=0;});
+  Object.values(allAnswers).forEach(function(qAnswers){
+    Object.keys(qAnswers).forEach(function(key){
+      var ans=qAnswers[key];
+      if(ans&&ans.correct&&scMap[key])MG.sc[scMap[key]]=(MG.sc[scMap[key]]||0)+10;
+    });
+  });
   MG.pl=players.map(function(p){return p.name;});endMulti();
 }
 
