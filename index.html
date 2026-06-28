@@ -558,6 +558,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
   <div class="card"><h3>🌐 Jouer en ligne</h3>
     <p style="font-size:12.5px;color:var(--mu);margin-bottom:10px;line-height:1.6">Chaque joueur ouvre ce fichier HTML sur son téléphone.<br><strong>L'hôte</strong> crée un salon → partage le code → les autres le rejoignent.</p>
     <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:1.6">⚠️ <strong>Prérequis :</strong> Connexion internet requise · Utilise Firebase (gratuit).</div>
+    <button onclick="testFirebase()" style="width:100%;padding:8px;border:2px solid var(--ac);background:var(--al);color:var(--ac);border-radius:9px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;margin-bottom:10px">🔌 Tester la connexion Firebase</button>
+    <div id="ol-test-result" style="display:none;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;margin-bottom:8px"></div>
     <div id="ol-action-btns" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <button class="btn-go" onclick="olShowCreate()" style="font-size:13px">🏠 Créer un salon</button>
       <button class="btn-go" onclick="olShowJoin()" style="font-size:13px;background:var(--ok)">🚪 Rejoindre</button>
@@ -1737,13 +1739,15 @@ async function olDoCreate(){
     OL.roomCode=null;OL.isHost=false;OL.myName='';
     var msg=e.message||'Erreur inconnue';
     if(msg==='TIMEOUT'||msg.includes('TIMEOUT')){
-      showOlError('❌ Firebase introuvable. Vérifie que FB_URL est bien configuré dans le code HTML.');
-    } else if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('Load failed')||msg.includes('network')){
-      showOlError('❌ Pas de connexion internet. Vérifie ton WiFi ou data mobile.');
-    } else if(msg.includes('400')||msg.includes('401')||msg.includes('403')){
-      showOlError('❌ Firebase refusé. Vérifie les règles de sécurité dans la console Firebase.');
+      showOlError('❌ Timeout (15s). Firebase inaccessible — vérifie ton internet et la FB_URL.');
+    } else if(msg.includes('Failed to fetch')||msg.includes('NetworkError')||msg.includes('Load failed')){
+      showOlError('❌ Réseau inaccessible. Vérifie ton WiFi ou data mobile.');
+    } else if(msg.includes('401')||msg.includes('Permission denied')){
+      showOlError('❌ Firebase refusé. Va dans Firebase Console → Realtime Database → Règles → mets read/write à true.');
+    } else if(msg.includes('400')){
+      showOlError('❌ Requête invalide (400). Vérifie que FB_URL est correcte dans le HTML.');
     } else {
-      showOlError('❌ Erreur: '+msg);
+      showOlError('❌ '+msg);
     }
   }
 }
@@ -1907,6 +1911,39 @@ function specShowFinalScores(players,answers,totalQ){
   });
   h+='</div>';
   document.getElementById('ol-spec-game').innerHTML=h;
+}
+
+async function testFirebase(){
+  var btn=document.querySelector('[onclick="testFirebase()"]');
+  var res=document.getElementById('ol-test-result');
+  btn.textContent='⏳ Test en cours…';btn.disabled=true;
+  res.style.display='none';
+  try{
+    var url=FB_URL.replace(/\/$/,'')+'/ping.json';
+    var r=await Promise.race([
+      fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:'"ok"'}),
+      new Promise(function(_,rej){setTimeout(function(){rej(new Error('TIMEOUT'));},10000);})
+    ]);
+    var body=await r.text();
+    if(r.ok){
+      res.style.cssText='display:block;background:#f0fdf4;border:1px solid #86efac;color:#166534';
+      res.textContent='✅ Firebase connecté ! ('+r.status+') Tu peux créer un salon.';
+      // Clean up ping
+      fetch(FB_URL.replace(/\/$/,'')+'/ping.json',{method:'DELETE'});
+    } else if(r.status===401||r.status===403||body.includes('Permission denied')){
+      res.style.cssText='display:block;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b';
+      res.innerHTML='❌ Firebase répond mais accès refusé ('+r.status+').<br>Va dans Firebase Console → Realtime Database → <strong>Règles</strong> et mets :<br><code style="font-size:11px">{"rules":{".read":true,".write":true}}</code>';
+    } else {
+      res.style.cssText='display:block;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b';
+      res.textContent='❌ Erreur Firebase: '+r.status+' — '+body.slice(0,100);
+    }
+  } catch(e){
+    res.style.cssText='display:block;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b';
+    if(e.message==='TIMEOUT') res.textContent='❌ Timeout — Firebase inaccessible (URL incorrecte ou pas internet)';
+    else if(e.message.includes('fetch')||e.message.includes('Failed')||e.message.includes('Load failed')) res.textContent='❌ Pas de connexion réseau. Vérifie ton WiFi/data.';
+    else res.textContent='❌ '+e.message;
+  }
+  btn.textContent='🔌 Tester la connexion Firebase';btn.disabled=false;
 }
 
 function showOlError(msg){
@@ -2187,20 +2224,27 @@ function copyRoomCode(){
 // ── Firebase REST helpers ──
 function fbTimeout(ms){return new Promise(function(_,rej){setTimeout(function(){rej(new Error('TIMEOUT'));},ms);});}
 async function fbSet(path,val){
+  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
   var r=await Promise.race([
-    fetch(FB_URL+'/'+path+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)}),
-    fbTimeout(8000)
+    fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(val)}),
+    fbTimeout(15000)
   ]);
-  if(!r.ok)throw new Error('PUT failed:'+r.status);return r.json();
+  if(!r.ok){var txt=await r.text().catch(function(){return r.status;});throw new Error('PUT '+r.status+': '+txt);}
+  return r.json().catch(function(){return null;});
 }
 async function fbGet(path){
+  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
   var r=await Promise.race([
-    fetch(FB_URL+'/'+path+'.json'),
-    fbTimeout(8000)
+    fetch(url),
+    fbTimeout(15000)
   ]);
-  if(!r.ok)throw new Error('GET failed:'+r.status);return r.json();
+  if(!r.ok){var txt=await r.text().catch(function(){return r.status;});throw new Error('GET '+r.status+': '+txt);}
+  return r.json().catch(function(){return null;});
 }
-async function fbDel(path){return fetch(FB_URL+'/'+path+'.json',{method:'DELETE'});}
+async function fbDel(path){
+  var url=FB_URL.replace(/\/$/,'')+'/'+path+'.json';
+  return fetch(url,{method:'DELETE'});
+}
 
 // ── RENDER ALL — each exercise rendered exactly once ──
 function renderAll(){
