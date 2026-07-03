@@ -2341,6 +2341,9 @@ var CATS={
   vocab:{l:'🔤 Vocab',d:function(){return D.vit2.concat(D.vfr2);}},
   regioni:{l:'🗺️ Régions',d:function(){return D.reg1.concat(D.reg2);}},
   truefaux:{l:'✅ Vrai/Faux',d:function(){return D.tf1;}},
+  present:{l:'🔄 Présent',d:function(){return D.pres4.concat(D.pres5);}},
+  reflexifs:{l:'🪞 Réfléchis',d:function(){return D.rifl3.concat(D.rifl4);}},
+  gerondif:{l:'🎭 Gérondif',d:function(){return D.ger3.concat(D.ger4);}},
 };
 var MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
 function shuf(a){return[].concat(a).sort(function(){return Math.random()-.5;});}
@@ -3164,6 +3167,8 @@ function renderAll(){
    ['lprof1',D.lprof1],['lfam1',D.lfam1],['lscuola1',D.lscuola1],
    ['losp1',D.losp1],['lcielo1',D.lcielo1],['corps1',D.corps1],
    ['vit1',D.vit1],['vfr1',D.vfr1],
+   ['pres1',D.pres1],['pres2',D.pres2],['pres3',D.pres3],['pres6',D.pres6],
+   ['rifl1',D.rifl1],['rifl2',D.rifl2],['ger1',D.ger1],['ger2',D.ger2],
   ].forEach(function(x){bF(x[0],x[1]);});
   // MCQ exercises — ess3 is MCQ only (removed duplicate bF call)
   [['ess2',D.ess2],['ess3',D.ess3],['ess4',D.ess4],['av2',D.av2],
@@ -3175,6 +3180,9 @@ function renderAll(){
    ['lprof2',D.lprof2],['lfam2',D.lfam2],['lscuola2',D.lscuola2],
    ['losp2',D.losp2],['lcielo2',D.lcielo2],['corps2',D.corps2],
    ['reg1',D.reg1],['reg2',D.reg2],['vit2',D.vit2],['vfr2',D.vfr2],
+   ['pres4',D.pres4],['pres5',D.pres5],
+   ['rifl3',D.rifl3],['rifl4',D.rifl4],
+   ['ger3',D.ger3],['ger4',D.ger4],
   ].forEach(function(x){bM(x[0],x[1]);});
   // True/False
   bT('tf1',D.tf1);bT('tf2',D.tf2);
