@@ -2489,7 +2489,7 @@ function resetMulti(){
   if(typeof _spectatorPoll!=='undefined'&&_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
   if(OL.roomCode)olLeave();
   MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
-  _gameStarted=false;_gameEnded=false;_advancingQ=false;_timerExpired=false;
+  _gameStarted=false;_gameEnded=false;_advancingQ=false;_timerExpired=false;_localAnswers={};
   pickMode(null);
 }
 
@@ -2520,6 +2520,7 @@ var _gameStarted=false;
 var _gameEnded=false;
 var _advancingQ=false;
 var _isSpectator=false;
+var _localAnswers=null; // cache of all answers seen so far — avoids re-fetching old questions
 var _spectatorPoll=null;
 var _specQi=-1; // last question spectator rendered
 
@@ -2884,7 +2885,7 @@ function olStartAsGuest(room){
   MG.pl=players.map(function(p){return p.name;});
   MG.sc={};MG.pl.forEach(function(p){MG.sc[p]=0;});
   MG.qs=room.questions||[];MG.qT=(room.settings&&room.settings.qT)||15;MG.qC=(room.settings&&room.settings.qC)||8;
-  MG.qi=0;MG.pi=0;MG.mode='online';_gameEnded=false;
+  MG.qi=0;MG.pi=0;MG.mode='online';_gameEnded=false;_localAnswers={};
   document.getElementById('ol-lobby').style.display='none';
   document.getElementById('ol-waiting').style.display='none';
   document.getElementById('multi-game').style.display='block';
@@ -3012,18 +3013,22 @@ function olPollAnswers(){
         return a&&typeof a.correct!=='undefined';
       }).length;
 
-      // FIX: update scores incrementally — only add points for current question answers
-      // (full recompute only when advancing to avoid stale reads)
+      // Recompute scores from ALL questions answered so far — authoritative, no drift
+      // We fetch allAnswers once per advance (not every tick) to keep reads low
       var scMap={};
-      MG.pl.forEach(function(n){scMap[sanitize(n)]=n;});
-      Object.keys(qA).forEach(function(key){
-        var a=qA[key];
-        if(a&&a.correct&&scMap[key]){
-          // Only add if not already counted for this question
-          var expectedMax=(MG.qi+1)*10;
-          if((MG.sc[scMap[key]]||0)<expectedMax){
-            MG.sc[scMap[key]]=(MG.sc[scMap[key]]||0)+10;
-          }
+      MG.pl.forEach(function(n){scMap[sanitize(n)]=n;MG.sc[n]=0;});
+      // Only recompute from what we know locally — add current question results
+      // Use _localAnswers cache to avoid re-fetching previous questions
+      if(!_localAnswers)_localAnswers={};
+      // Merge current question answers into local cache
+      Object.keys(qA).forEach(function(key){if(qA[key])_localAnswers[('q'+MG.qi)+'_'+key]=qA[key];});
+      // Recompute from cache — correct answers only
+      Object.keys(_localAnswers).forEach(function(cacheKey){
+        var parts=cacheKey.split('_');
+        var playerKey=parts.slice(1).join('_'); // handle names with underscores
+        var ans=_localAnswers[cacheKey];
+        if(ans&&ans.correct&&scMap[playerKey]){
+          MG.sc[scMap[playerKey]]=(MG.sc[scMap[playerKey]]||0)+10;
         }
       });
       updateMGSc();
