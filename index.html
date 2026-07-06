@@ -2467,17 +2467,93 @@ function endMulti(){
   SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
   document.getElementById('multi-game').style.display='none';
   document.getElementById('multi-results').style.display='block';
+
   var sorted=[].concat(MG.pl).sort(function(a,b){return (MG.sc[b]||0)-(MG.sc[a]||0);});
-  var medals=['🥇','🥈','🥉','4️⃣'];
-  var h='<div style="text-align:center;margin-bottom:14px"><div style="font-size:36px">🏆</div>'
-    +'<div style="font-family:\'Playfair Display\',serif;font-size:20px;font-weight:900">Partie terminée !</div>'
-    +'<div style="font-size:13px;color:var(--mu);margin-top:4px">Gagnant : <strong style="color:var(--wa)">'+sorted[0]+'</strong> — '+(MG.sc[sorted[0]]||0)+' points !</div></div>'
-    +'<div class="podium">';
-  var ord=sorted.length>=3?[sorted[1],sorted[0],sorted[2]]:sorted.length===2?[sorted[1],sorted[0]]:[sorted[0]];
-  var pcls=sorted.length>=3?['pod pod-2','pod pod-1','pod pod-3']:sorted.length===2?['pod pod-2','pod pod-1']:['pod pod-1'];
-  ord.forEach(function(p,i){var rank=sorted.indexOf(p);h+='<div class="'+pcls[i]+'"><div class="pod-rank">'+medals[rank]+'</div><div class="pod-name">'+p+'</div><div class="pod-pts">'+(MG.sc[p]||0)+' pts</div></div>';});
+  var medals=['🥇','🥈','🥉'];
+  var totalQ=MG.qs?MG.qs.length:0;
+
+  // ── Header ──
+  var h='<div style="text-align:center;margin-bottom:16px">'
+    +'<div style="font-size:40px">🏆</div>'
+    +'<div style="font-family:var(--ff);font-size:22px;font-weight:900;margin:6px 0">Partie terminée !</div>';
+  if(sorted.length>0){
+    h+='<div style="font-size:13px;color:var(--mu)">Vainqueur : <strong style="color:var(--wa);font-size:15px">'+sorted[0]+'</strong> avec '+(MG.sc[sorted[0]]||0)+' pts 🎉</div>';
+  }
   h+='</div>';
-  if(sorted.length>3){sorted.slice(3).forEach(function(p,i){h+='<div style="display:flex;justify-content:space-between;padding:7px 12px;background:var(--bg);border-radius:8px;margin-bottom:5px;font-weight:700"><span>'+medals[i+3]+' '+p+'</span><span>'+(MG.sc[p]||0)+' pts</span></div>';});}
+
+  // ── Podium top 3 ──
+  var top3=sorted.slice(0,Math.min(3,sorted.length));
+  if(top3.length>=3){
+    // Classic podium order: 2nd left, 1st center, 3rd right
+    h+='<div class="podium" style="margin-bottom:16px">';
+    var podOrder=[top3[1],top3[0],top3[2]];
+    var podCls=['pod pod-2','pod pod-1','pod pod-3'];
+    var podMedals=['🥈','🥇','🥉'];
+    podOrder.forEach(function(p,i){
+      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
+      h+='<div class="'+podCls[i]+'">'
+        +'<div class="pod-rank">'+podMedals[i]+'</div>'
+        +'<div class="pod-name">'+p+'</div>'
+        +'<div class="pod-pts">'+(MG.sc[p]||0)+' pts</div>'
+        +(pct>0?'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+pct+'% correct</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  } else {
+    // Fewer than 3 players — simple podium
+    h+='<div class="podium" style="margin-bottom:16px">';
+    if(top3.length===2){
+      [top3[1],top3[0]].forEach(function(p,i){
+        var rank=sorted.indexOf(p);
+        h+='<div class="pod '+(rank===0?'pod-1':'pod-2')+'">'
+          +'<div class="pod-rank">'+medals[rank]+'</div>'
+          +'<div class="pod-name">'+p+'</div>'
+          +'<div class="pod-pts">'+(MG.sc[p]||0)+' pts</div>'
+          +'</div>';
+      });
+    } else if(top3.length===1){
+      h+='<div class="pod pod-1"><div class="pod-rank">🥇</div><div class="pod-name">'+top3[0]+'</div><div class="pod-pts">'+(MG.sc[top3[0]]||0)+' pts</div></div>';
+    }
+    h+='</div>';
+  }
+
+  // ── Full rankings (all players) ──
+  if(sorted.length>3){
+    h+='<div style="font-size:12px;font-weight:800;color:var(--mu);margin-bottom:8px;letter-spacing:.5px">CLASSEMENT COMPLET</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:5px">';
+    sorted.forEach(function(p,i){
+      var isTop3=i<3;
+      var rankIcon=i===0?'🥇':i===1?'🥈':i===2?'🥉':('<span style="display:inline-block;width:22px;text-align:center;font-weight:900;color:var(--mu)">'+(i+1)+'</span>');
+      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;'
+        +'background:'+(isTop3?'linear-gradient(90deg,var(--al),var(--bg))':'var(--bg)')+';'
+        +'border-radius:10px;'
+        +'border-left:3px solid '+(i===0?'var(--wa)':i===1?'#9ca3af':i===2?'#b45309':'var(--bo)')+';'
+        +'font-weight:'+(isTop3?'800':'700')+';">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:'+(isTop3?'18':'14')+'px">'+rankIcon+'</span>'
+        +'<span style="font-size:13px">'+p+'</span>'
+        +'</div>'
+        +'<div style="text-align:right">'
+        +'<div style="font-size:14px;font-weight:900;color:'+(i===0?'var(--wa)':'var(--ac)')+'">'+(MG.sc[p]||0)+' pts</div>'
+        +(pct>0?'<div style="font-size:10px;color:var(--mu)">'+pct+'% ✓</div>':'<div style="font-size:10px;color:var(--mu)">0%</div>')
+        +'</div>'
+        +'</div>';
+    });
+    h+='</div>';
+  } else if(sorted.length<=3 && sorted.length>0){
+    // Show all players in a simple list even when ≤3
+    h+='<div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">';
+    sorted.forEach(function(p,i){
+      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:10px;font-weight:700">'
+        +'<span>'+(i===0?'🥇':i===1?'🥈':'🥉')+' '+p+'</span>'
+        +'<span style="font-weight:900">'+(MG.sc[p]||0)+' pts'+(pct>0?' <span style="font-size:11px;color:var(--mu)">'+pct+'%</span>':'')+'</span>'
+        +'</div>';
+    });
+    h+='</div>';
+  }
+
   document.getElementById('mr-podium').innerHTML=h;
   if(MG.mode==='online'&&OL.roomCode)olEndGame();
 }
@@ -2814,9 +2890,12 @@ function olLeaveSpectate(){
 // ── LOBBY POLL (players only) ──
 function olPollRoom(code){
   if(OL.pollInterval)clearInterval(OL.pollInterval);
+  var _lobbyBusy=false;
   OL.pollInterval=setInterval(async function(){
+    if(_lobbyBusy)return;
+    _lobbyBusy=true;
     try{
-      // FIX: fetch players + status separately to avoid large payload
+      // Fetch players + status separately — small payloads
       var players=await fbGet('rooms/'+code+'/players')||{};
       var specs=await fbGet('rooms/'+code+'/spectators')||{};
       var status=await fbGet('rooms/'+code+'/status')||'lobby';
@@ -2838,6 +2917,7 @@ function olPollRoom(code){
         olStartAsGuest(room);
       }
     }catch(e){}
+    _lobbyBusy=false;
   },2000);
 }
 
@@ -2868,9 +2948,9 @@ async function olStartGame(){
     await fbSet('rooms/'+OL.roomCode+'/questions',qsS);
     await fbSet('rooms/'+OL.roomCode+'/qi',0);
     await fbSet('rooms/'+OL.roomCode+'/answers',null);
+    _gameStarted=true;            // FIX: set BEFORE writing status so olPollRoom can't trigger olStartAsGuest
+    clearInterval(OL.pollInterval);OL.pollInterval=null; // FIX: stop lobby poll BEFORE writing status
     await fbSet('rooms/'+OL.roomCode+'/status','playing');
-    _gameStarted=true;
-    clearInterval(OL.pollInterval);OL.pollInterval=null;
     var room=await fbGet('rooms/'+OL.roomCode);
     olStartAsGuest(room);
   }catch(e){alert('Erreur lancement: '+e.message);}
@@ -3054,6 +3134,8 @@ function olPollAnswers(){
       }
     }catch(e){
       // On error, just continue — don't freeze
+      _pollBusy=false; // FIX: MUST release here too — otherwise poll locks permanently
+      return;
     }
     _pollBusy=false;
   },1500);
