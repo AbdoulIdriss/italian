@@ -161,6 +161,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <button class="tb" onclick="G('present')">🔄 Présent</button>
 <button class="tb" onclick="G('reflexifs')">🪞 Réfléchis</button>
 <button class="tb" onclick="G('gerondif')">🎭 Gérondif</button>
+<button class="tb" onclick="G('passato')">⏮️ Passato</button>
 <button class="tb" onclick="G('multi')">🎮 Multi</button>
 </div></div>
 
@@ -187,6 +188,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div class="hcard" onclick="G('present')"><div class="em">🔄</div><h3>Présent</h3><p>Rég. + Irrég.</p></div>
 <div class="hcard" onclick="G('reflexifs')"><div class="em">🪞</div><h3>Réfléchis</h3><p>mi, ti, si…</p></div>
 <div class="hcard" onclick="G('gerondif')"><div class="em">🎭</div><h3>Gérondif</h3><p>stare + -ando/-endo</p></div>
+<div class="hcard" onclick="G('passato')"><div class="em">⏮️</div><h3>Passato Prossimo</h3><p>ho fatto · sono andato</p></div>
 <div class="hcard" onclick="G('multi')"><div class="em">🎮</div><h3>Multijoueur 🏆</h3><p>Jusqu'à 4 joueurs</p></div>
 <div class="hcard" onclick="G('essere')"><div class="em">🎯</div><h3>Commencer!</h3><p>→ Essere</p></div>
 </div></div>
@@ -667,6 +669,59 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div id="ger4-items"></div>
 <button class="btn-go" onclick="chkM('ger4',D.ger4)">✅ Vérifier</button>
 <div class="score" id="ger4-score"></div></div>
+</div>
+
+<!-- PASSATO PROSSIMO -->
+<div class="sec" id="passato">
+<h2 class="sec-t">⏮️ Passato Prossimo</h2>
+<p class="sec-s">Passé composé · auxiliaires AVERE et ESSERE · participes réguliers et irréguliers</p>
+
+<div class="th"><strong>Formation :</strong> auxiliaire (avere/essere) + participe passé
+<table><tr><th></th><th>-ARE → -ato</th><th>-ERE → -uto</th><th>-IRE → -ito</th></tr>
+<tr><td><strong>avere</strong></td><td>parlare → ho parlato</td><td>ricevere → ho ricevuto</td><td>dormire → ho dormito</td></tr>
+<tr><td><strong>essere</strong></td><td>andare → sono andato/a</td><td>—</td><td>partire → sono partito/a</td></tr></table>
+<strong>⚠️ Avec ESSERE :</strong> le participe s'accorde avec le sujet → <em>Mario è andato</em> / <em>Maria è andata</em> / <em>siamo andati</em><br>
+<strong>Verbes avec ESSERE :</strong> andare · venire · partire · arrivare · tornare · uscire · entrare · nascere · morire · restare · rimanere · diventare · cadere · salire · scendere + tous les réfléchis<br>
+<strong>Participes irréguliers fréquents :</strong>
+<table><tr><th>Infinitif</th><th>Part.</th><th>Infinitif</th><th>Part.</th><th>Infinitif</th><th>Part.</th></tr>
+<tr><td>fare</td><td><strong>fatto</strong></td><td>dire</td><td><strong>detto</strong></td><td>vedere</td><td><strong>visto</strong></td></tr>
+<tr><td>prendere</td><td><strong>preso</strong></td><td>mettere</td><td><strong>messo</strong></td><td>scrivere</td><td><strong>scritto</strong></td></tr>
+<tr><td>leggere</td><td><strong>letto</strong></td><td>aprire</td><td><strong>aperto</strong></td><td>chiedere</td><td><strong>chiesto</strong></td></tr>
+<tr><td>rispondere</td><td><strong>risposto</strong></td><td>chiudere</td><td><strong>chiuso</strong></td><td>vivere</td><td><strong>vissuto</strong></td></tr>
+<tr><td>nascere</td><td><strong>nato</strong></td><td>rimanere</td><td><strong>rimasto</strong></td><td>scegliere</td><td><strong>scelto</strong></td></tr>
+<tr><td>bere</td><td><strong>bevuto</strong></td><td>correre</td><td><strong>corso</strong></td><td>spendere</td><td><strong>speso</strong></td></tr></table></div>
+
+<div class="card" id="ex-pp1"><h3>🟢 Ex.1 — Conjugaison avec AVERE et ESSERE (fill-in)</h3>
+<p style="font-size:11.5px;color:var(--mu);margin-bottom:9px">Écris la forme complète (ex: ho parlato · sono andato/a)</p>
+<div id="pp1-items"></div>
+<button class="btn-go" onclick="chkF('pp1',D.pp1)">✅ Vérifier</button>
+<div class="score" id="pp1-score"></div></div>
+
+<div class="card" id="ex-pp2"><h3>🔵 Ex.2 — Participes irréguliers (fill-in)</h3>
+<p style="font-size:11.5px;color:var(--mu);margin-bottom:9px">Donne le participe passé de chaque verbe.</p>
+<div id="pp2-items"></div>
+<button class="btn-go" onclick="chkF('pp2',D.pp2)">✅ Vérifier</button>
+<div class="score" id="pp2-score"></div></div>
+
+<div class="card" id="ex-pp3"><h3>🟡 Ex.3 — Phrases complètes (fill-in)</h3>
+<div id="pp3-items"></div>
+<button class="btn-go" onclick="chkF('pp3',D.pp3)">✅ Vérifier</button>
+<div class="score" id="pp3-score"></div></div>
+
+<div class="card" id="ex-pp4"><h3>🔴 Ex.4 — Avoir ou Être ? (QCM)</h3>
+<div id="pp4-items"></div>
+<button class="btn-go" onclick="chkM('pp4',D.pp4)">✅ Vérifier</button>
+<div class="score" id="pp4-score"></div></div>
+
+<div class="card" id="ex-pp5"><h3>🎯 Ex.5 — Formes et accords (QCM)</h3>
+<div id="pp5-items"></div>
+<button class="btn-go" onclick="chkM('pp5',D.pp5)">✅ Vérifier</button>
+<div class="score" id="pp5-score"></div></div>
+
+<div class="card" id="ex-pp6"><h3>💪 Ex.6 — Participes + traductions (QCM difficile)</h3>
+<div id="pp6-items"></div>
+<button class="btn-go" onclick="chkM('pp6',D.pp6)">✅ Vérifier</button>
+<div class="score" id="pp6-score"></div></div>
 </div>
 
 <!-- MULTI -->
@@ -2078,6 +2133,182 @@ ger4:[
   {q:"Quelle phrase est INCORRECTE ?",opts:["Sto parlando.","Stai leggendo.","Sta facendo.","Sto andando al cinema."],ans:"Sto andando al cinema.",explain:"andare en gérondif avec stare est évité en italien courant — on dit 'Vado al cinema'"},
   {q:"'Sbagliando si impara.' signifie :",opts:["Il faut éviter les erreurs.","C'est en faisant des erreurs qu'on apprend.","On apprend avant de faire des erreurs.","Les erreurs sont interdites."],ans:"C'est en faisant des erreurs qu'on apprend.",explain:"Proverbe italien célèbre"},
 ],
+// ══ PASSATO PROSSIMO ══
+pp1:[
+  // auxiliaire AVERE — réguliers -ARE
+  {label:"parlare — io (avere)",ans:"ho parlato"},
+  {label:"mangiare — io (avere)",ans:"ho mangiato"},
+  {label:"lavorare — tu (avere)",ans:"hai lavorato"},
+  {label:"studiare — lui/lei (avere)",ans:"ha studiato"},
+  {label:"ascoltare — noi (avere)",ans:"abbiamo ascoltato"},
+  {label:"comprare — voi (avere)",ans:"avete comprato"},
+  {label:"cantare — loro (avere)",ans:"hanno cantato"},
+  {label:"aspettare — io (avere)",ans:"ho aspettato"},
+  {label:"chiamare — tu (avere)",ans:"hai chiamato"},
+  {label:"incontrare — lei (avere)",ans:"ha incontrato"},
+  {label:"portare — noi (avere)",ans:"abbiamo portato"},
+  {label:"guardare — voi (avere)",ans:"avete guardato"},
+  {label:"abitare — loro (avere)",ans:"hanno abitato"},
+  {label:"pagare — io (avere)",ans:"ho pagato"},
+  {label:"giocare — tu (avere)",ans:"hai giocato"},
+  // auxiliaire AVERE — réguliers -ERE
+  {label:"ricevere — io (avere)",ans:"ho ricevuto"},
+  {label:"vendere — tu (avere)",ans:"hai venduto"},
+  {label:"credere — lui/lei (avere)",ans:"ha creduto"},
+  {label:"perdere — noi (avere)",ans:"abbiamo perduto"},
+  {label:"temere — voi (avere)",ans:"avete temuto"},
+  // auxiliaire ESSERE — réguliers -ARE/-IRE
+  {label:"andare — io (essere)",ans:"sono andato/a"},
+  {label:"arrivare — tu (essere)",ans:"sei arrivato/a"},
+  {label:"partire — lui (essere)",ans:"è partito"},
+  {label:"partire — lei (essere)",ans:"è partita"},
+  {label:"uscire — noi (essere)",ans:"siamo usciti/e"},
+  {label:"tornare — voi (essere)",ans:"siete tornati/e"},
+  {label:"entrare — loro (essere)",ans:"sono entrati/e"},
+  {label:"nascere — io (essere)",ans:"sono nato/a"},
+  {label:"rimanere — tu (essere)",ans:"sei rimasto/a"},
+  {label:"diventare — lui (essere)",ans:"è diventato"},
+],
+pp2:[
+  // Participes irréguliers fréquents
+  {label:"fare → part. passé",ans:"fatto"},
+  {label:"dire → part. passé",ans:"detto"},
+  {label:"essere → part. passé",ans:"stato"},
+  {label:"avere → part. passé",ans:"avuto"},
+  {label:"vedere → part. passé",ans:"visto"},
+  {label:"venire → part. passé",ans:"venuto"},
+  {label:"andare → part. passé",ans:"andato"},
+  {label:"prendere → part. passé",ans:"preso"},
+  {label:"mettere → part. passé",ans:"messo"},
+  {label:"scrivere → part. passé",ans:"scritto"},
+  {label:"leggere → part. passé",ans:"letto"},
+  {label:"aprire → part. passé",ans:"aperto"},
+  {label:"offrire → part. passé",ans:"offerto"},
+  {label:"chiedere → part. passé",ans:"chiesto"},
+  {label:"rispondere → part. passé",ans:"risposto"},
+  {label:"chiudere → part. passé",ans:"chiuso"},
+  {label:"perdere → part. passé",ans:"perso"},
+  {label:"conoscere → part. passé",ans:"conosciuto"},
+  {label:"nascere → part. passé",ans:"nato"},
+  {label:"rimanere → part. passé",ans:"rimasto"},
+  {label:"scegliere → part. passé",ans:"scelto"},
+  {label:"spendere → part. passé",ans:"speso"},
+  {label:"vivere → part. passé",ans:"vissuto"},
+  {label:"accendere → part. passé",ans:"acceso"},
+  {label:"correre → part. passé",ans:"corso"},
+  {label:"bere → part. passé",ans:"bevuto"},
+  {label:"dovere → part. passé",ans:"dovuto"},
+  {label:"potere → part. passé",ans:"potuto"},
+  {label:"volere → part. passé",ans:"voluto"},
+  {label:"sapere → part. passé",ans:"saputo"},
+],
+pp3:[
+  // Phrases complètes fill-in
+  {label:"Ieri io (mangiare) ___ la pizza.",ans:"ho mangiato"},
+  {label:"Stamattina tu (bere) ___ il caffè?",ans:"hai bevuto"},
+  {label:"Marco (fare) ___ i compiti.",ans:"ha fatto"},
+  {label:"Noi (vedere) ___ un bel film.",ans:"abbiamo visto"},
+  {label:"Voi (andare) ___ al mare?",ans:"siete andati/e"},
+  {label:"Loro (arrivare) ___ tardi.",ans:"sono arrivati/e"},
+  {label:"Io (leggere) ___ quel libro.",ans:"ho letto"},
+  {label:"Tu (venire) ___ a piedi?",ans:"sei venuto/a"},
+  {label:"Lei (scrivere) ___ una lettera.",ans:"ha scritto"},
+  {label:"Noi (uscire) ___ insieme.",ans:"siamo usciti/e"},
+  {label:"Voi (prendere) ___ l'autobus?",ans:"avete preso"},
+  {label:"Loro (dire) ___ la verità.",ans:"hanno detto"},
+  {label:"Io (aprire) ___ la finestra.",ans:"ho aperto"},
+  {label:"Tu (restare) ___ a casa.",ans:"sei rimasto/a"},
+  {label:"Carlo (nascere) ___ a Roma.",ans:"è nato"},
+  {label:"Noi (spendere) ___ troppo.",ans:"abbiamo speso"},
+  {label:"Voi (chiedere) ___ aiuto?",ans:"avete chiesto"},
+  {label:"Loro (scegliere) ___ il ristorante.",ans:"hanno scelto"},
+  {label:"Io (rispondere) ___ subito.",ans:"ho risposto"},
+  {label:"Tu (chiudere) ___ la porta?",ans:"hai chiuso"},
+  {label:"Giulia (partire) ___ presto.",ans:"è partita"},
+  {label:"Noi (correre) ___ nel parco.",ans:"abbiamo corso"},
+  {label:"I ragazzi (tornare) ___ dal viaggio.",ans:"sono tornati"},
+  {label:"Io (conoscere) ___ Marco a Parigi.",ans:"ho conosciuto"},
+  {label:"Tu (vivere) ___ a Milano?",ans:"hai vissuto"},
+],
+pp4:[
+  // MCQ auxiliaire essere vs avere
+  {q:"'Partire' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Mangiare' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Andare' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Vedere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Nascere' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Scrivere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Venire' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Fare' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Tornare' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Bere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Uscire' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Leggere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Rimanere' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Prendere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Diventare' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Rispondere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Entrare' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Conoscere' au passato prossimo utilise :",opts:["avere","essere"],ans:"avere"},
+  {q:"'Cadere' au passato prossimo utilise :",opts:["avere","essere"],ans:"essere"},
+  {q:"'Vivere' au passato prossimo utilise :",opts:["avere","essere","avere ou être selon sens"],ans:"avere ou être selon sens",explain:"vivere → ha vissuto (transitif) / è vissuto (durée de vie)"},
+],
+pp5:[
+  // MCQ formes correctes + accords
+  {q:"Luca ___ al bar. (andare)",opts:["ha andato","è andato","è andati","ha andati"],ans:"è andato"},
+  {q:"Maria ___ la pasta. (mangiare)",opts:["è mangiata","ha mangiata","ha mangiato","è mangiato"],ans:"ha mangiato",explain:"avec avere, pas d'accord obligatoire"},
+  {q:"Le ragazze ___ presto. (arrivare)",opts:["sono arrivate","hanno arrivato","sono arrivati","ha arrivate"],ans:"sono arrivate",explain:"essere → accord au féminin pluriel"},
+  {q:"Io (m.) ___ a casa. (restare)",opts:["sono restato","ho restato","sono restata","è restato"],ans:"sono restato"},
+  {q:"Noi ___ un film. (vedere)",opts:["siamo visti","abbiamo visto","abbiamo vista","siamo veduto"],ans:"abbiamo visto"},
+  {q:"Voi ___ dal Camerun. (venire)",opts:["avete venuto","siete venuti","avete venuti","siete venuto"],ans:"siete venuti"},
+  {q:"Sara ___ i capelli. (tagliare)",opts:["è tagliata","ha tagliata","ha tagliato","è tagliato"],ans:"ha tagliato",explain:"tagliare + avere → pas d'accord"},
+  {q:"I bambini ___ a letto tardi. (andare)",opts:["hanno andato","sono andati","sono andate","hanno andati"],ans:"sono andati"},
+  {q:"Io (f.) ___ in Italia. (nascere)",opts:["sono nato","ho nato","sono nata","ha nata"],ans:"sono nata"},
+  {q:"Tu ___ la lettera? (scrivere)",opts:["sei scritto","hai scritto","sei scritta","hai scritta"],ans:"hai scritto"},
+  {q:"Marco e Luca ___ il treno. (perdere)",opts:["sono persi","hanno perso","sono perduti","hanno perduti"],ans:"hanno perso"},
+  {q:"Mia sorella ___ medico. (diventare)",opts:["ha diventata","è diventata","ha diventato","è diventato"],ans:"è diventata",explain:"diventare + essere → accord"},
+  {q:"Noi ___ tutta la notte. (dormire)",opts:["siamo dormiti","abbiamo dormito","siamo dormite","abbiamo dormiti"],ans:"abbiamo dormito",explain:"dormire + avere"},
+  {q:"Le studentesse ___ a casa. (rimanere)",opts:["hanno rimasto","sono rimaste","sono rimasti","hanno rimaste"],ans:"sono rimaste"},
+  {q:"Ieri tu ___ troppo! (spendere)",opts:["sei speso","hai speso","hai spesa","sei spesa"],ans:"hai speso"},
+  {q:"Quanto tempo ___ qui? (vivere, loro)",opts:["hanno vissuto","sono vissuti","hanno vivuto","sono vivuti"],ans:"hanno vissuto"},
+  {q:"Il dottore ___ alle 8. (arrivare)",opts:["ha arrivato","è arrivati","è arrivato","ha arrivati"],ans:"è arrivato"},
+  {q:"Questa mattina io ___ tardi. (alzarsi)",opts:["mi sono alzato/a","ho alzato","mi ha alzato","sono alzato"],ans:"mi sono alzato/a",explain:"réfléchi → sempre essere"},
+  {q:"Voi ___ bene al ristorante? (mangiare)",opts:["siete mangiati","avete mangiato","avete mangiati","siete mangiato"],ans:"avete mangiato"},
+  {q:"I miei genitori ___ in Francia. (vivere, sens de durée de vie)",opts:["hanno vissuto","sono vissuti","hanno vivuto","sono vivuto"],ans:"sono vissuti",explain:"vivere intransitif (durée de vie) → essere"},
+],
+pp6:[
+  // MCQ difficile — participes irréguliers + contexte
+  {q:"Forme correcte du participe passé de 'fare' ?",opts:["farito","fatto","fato","faccio"],ans:"fatto"},
+  {q:"Forme correcte du participe passé de 'prendere' ?",opts:["prenduto","prendito","preso","prendo"],ans:"preso"},
+  {q:"Forme correcte du participe passé de 'dire' ?",opts:["dirito","ditto","detto","dito"],ans:"detto"},
+  {q:"Forme correcte du participe passé de 'leggere' ?",opts:["legguto","leggito","letto","leggetto"],ans:"letto"},
+  {q:"Forme correcte du participe passé de 'mettere' ?",opts:["mettuto","mettito","messo","metteto"],ans:"messo"},
+  {q:"Forme correcte du participe passé de 'chiudere' ?",opts:["chiuduto","chiudito","chiuso","chiudeto"],ans:"chiuso"},
+  {q:"Forme correcte du participe passé de 'aprire' ?",opts:["aprito","apruto","aperto","apreto"],ans:"aperto"},
+  {q:"Forme correcte du participe passé de 'scrivere' ?",opts:["scrivuto","scrivito","scritto","scriveto"],ans:"scritto"},
+  {q:"Forme correcte du participe passé de 'vedere' ?",opts:["veduto","vedito","visto","vedeto"],ans:"visto",explain:"aussi 'veduto' mais 'visto' est plus courant"},
+  {q:"Forme correcte du participe passé de 'bere' ?",opts:["berito","beuto","bevuto","beto"],ans:"bevuto"},
+  {q:"Forme correcte du participe passé de 'venire' ?",opts:["venito","venuto","vennuto","vento"],ans:"venuto"},
+  {q:"Forme correcte du participe passé de 'chiedere' ?",opts:["chieduto","chiedito","chiesto","chiedeto"],ans:"chiesto"},
+  {q:"Forme correcte du participe passé de 'rispondere' ?",opts:["risponduto","rispondito","risposto","rispondeto"],ans:"risposto"},
+  {q:"Forme correcte du participe passé de 'nascere' ?",opts:["nascuto","nascito","nato","nasceto"],ans:"nato"},
+  {q:"Forme correcte du participe passé de 'scegliere' ?",opts:["scegliuto","scegliito","scelto","sceglieto"],ans:"scelto"},
+  {q:"Forme correcte du participe passé de 'vivere' ?",opts:["vivuto","vivito","vissuto","viveto"],ans:"vissuto"},
+  {q:"Forme correcte du participe passé de 'correre' ?",opts:["corrito","coruto","corso","coreto"],ans:"corso"},
+  {q:"Forme correcte du participe passé de 'rimanere' ?",opts:["rimanuto","rimanito","rimasto","rimaneto"],ans:"rimasto"},
+  {q:"Forme correcte du participe passé de 'accendere' ?",opts:["accenduto","accendito","acceso","accendeto"],ans:"acceso"},
+  {q:"Forme correcte du participe passé de 'spendere' ?",opts:["spenduto","spendito","speso","spendeto"],ans:"speso"},
+  {q:"'Ho conosciuto Marco' signifie :",opts:["Je connaissais Marco","J'ai rencontré/connu Marco","Je connais Marco","Je vais connaître Marco"],ans:"J'ai rencontré/connu Marco"},
+  {q:"'Siamo usciti alle 8' signifie :",opts:["Nous sortons à 8h","Nous sortions à 8h","Nous sommes sortis à 8h","Nous sortirons à 8h"],ans:"Nous sommes sortis à 8h"},
+  {q:"'Non ho capito niente' signifie :",opts:["Je ne comprends rien","Je ne comprenais rien","Je n'ai rien compris","Je ne comprendrai rien"],ans:"Je n'ai rien compris"},
+  {q:"'È già partita?' signifie :",opts:["Elle part déjà ?","Elle partait déjà ?","Elle est déjà partie ?","Elle va déjà partir ?"],ans:"Elle est déjà partie ?"},
+  {q:"'Hai mai vissuto all'estero?' signifie :",opts:["Tu vis à l'étranger ?","As-tu jamais vécu à l'étranger ?","Tu vivais à l'étranger ?","Tu vas vivre à l'étranger ?"],ans:"As-tu jamais vécu à l'étranger ?"},
+  {q:"Quelle phrase est CORRECTE ?",opts:["Ho andato al mercato","Sono andato al mercato","Avevo andato al mercato","Sto andato al mercato"],ans:"Sono andato al mercato"},
+  {q:"Quelle phrase est CORRECTE ?",opts:["Sono mangiato la pizza","Ha mangiata la pizza","Ho mangiato la pizza","Avevo mangiato la pizza"],ans:"Ho mangiato la pizza"},
+  {q:"Quelle phrase est CORRECTE ?",opts:["Siamo arrivato tardi","Abbiamo arrivati tardi","Siamo arrivati tardi","Hanno arrivato tardi"],ans:"Siamo arrivati tardi"},
+  {q:"'Ieri sera' est souvent utilisé avec :",opts:["il presente","il passato prossimo","il futuro","il condizionale"],ans:"il passato prossimo"},
+  {q:"Négation au passato prossimo — ordre correct ?",opts:["Ho non mangiato","Non mangiato ho","Non ho mangiato","Ho mangiato non"],ans:"Non ho mangiato"},
+],
 
 };
 
@@ -2344,6 +2575,7 @@ var CATS={
   present:{l:'🔄 Présent',d:function(){return D.pres4.concat(D.pres5);}},
   reflexifs:{l:'🪞 Réfléchis',d:function(){return D.rifl3.concat(D.rifl4);}},
   gerondif:{l:'🎭 Gérondif',d:function(){return D.ger3.concat(D.ger4);}},
+  passato:{l:'⏮️ Passato Prossimo',d:function(){return D.pp4.concat(D.pp5).concat(D.pp6);}},
 };
 var MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
 function shuf(a){return[].concat(a).sort(function(){return Math.random()-.5;});}
@@ -3256,6 +3488,7 @@ function renderAll(){
    ['vit1',D.vit1],['vfr1',D.vfr1],
    ['pres1',D.pres1],['pres2',D.pres2],['pres3',D.pres3],['pres6',D.pres6],
    ['rifl1',D.rifl1],['rifl2',D.rifl2],['ger1',D.ger1],['ger2',D.ger2],
+   ['pp1',D.pp1],['pp2',D.pp2],['pp3',D.pp3],
   ].forEach(function(x){bF(x[0],x[1]);});
   // MCQ exercises — ess3 is MCQ only (removed duplicate bF call)
   [['ess2',D.ess2],['ess3',D.ess3],['ess4',D.ess4],['av2',D.av2],
@@ -3270,6 +3503,7 @@ function renderAll(){
    ['pres4',D.pres4],['pres5',D.pres5],
    ['rifl3',D.rifl3],['rifl4',D.rifl4],
    ['ger3',D.ger3],['ger4',D.ger4],
+   ['pp4',D.pp4],['pp5',D.pp5],['pp6',D.pp6],
   ].forEach(function(x){bM(x[0],x[1]);});
   // True/False
   bT('tf1',D.tf1);bT('tf2',D.tf2);
