@@ -162,6 +162,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <button class="tb" onclick="G('reflexifs')">🪞 Réfléchis</button>
 <button class="tb" onclick="G('gerondif')">🎭 Gérondif</button>
 <button class="tb" onclick="G('passato')">⏮️ Passato</button>
+<button class="tb" onclick="G('participio')">📎 Participio</button>
 <button class="tb" onclick="G('multi')">🎮 Multi</button>
 </div></div>
 
@@ -189,6 +190,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div class="hcard" onclick="G('reflexifs')"><div class="em">🪞</div><h3>Réfléchis</h3><p>mi, ti, si…</p></div>
 <div class="hcard" onclick="G('gerondif')"><div class="em">🎭</div><h3>Gérondif</h3><p>stare + -ando/-endo</p></div>
 <div class="hcard" onclick="G('passato')"><div class="em">⏮️</div><h3>Passato Prossimo</h3><p>ho fatto · sono andato</p></div>
+<div class="hcard" onclick="G('participio')"><div class="em">📎</div><h3>Participio Agg.</h3><p>adjectif · passif</p></div>
 <div class="hcard" onclick="G('multi')"><div class="em">🎮</div><h3>Multijoueur 🏆</h3><p>Jusqu'à 4 joueurs</p></div>
 <div class="hcard" onclick="G('essere')"><div class="em">🎯</div><h3>Commencer!</h3><p>→ Essere</p></div>
 </div></div>
@@ -722,6 +724,46 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div id="pp6-items"></div>
 <button class="btn-go" onclick="chkM('pp6',D.pp6)">✅ Vérifier</button>
 <div class="score" id="pp6-score"></div></div>
+</div>
+
+<!-- PARTICIPIO PASSATO AGGETTIVO/PASSIVO -->
+<div class="sec" id="participio">
+<h2 class="sec-t">📎 Participio Passato — Aggettivo e Passivo</h2>
+<p class="sec-s">Participe passé comme adjectif · Voix passive avec essere · Accord du participe</p>
+
+<div class="th"><strong>1. Participe passé = adjectif (accord avec le nom)</strong><br>
+<em>La porta è <strong>chiusa</strong></em> (f.sg) · <em>I libri sono <strong>scritti</strong></em> (m.pl) · <em>Le ragazze sono <strong>stanche</strong></em> (f.pl)<br>
+→ Le participe s'accorde en genre et nombre avec le nom qu'il qualifie.<br><br>
+<strong>2. Voix passive : essere + participio passato (+ da + agent)</strong>
+<table><tr><th>Actif</th><th>Passif</th></tr>
+<tr><td>Marco scrive il libro.</td><td>Il libro <strong>è scritto</strong> da Marco.</td></tr>
+<tr><td>Il cuoco prepara la pizza.</td><td>La pizza <strong>è preparata</strong> dal cuoco.</td></tr>
+<tr><td>La polizia ha arrestato i ladri.</td><td>I ladri <strong>sono stati arrestati</strong> dalla polizia.</td></tr></table>
+⚠️ Au passif, le participe s'accorde toujours avec le <strong>sujet</strong><br>
+<strong>venire + participio</strong> = passif habituel/présent → <em>Il libro viene letto da tutti</em><br>
+<strong>Participes irréguliers à retenir :</strong> scritto · letto · fatto · visto · aperto · chiuso · rotto · messo · preso · detto · tradotto · corretto · risolto</div>
+
+<div class="card" id="ex-partadj1"><h3>🟢 Ex.1 — Participe adjectif (fill-in)</h3>
+<p style="font-size:11.5px;color:var(--mu);margin-bottom:9px">Mets le participe passé à la bonne forme (accord avec le sujet).</p>
+<div id="partadj1-items"></div>
+<button class="btn-go" onclick="chkF('partadj1',D.partadj1)">✅ Vérifier</button>
+<div class="score" id="partadj1-score"></div></div>
+
+<div class="card" id="ex-partadj2"><h3>🔵 Ex.2 — Voix passive essere + participio (fill-in)</h3>
+<p style="font-size:11.5px;color:var(--mu);margin-bottom:9px">Transforme à la voix passive. Ex: <em>è stato scritto</em></p>
+<div id="partadj2-items"></div>
+<button class="btn-go" onclick="chkF('partadj2',D.partadj2)">✅ Vérifier</button>
+<div class="score" id="partadj2-score"></div></div>
+
+<div class="card" id="ex-partadj3"><h3>🟡 Ex.3 — Accords du participe adjectif (QCM)</h3>
+<div id="partadj3-items"></div>
+<button class="btn-go" onclick="chkM('partadj3',D.partadj3)">✅ Vérifier</button>
+<div class="score" id="partadj3-score"></div></div>
+
+<div class="card" id="ex-partadj4"><h3>🔴 Ex.4 — Passif + sens + analyse (QCM)</h3>
+<div id="partadj4-items"></div>
+<button class="btn-go" onclick="chkM('partadj4',D.partadj4)">✅ Vérifier</button>
+<div class="score" id="partadj4-score"></div></div>
 </div>
 
 <!-- MULTI -->
@@ -2309,6 +2351,99 @@ pp6:[
   {q:"'Ieri sera' est souvent utilisé avec :",opts:["il presente","il passato prossimo","il futuro","il condizionale"],ans:"il passato prossimo"},
   {q:"Négation au passato prossimo — ordre correct ?",opts:["Ho non mangiato","Non mangiato ho","Non ho mangiato","Ho mangiato non"],ans:"Non ho mangiato"},
 ],
+// ══ PARTICIPIO PASSATO — AGGETTIVO E PASSIVO ══
+partadj1:[
+  // Fill-in: participe passé comme adjectif
+  {label:"La porta è ___ (chiudere).",ans:"chiusa"},
+  {label:"Il libro è ___ (scrivere).",ans:"scritto"},
+  {label:"La finestra è ___ (aprire).",ans:"aperta"},
+  {label:"I compiti sono ___ (finire).",ans:"finiti"},
+  {label:"Le lettere sono ___ (spedire).",ans:"spedite"},
+  {label:"Il caffè è ___ (preparare).",ans:"preparato"},
+  {label:"La torta è ___ (fare).",ans:"fatta"},
+  {label:"I biglietti sono ___ (vendere).",ans:"venduti"},
+  {label:"La macchina è ___ (rompere).",ans:"rotta"},
+  {label:"Le scarpe sono ___ (usare).",ans:"usate"},
+  {label:"Il film è ___ (vedere, già).",ans:"visto"},
+  {label:"La cena è ___ (cucinare).",ans:"cucinata"},
+  {label:"I soldi sono ___ (perdere).",ans:"persi"},
+  {label:"La valigia è ___ (preparare).",ans:"preparata"},
+  {label:"Il documento è ___ (firmare).",ans:"firmato"},
+  {label:"Le strade sono ___ (bagnare).",ans:"bagnate"},
+  {label:"Il pane è ___ (tagliare).",ans:"tagliato"},
+  {label:"La riunione è ___ (annullare).",ans:"annullata"},
+  {label:"I bambini sono ___ (stancare).",ans:"stanchi",explain:"stanchi = adjectif issu de stancare"},
+  {label:"La canzone è ___ (tradurre).",ans:"tradotta"},
+],
+partadj2:[
+  // Fill-in: voix passive essere + participio passato
+  {label:"Il libro ___ (scrivere) da Dante.",ans:"è stato scritto"},
+  {label:"La pizza ___ (preparare) dal cuoco.",ans:"è stata preparata"},
+  {label:"I biglietti ___ (vendere) tutti.",ans:"sono stati venduti"},
+  {label:"Le lettere ___ (spedire) ieri.",ans:"sono state spedite"},
+  {label:"Il film ___ (girare) a Roma.",ans:"è stato girato"},
+  {label:"La casa ___ (costruire) nel 1900.",ans:"è stata costruita"},
+  {label:"I documenti ___ (firmare) dal direttore.",ans:"sono stati firmati"},
+  {label:"La finestra ___ (rompere) stamattina.",ans:"è stata rotta"},
+  {label:"Il pranzo ___ (servire) alle 13.",ans:"è stato servito"},
+  {label:"Le scarpe ___ (comprare) in Italia.",ans:"sono state comprate"},
+  {label:"L'errore ___ (correggere) dall'insegnante.",ans:"è stato corretto"},
+  {label:"La musica ___ (comporre) da Verdi.",ans:"è stata composta"},
+  {label:"I ladri ___ (arrestare) dalla polizia.",ans:"sono stati arrestati"},
+  {label:"La torta ___ (mangiare) dai bambini.",ans:"è stata mangiata"},
+  {label:"Il problema ___ (risolvere) facilmente.",ans:"è stato risolto"},
+  {label:"Le regole ___ (spiegare) dal professore.",ans:"sono state spiegate"},
+  {label:"Il ponte ___ (costruire) dai romani.",ans:"è stato costruito"},
+  {label:"La partita ___ (trasmettere) in diretta.",ans:"è stata trasmessa"},
+  {label:"I prezzi ___ (aumentare) molto.",ans:"sono stati aumentati"},
+  {label:"La conferenza ___ (organizzare) bene.",ans:"è stata organizzata"},
+],
+partadj3:[
+  // MCQ: accord de l'adjectif participial
+  {q:"La porta è ___. (chiudere)",opts:["chiuso","chiusa","chiusi","chiuse"],ans:"chiusa",explain:"porta = féminin singulier"},
+  {q:"I libri sono ___. (leggere)",opts:["letto","letta","letti","lette"],ans:"letti",explain:"libri = masculin pluriel"},
+  {q:"Le finestre sono ___. (aprire)",opts:["aperto","aperta","aperti","aperte"],ans:"aperte",explain:"finestre = féminin pluriel"},
+  {q:"Il caffè è ___. (preparare)",opts:["preparato","preparata","preparati","preparate"],ans:"preparato",explain:"caffè = masculin singulier"},
+  {q:"La torta è ___. (fare)",opts:["fatto","fatta","fatti","fatte"],ans:"fatta",explain:"torta = féminin singulier"},
+  {q:"I compiti sono ___. (finire)",opts:["finito","finita","finiti","finite"],ans:"finiti",explain:"compiti = masculin pluriel"},
+  {q:"Le scarpe sono ___. (usare)",opts:["usato","usata","usati","usate"],ans:"usate",explain:"scarpe = féminin pluriel"},
+  {q:"Il documento è ___. (firmare)",opts:["firmato","firmata","firmati","firmate"],ans:"firmato"},
+  {q:"La macchina è ___. (rompere)",opts:["rotto","rotta","rotti","rotte"],ans:"rotta"},
+  {q:"I soldi sono ___. (perdere)",opts:["perso","persa","persi","perse"],ans:"persi"},
+  {q:"La canzone è ___. (tradurre)",opts:["tradotto","tradotta","tradotti","tradotte"],ans:"tradotta"},
+  {q:"Gli studenti sono ___. (stancare)",opts:["stanco","stanca","stanchi","stanche"],ans:"stanchi",explain:"studenti = masculin pluriel"},
+  {q:"Le studentesse sono ___. (stancare)",opts:["stanco","stanca","stanchi","stanche"],ans:"stanche",explain:"studentesse = féminin pluriel"},
+  {q:"Il pane è ___. (tagliare)",opts:["tagliato","tagliata","tagliati","tagliate"],ans:"tagliato"},
+  {q:"Le strade sono ___. (bagnare)",opts:["bagnato","bagnata","bagnati","bagnate"],ans:"bagnate"},
+  {q:"Un uomo ___. (stancare)",opts:["stanco","stanca","stanchi","stanche"],ans:"stanco"},
+  {q:"Una donna ___. (stancare)",opts:["stanco","stanca","stanchi","stanche"],ans:"stanca"},
+  {q:"Le porte sono ___. (chiudere)",opts:["chiuso","chiusa","chiusi","chiuse"],ans:"chiuse"},
+  {q:"Il lavoro è ___. (completare)",opts:["completato","completata","completati","completate"],ans:"completato"},
+  {q:"Le foto sono ___. (scattare)",opts:["scattato","scattata","scattati","scattate"],ans:"scattate"},
+],
+partadj4:[
+  // MCQ: voix passive — choisir la bonne forme
+  {q:"Il libro ___ da molti studenti. (leggere)",opts:["è letto","è letta","sono letti","è lettato"],ans:"è letto",explain:"libro=m.sg → è letto"},
+  {q:"La lettera ___ dal direttore. (firmare)",opts:["è firmato","è firmata","sono firmate","sono firmati"],ans:"è firmata",explain:"lettera=f.sg → è firmata"},
+  {q:"I documenti ___ ogni anno. (aggiornare)",opts:["è aggiornato","sono aggiornate","sono aggiornati","è aggiornata"],ans:"sono aggiornati",explain:"documenti=m.pl → sono aggiornati"},
+  {q:"Le regole ___ dall'insegnante. (spiegare)",opts:["è spiegato","è spiegata","sono spiegate","sono spiegati"],ans:"sono spiegate",explain:"regole=f.pl → sono spiegate"},
+  {q:"Il problema ___ dagli esperti. (risolvere)",opts:["è risolto","è risolta","sono risolti","sono risolte"],ans:"è risolto"},
+  {q:"La pizza ___ con mozzarella. (fare)",opts:["è fatto","è fatta","sono fatte","sono fatti"],ans:"è fatta"},
+  {q:"I prezzi ___ ogni mese. (aumentare)",opts:["è aumentato","è aumentata","sono aumentati","sono aumentate"],ans:"sono aumentati"},
+  {q:"'Il film è stato girato' = ?",opts:["Le film sera tourné","Le film est tourné/a été tourné","Le film était tourné","Le film aurait été tourné"],ans:"Le film est tourné/a été tourné"},
+  {q:"'La casa è stata venduta' = ?",opts:["La maison sera vendue","La maison était vendue","La maison a été vendue","La maison aurait été vendue"],ans:"La maison a été vendue"},
+  {q:"'I ladri sono stati arrestati' = ?",opts:["Les voleurs seront arrêtés","Les voleurs ont été arrêtés","Les voleurs étaient arrêtés","Les voleurs auraient été arrêtés"],ans:"Les voleurs ont été arrêtés"},
+  {q:"Quelle phrase exprime la VOIX PASSIVE ?",opts:["Marco mangia la pizza.","La pizza è mangiata da Marco.","Marco ha mangiato la pizza.","Marco sta mangiando la pizza."],ans:"La pizza è mangiata da Marco."},
+  {q:"Comment transforme-t-on 'Marco scrive il libro' à la voix passive ?",opts:["Il libro è scritto da Marco.","Il libro ha scritto Marco.","Marco è scritto dal libro.","Il libro scrive Marco."],ans:"Il libro è scritto da Marco."},
+  {q:"'La torta viene fatta ogni domenica.' — 'viene' ici exprime :",opts:["une action passée","une action habituelle au présent passif","une action future","une action en cours"],ans:"une action habituelle au présent passif",explain:"venire + part. passé = passif habituel/présent"},
+  {q:"Différence entre 'La porta è chiusa' et 'La porta viene chiusa' ?",opts:["Aucune différence","è chiusa = état résultant; viene chiusa = action (on ferme la porte)","viene chiusa = état; è chiusa = action","Les deux expriment une action"],ans:"è chiusa = état résultant; viene chiusa = action (on ferme la porte)"},
+  {q:"'Il romanzo è stato scritto da Calvino' — qui est l'agent ?",opts:["il romanzo","è stato","Calvino","scritto"],ans:"Calvino",explain:"'da' introduit l'agent dans la construction passive"},
+  {q:"Passif avec 'venire' — lequel est CORRECT ?",opts:["Il libro viene letto.","Il libro viene stato letto.","Il libro è venuto letto.","Il libro viene leggere."],ans:"Il libro viene letto.",explain:"venire + infinitif = INCORRECT; venire + part. passé = correct"},
+  {q:"'Stanco' dans 'Sono stanco' est :",opts:["un verbe","un participe passé utilisé comme adjectif","un adverbe","un nom"],ans:"un participe passé utilisé comme adjectif"},
+  {q:"Quelle phrase contient un participe passé utilisé comme adjectif ?",opts:["Ho mangiato la pizza.","La pizza è mangiata.","Sto mangiando la pizza.","Mangio la pizza."],ans:"La pizza è mangiata.",explain:"è mangiata = participe adjectival (état)"},
+  {q:"'Una donna amata da tutti' signifie :",opts:["une femme qui aime tout le monde","une femme aimée de tous","une femme qui a aimé","une femme aimante"],ans:"une femme aimée de tous"},
+  {q:"'Aperto/chiuso' sur une boutique signifie :",opts:["on ouvre/ferme","ouvert/fermé (état)","on a ouvert/fermé","sera ouvert/fermé"],ans:"ouvert/fermé (état)",explain:"participe passé = adjectif d'état, très courant en signalisation"},
+],
 
 };
 
@@ -2576,6 +2711,7 @@ var CATS={
   reflexifs:{l:'🪞 Réfléchis',d:function(){return D.rifl3.concat(D.rifl4);}},
   gerondif:{l:'🎭 Gérondif',d:function(){return D.ger3.concat(D.ger4);}},
   passato:{l:'⏮️ Passato Prossimo',d:function(){return D.pp4.concat(D.pp5).concat(D.pp6);}},
+  participio:{l:'📎 Participio Aggettivo/Passivo',d:function(){return D.partadj3.concat(D.partadj4);}},
 };
 var MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
 function shuf(a){return[].concat(a).sort(function(){return Math.random()-.5;});}
@@ -3489,6 +3625,7 @@ function renderAll(){
    ['pres1',D.pres1],['pres2',D.pres2],['pres3',D.pres3],['pres6',D.pres6],
    ['rifl1',D.rifl1],['rifl2',D.rifl2],['ger1',D.ger1],['ger2',D.ger2],
    ['pp1',D.pp1],['pp2',D.pp2],['pp3',D.pp3],
+   ['partadj1',D.partadj1],['partadj2',D.partadj2],
   ].forEach(function(x){bF(x[0],x[1]);});
   // MCQ exercises — ess3 is MCQ only (removed duplicate bF call)
   [['ess2',D.ess2],['ess3',D.ess3],['ess4',D.ess4],['av2',D.av2],
@@ -3504,6 +3641,7 @@ function renderAll(){
    ['rifl3',D.rifl3],['rifl4',D.rifl4],
    ['ger3',D.ger3],['ger4',D.ger4],
    ['pp4',D.pp4],['pp5',D.pp5],['pp6',D.pp6],
+   ['partadj3',D.partadj3],['partadj4',D.partadj4],
   ].forEach(function(x){bM(x[0],x[1]);});
   // True/False
   bT('tf1',D.tf1);bT('tf2',D.tf2);
