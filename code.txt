@@ -1,0 +1,2 @@
+Additions 
+-For someone watching the game , at the end of the countdown of a question , he should see the correct answer (Only for the one who's spectating and not playing)

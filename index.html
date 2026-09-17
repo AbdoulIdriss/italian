@@ -108,6 +108,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 .sc-name{font-size:11px;font-weight:800;margin-bottom:3px}
 .sc-pts{font-size:20px;font-weight:900;font-family:'Playfair Display',serif}
 .sc-card.leader{border-color:var(--wa);background:#fffbeb}
+/* Le classement se réordonne en direct : les cartes glissent à leur nouvelle place
+   (technique FLIP, transform piloté en JS) et le score « pompe » quand il change. */
+.sc-card{will-change:transform}
+@keyframes scpop{0%{transform:scale(1)}40%{transform:scale(1.38)}100%{transform:scale(1)}}
+.sc-pts.pop{animation:scpop .5s ease}
+@media(prefers-reduced-motion:reduce){.sc-pts.pop{animation:none}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:14px 0}
 .pod{text-align:center;border-radius:12px 12px 0 0;padding:10px 8px;min-width:65px}
 .pod-1{background:linear-gradient(135deg,#ffd700,#ffb700);height:110px;order:2}
@@ -139,7 +145,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 </style>
 </head>
 <body>
-<div class="hdr"><div class="hdr-f">🇮🇹</div><h1>Italiano per Tutti</h1><p>32 catégories · A1–A2 · En français · Mobile-friendly</p></div>
+<div class="hdr"><div class="hdr-f">🇮🇹</div><h1>Italiano per Tutti</h1><p>34 catégories · A1 → C2 · Prépa CILS / CERT.it · En français</p></div>
 <div class="tscr"><div class="tabs">
 <button class="tb active" onclick="G('home')">🏠 Accueil</button>
 <button class="tb" onclick="G('essere')">🔵 Essere</button>
@@ -168,7 +174,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 
 <!-- HOME -->
 <div class="sec active" id="home">
-<div class="hwelc"><h2>Benvenuto! 👋</h2><p>32 catégories · score + erreurs · ⏱ chrono · responsive mobile</p></div>
+<div class="hwelc"><h2>Benvenuto! 👋</h2><p>34 catégories · A1 → C2 · score + erreurs · ⏱ chrono · multijoueur</p></div>
 <div class="hgrid">
 <div class="hcard" onclick="G('essere')"><div class="em">🔵</div><h3>Essere</h3><p>être</p></div>
 <div class="hcard" onclick="G('avere')"><div class="em">🟢</div><h3>Avere</h3><p>avoir</p></div>
@@ -202,6 +208,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 <div class="hcard" onclick="G('imperativo')"><div class="em">📢</div><h3>Imperativo</h3><p>ordres · Lei · pronomi</p></div>
 <div class="hcard" onclick="G('congiuntivo')"><div class="em">🌀</div><h3>Congiuntivo</h3><p>presente · passato · imperfetto</p></div>
 <div class="hcard" onclick="G('ipotetico')"><div class="em">🔀</div><h3>Periodo Ipotetico</h3><p>tipo I · II · III</p></div>
+<div class="hcard" onclick="G('sinonimi')"><div class="em">🔁</div><h3>Sinonimi</h3><p>A1→C2 · contrari · registre</p></div>
+<div class="hcard" onclick="G('avanzato')"><div class="em">🎓</div><h3>Tempi Avanzati</h3><p>passato remoto · B1→C2</p></div>
 <div class="hcard" onclick="G('multi')"><div class="em">🎮</div><h3>Multijoueur 🏆</h3><p>Jusqu'à 4 joueurs</p></div>
 <div class="hcard" onclick="G('essere')"><div class="em">🎯</div><h3>Commencer!</h3><p>→ Essere</p></div>
 </div></div>
@@ -1390,6 +1398,60 @@ Irréguliers : essere→sia, avere→abbia, fare→faccia, andare→vada, dare�
 <div class="score" id="ipot6-score"></div></div>
 </div>
 
+<!-- SINONIMI -->
+<div class="sec" id="sinonimi">
+<h2 class="sec-t">🔁 Sinonimi e Contrari</h2>
+<p class="sec-s">Du niveau A1 au C2 · synonymes, antonymes et registre — cœur du lexique CILS / CERT.it</p>
+<div class="th">
+<strong>Pourquoi c'est central aux examens</strong> — le CILS et le CERT.it évaluent l'<em>étendue lexicale</em> : savoir dire la même chose de plusieurs façons, et adapter le registre à la situation. Une même idée change de mot selon le niveau :
+<table><tr><th>Niveau</th><th>Idée « rinviare »</th><th>Idée « difficile »</th></tr>
+<tr><td>A1–A2</td><td>lasciare per dopo</td><td>difficile</td></tr>
+<tr><td>B1–B2</td><td>rimandare, posticipare</td><td>complicato, impegnativo</td></tr>
+<tr><td>C1–C2</td><td>procrastinare, differire</td><td>arduo, ostico</td></tr></table>
+<strong>Registre</strong> : <em>formale</em> (Le sarei grato se potesse…) · <em>neutro</em> (Può aiutarmi?) · <em>informale</em> (Mi dai una mano?) · <em>colloquiale</em> (Dammi una mano!)<br><br>
+⚠️ Deux pièges classiques à l'examen : confondre <strong>synonyme</strong> et <strong>contraire</strong>, et employer un mot juste mais d'un <strong>registre inadapté</strong> (« Ciao » dans une lettre officielle).</div>
+
+<div class="card" id="ex-sin1"><h3>🟢 Ex.1 — Sinonimi A1–A2 (QCM)</h3><div id="sin1-items"></div><button class="btn-go" onclick="chkM('sin1',D.sin1)">✅ Vérifier</button><div class="score" id="sin1-score"></div></div>
+<div class="card" id="ex-sin2"><h3>🔵 Ex.2 — Sinonimi B1–B2 (QCM)</h3><div id="sin2-items"></div><button class="btn-go" onclick="chkM('sin2',D.sin2)">✅ Vérifier</button><div class="score" id="sin2-score"></div></div>
+<div class="card" id="ex-sin3"><h3>🔴 Ex.3 — Sinonimi C1–C2 (QCM)</h3><div id="sin3-items"></div><button class="btn-go" onclick="chkM('sin3',D.sin3)">✅ Vérifier</button><div class="score" id="sin3-score"></div></div>
+<div class="card" id="ex-sin4"><h3>↔️ Ex.4 — Contrari (QCM)</h3><div id="sin4-items"></div><button class="btn-go" onclick="chkM('sin4',D.sin4)">✅ Vérifier</button><div class="score" id="sin4-score"></div></div>
+<div class="card" id="ex-sin5"><h3>🎩 Ex.5 — Registro : formale / informale (QCM)</h3><div id="sin5-items"></div><button class="btn-go" onclick="chkM('sin5',D.sin5)">✅ Vérifier</button><div class="score" id="sin5-score"></div></div>
+<div class="card" id="ex-sin6"><h3>🔍 Ex.6 — Phrases à corriger</h3><div id="sin6-items"></div><button class="btn-go" onclick="chkT('sin6',D.sin6)">✅ Vérifier</button><div class="score" id="sin6-score"></div></div>
+</div>
+
+<!-- TEMPI AVANZATI -->
+<div class="sec" id="avanzato">
+<h2 class="sec-t">🎓 Tempi Avanzati (B1 → C2)</h2>
+<p class="sec-s">Passato remoto · trapassato · concordanza dei tempi · si passivante et impersonale</p>
+<div class="th">
+<strong>1. Passato remoto</strong> — action passée, conclue, sans lien avec le présent. Indispensable pour lire la littérature et les textes historiques, et exigé dès le B1 au CILS.
+<table><tr><th></th><th>-ARE (parlare)</th><th>-ERE (credere)</th><th>-IRE (finire)</th></tr>
+<tr><td>io</td><td>parlai</td><td>credei/credetti</td><td>finii</td></tr>
+<tr><td>tu</td><td>parlasti</td><td>credesti</td><td>finisti</td></tr>
+<tr><td>lui/lei</td><td>parlò</td><td>credé/credette</td><td>finì</td></tr>
+<tr><td>noi</td><td>parlammo</td><td>credemmo</td><td>finimmo</td></tr>
+<tr><td>voi</td><td>parlaste</td><td>credeste</td><td>finiste</td></tr>
+<tr><td>loro</td><td>parlarono</td><td>crederono/credettero</td><td>finirono</td></tr></table>
+⚠️ <strong>Le schéma 1-3-3</strong> : la plupart des irréguliers ne le sont qu'à la <strong>1ʳᵉ sing., 3ᵉ sing. et 3ᵉ plur.</strong> — les autres personnes restent régulières.<br>
+<em>scrivere</em> → <strong>scrissi</strong>, scrivesti, <strong>scrisse</strong>, scrivemmo, scriveste, <strong>scrissero</strong><br>
+Irréguliers fréquents : essere→fui · avere→ebbi · fare→feci · dire→dissi · vedere→vidi · venire→venni · volere→volli · sapere→seppi · prendere→presi · leggere→lessi · mettere→misi · nascere→nacqui · vivere→vissi · conoscere→conobbi · rimanere→rimasi · chiedere→chiesi<br><br>
+<strong>2. Trapassato prossimo</strong> (imperfetto de avere/essere + participe) = action antérieure à une autre action passée : <em>Quando arrivai, era già partito.</em><br>
+<strong>Trapassato remoto</strong> (passato remoto + participe) — usage littéraire, après <em>appena, dopo che, quando</em> : <em>Appena ebbe finito, uscì.</em><br><br>
+<strong>3. Concordanza dei tempi</strong> — la principale commande la subordonnée :
+<table><tr><th>Principale</th><th>Subordonnée</th><th>Exemple</th></tr>
+<tr><td>présent</td><td>cong. presente / passato</td><td>Penso che sia partito.</td></tr>
+<tr><td>passé</td><td>cong. imperfetto / trapassato</td><td>Pensavo che fosse partito.</td></tr>
+<tr><td>passé + futur</td><td>condizionale composto</td><td>Disse che sarebbe venuto.</td></tr></table>
+<strong>4. Si passivante / si impersonale</strong> : <em>si vende</em> il pane / <em>si vendono</em> i biglietti (accord avec le nom) · <em>si mangia</em> bene qui (= « on ») · aux temps composés → auxiliaire <strong>essere</strong> : <em>si è mangiato</em> · adjectif au masculin pluriel : <em>quando si è stanchi</em> · verbe réfléchi → <strong>ci si</strong> : <em>ci si alza tardi</em>.</div>
+
+<div class="card" id="ex-avz1"><h3>🟢 Ex.1 — Passato remoto (fill-in)</h3><div id="avz1-items"></div><button class="btn-go" onclick="chkF('avz1',D.avz1)">✅ Vérifier</button><div class="score" id="avz1-score"></div></div>
+<div class="card" id="ex-avz2"><h3>🔵 Ex.2 — Passato remoto (QCM)</h3><div id="avz2-items"></div><button class="btn-go" onclick="chkM('avz2',D.avz2)">✅ Vérifier</button><div class="score" id="avz2-score"></div></div>
+<div class="card" id="ex-avz3"><h3>🟡 Ex.3 — Trapassato prossimo et remoto (QCM)</h3><div id="avz3-items"></div><button class="btn-go" onclick="chkM('avz3',D.avz3)">✅ Vérifier</button><div class="score" id="avz3-score"></div></div>
+<div class="card" id="ex-avz4"><h3>🔴 Ex.4 — Concordanza dei tempi (QCM)</h3><div id="avz4-items"></div><button class="btn-go" onclick="chkM('avz4',D.avz4)">✅ Vérifier</button><div class="score" id="avz4-score"></div></div>
+<div class="card" id="ex-avz5"><h3>🎯 Ex.5 — Si passivante / impersonale (QCM)</h3><div id="avz5-items"></div><button class="btn-go" onclick="chkM('avz5',D.avz5)">✅ Vérifier</button><div class="score" id="avz5-score"></div></div>
+<div class="card" id="ex-avz6"><h3>🔍 Ex.6 — Phrases à corriger</h3><div id="avz6-items"></div><button class="btn-go" onclick="chkT('avz6',D.avz6)">✅ Vérifier</button><div class="score" id="avz6-score"></div></div>
+</div>
+
 <!-- MULTI -->
 <div class="sec" id="multi">
 <h2 class="sec-t">🎮 Mode Multijoueur</h2>
@@ -1489,6 +1551,7 @@ Irréguliers : essere→sia, avere→abbia, fare→faccia, andare→vada, dare�
       <div class="t-wrap"><div class="t-bar" id="ol-spec-tbar" style="width:100%;background:var(--ok)"></div></div>
       <div id="ol-spec-q" style="font-size:15px;font-weight:700;margin-bottom:10px;line-height:1.5"></div>
       <div id="ol-spec-opts" class="mopts"></div>
+      <div id="ol-spec-reveal" style="display:none;margin-top:9px;padding:8px 11px;border-radius:9px;background:#f0fdf4;border:1px solid var(--ok);font-size:12.5px;font-weight:800;color:var(--ok)"></div>
     </div>
     <div id="ol-spec-scores" style="margin-top:10px"></div>
   </div>
@@ -1510,6 +1573,8 @@ Irréguliers : essere→sia, avere→abbia, fare→faccia, andare→vada, dare�
     <div id="mg-opts" class="mopts"></div>
     <div id="mg-fb" style="display:none;text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:800;font-size:14px"></div>
   </div>
+  <div id="mg-answered" style="display:none;margin-bottom:10px"></div>
+  <div id="mg-reveal" style="display:none;margin-bottom:10px"></div>
   <div id="mg-scores" style="margin-top:10px"></div>
   <div id="ol-answer-panel" style="display:none">
     <div class="card" style="text-align:center;background:var(--al)">
@@ -1517,6 +1582,12 @@ Irréguliers : essere→sia, avere→abbia, fare→faccia, andare→vada, dare�
       <div id="ol-ap-q" style="font-size:14px;font-weight:700;margin-bottom:10px;line-height:1.5"></div>
       <div id="ol-ap-opts" class="mopts" style="justify-content:center"></div>
       <div id="ol-ap-fb" style="display:none;padding:8px;border-radius:9px;margin-top:8px;font-weight:800;font-size:14px"></div>
+    </div>
+  </div>
+  <div id="mg-emoji-bar" style="display:none">
+    <div class="card" style="padding:10px">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--mu);margin-bottom:7px">😄 Réactions</div>
+      <div id="mg-emoji-btns" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
     </div>
   </div>
 </div>
@@ -1558,7 +1629,6 @@ ess2:[
   {q:"___ siete tedeschi.",opts:["Noi","Loro","Voi","Tu"],ans:"Voi"},
   {q:"___ sono giapponesi.",opts:["Lui","Loro","Lei","Noi"],ans:"Loro"},
   {q:"Questo è Giacomo. ___ è un amico!",opts:["Lei","Io","Lui","Tu"],ans:"Lui"},
-,
   {"q":"Dove ___ tu?","opts":["sei","è","sono","siamo"],"ans":"sei"},
   {"q":"Come si chiama? ___ Marco.","opts":["Ho","Sono","È","Sei"],"ans":"È"},
   {"q":"Io e Maria ___ amiche.","opts":["siete","sono","siamo","è"],"ans":"siamo"},
@@ -1592,7 +1662,6 @@ ess4:[
   {q:"Oggi (3)___ il sole.",opts:["ci sono","ha","c'è","sono"],ans:"c'è",explain:"c'è = il y a (singulier)"},
   {q:"A Roma (4)___ tante cose da vedere.",opts:["c'è","è","ci sono","ha"],ans:"ci sono",explain:"ci sono = il y a (pluriel)"},
   {q:"Sul tavolo (5)___ un libro.",opts:["ci sono","sono","ha","c'è"],ans:"c'è",explain:"c'è = il y a (singulier)"},
-,
   {"q":"In biblioteca ___ molti libri.","opts":["c'è","ci sono","è","ha"],"ans":"ci sono"},
   {"q":"___ qualcuno in casa?","opts":["Ci sono","C'è","Sono","Hanno"],"ans":"C'è"},
   {"q":"Sul muro ___ un quadro bellissimo.","opts":["ci sono","è","c'è","ha"],"ans":"c'è"},
@@ -1623,7 +1692,6 @@ av2:[
   {q:"Hai paura? ___ qui io!",opts:["Sono","Ho","Sto","Siamo"],ans:"Sono",explain:"localisation → essere"},
   {q:"Lei ___ la carta di credito, signora?",opts:["è","sta","ha","sono"],ans:"ha",explain:"possédé (Lei cortesia) → ha"},
   {q:"Quanti anni ___ (tu)?",opts:["sei","stai","fai","hai"],ans:"hai",explain:"âge → avere + anni"},
-,
   {"q":"Loro ___ molto fame dopo la partita.","opts":["sono","stanno","hanno","fanno"],"ans":"hanno","explain":"fame → avere fame"},
   {"q":"Maria ___ gli occhi azzurri.","opts":["è","sta","ha","sono"],"ans":"ha","explain":"caratteristica fisica → avere"},
   {"q":"Noi ___ italiani.","opts":["abbiamo","stiamo","facciamo","siamo"],"ans":"siamo","explain":"nazionalità → essere"},
@@ -1664,7 +1732,6 @@ st2:[
   {q:"Noi ___ qui perché cerchiamo lavoro.",opts:["stiamo","siamo","abbiamo","avete"],ans:"siamo",explain:"localisation → essere"},
   {q:"Come ___ la tua nuova auto?",opts:["stai","sta","sei","hai"],ans:"sta",explain:"descrizione oggetto → stare"},
   {q:"I bambini ___ in piedi davanti al maestro.",opts:["sono","hanno","stanno","stano"],ans:"stanno",explain:"stare in piedi → stare"},
-,
   {"q":"Dove ___ (tu) adesso?","opts":["sei","hai","stai","vai"],"ans":"stai","explain":"posizione temporanea → stare"},
   {"q":"La tua macchina ___ bene?","opts":["è","ha","sta","va"],"ans":"sta","explain":"funzionamento → stare"},
   {"q":"Noi ___ aspettando l'autobus.","opts":["siamo","abbiamo","stiamo","facciamo"],"ans":"stiamo","explain":"stare + gerundio"},
@@ -1807,7 +1874,6 @@ heure2:[
   {q:"Horloge: 1h00",opts:["È l'una","Sono le una","È uno"],ans:"È l'una"},
   {q:"Horloge: 4h20",opts:["Sono le quattro e venti","Sono le cinque meno venti","Sono le quattro e due"],ans:"Sono le quattro e venti"},
   {q:"Horloge: 8h50",opts:["Sono le otto e cinquanta","Sono le nove meno dieci","Sono le otto meno dieci"],ans:"Sono le nove meno dieci"},
-,
   {"q":"Horloge: 6h15","opts":["Sono le sei e un quarto","Sono le sei e mezza","Sono le sette meno un quarto","È l'una"],"ans":"Sono le sei e un quarto"},
   {"q":"Horloge: 2h30","opts":["Sono le due e venti","Sono le due e mezza","Sono le tre meno trenta","Sono le due"],"ans":"Sono le due e mezza"},
   {"q":"Horloge: 11h45","opts":["Sono le undici e tre quarti","Sono le dodici meno un quarto","Sono le undici e mezza","Sono le dodici e un quarto"],"ans":"Sono le dodici meno un quarto"},
@@ -1831,7 +1897,6 @@ ce1:[
   {q:"A Bologna ___ un'università importante.",opts:["c'è","ci sono"],ans:"c'è"},{q:"___ tre gatti qui!",opts:["C'è","Ci sono"],ans:"Ci sono"},
   {q:"Non ___ posto per tutti.",opts:["c'è","ci sono"],ans:"c'è"},{q:"In questo mese ___ trenta giorni.",opts:["c'è","ci sono"],ans:"ci sono"},
   {q:"Nel frigorifero ___ delle mele.",opts:["c'è","ci sono"],ans:"ci sono"},{q:"Non ___ neppure del caffè.",opts:["c'è","ci sono"],ans:"c'è"},
-,
   {"q":"In questa via ___ molti negozi.","opts":["c'è","ci sono"],"ans":"ci sono"},
   {"q":"___ un dottore qui?","opts":["C'è","Ci sono"],"ans":"C'è"},
   {"q":"Nel frigorifero ___ solo acqua.","opts":["c'è","ci sono"],"ans":"c'è"},
@@ -1865,7 +1930,6 @@ ce3:[
   {q:"___ tre finestre in questa stanza.",opts:["C'è","Ci sono","Non c'è","Non ci sono"],ans:"Ci sono"},
   {q:"___ una farmacia vicino alla scuola.",opts:["C'è","Ci sono","Non c'è","Non ci sono"],ans:"C'è"},
   {q:"___ autobus di notte in questo quartiere.",opts:["C'è","Ci sono","Non c'è","Non ci sono"],ans:"Non ci sono"},
-,
   {"q":"___ qualcosa di strano qui.","opts":["C'è","Ci sono","Non c'è","Non ci sono"],"ans":"C'è"},
   {"q":"___ abbastanza posti per tutti.","opts":["C'è","Ci sono","Non c'è","Non ci sono"],"ans":"Ci sono"},
   {"q":"___ nessuno in casa.","opts":["C'è","Ci sono","Non c'è","Non ci sono"],"ans":"Non c'è"},
@@ -1894,7 +1958,6 @@ ogni1:[
   {q:"___ persona ha i suoi problemi.",opts:["Ogni","Qualche"],ans:"Ogni"},{q:"___ anno andiamo in vacanza in Italia.",opts:["Ogni","Qualche"],ans:"Ogni"},
   {q:"Ho sentito ___ rumore strano.",opts:["ogni","qualche"],ans:"qualche"},{q:"Abbiamo bisogno di ___ minuto.",opts:["ogni","qualche"],ans:"qualche"},
   {q:"___ volta che piove resto a casa.",opts:["Ogni","Qualche"],ans:"Ogni"},{q:"Hai ___ spicciolo?",opts:["ogni","qualche"],ans:"qualche"},
-,
   {"q":"___ domenica vado a messa.","opts":["Ogni","Qualche"],"ans":"Ogni"},
   {"q":"Ho ___ dubbio su questa questione.","opts":["ogni","qualche"],"ans":"qualche"},
   {"q":"___ nazione ha la sua lingua.","opts":["Ogni","Qualche"],"ans":"Ogni"},
@@ -1953,7 +2016,6 @@ dim3:[
   {q:"Loin, m.pl voy. → ___ amici sono simpatici.",opts:["Quei","Questi","Quegli","Quelli"],ans:"Quegli"},
   {q:"Proche, f.pl → ___ ragazze cantano bene.",opts:["Queste","Quelle","Questi","Quei"],ans:"Queste"},
   {q:"Loin, f.pl → ___ case sono grandi.",opts:["Queste","Quelle","Questi","Quei"],ans:"Quelle"},
-,
   {"q":"Proche, m.sp → ___ studente è bravo.","opts":["Quel","Quello","Questo","Quest'"],"ans":"Questo"},
   {"q":"Loin, f.voy → ___ amica di Maria.","opts":["Questa","Quest'","Quella","Quell'"],"ans":"Quell'"},
   {"q":"Proche, f.pl → ___ scarpe sono nuove.","opts":["Quelle","Queste","Questi","Quei"],"ans":"Queste"},
@@ -2001,7 +2063,6 @@ num2:[
   {q:"Comment dit-on 81 ?",opts:["ottantauno","ottantuno","ottantotto","ottantadue"],ans:"ottantuno",explain:"ottanta perd le a devant uno"},
   {q:"'Trecento' = ?",opts:["300","30","3000","30000"],ans:"300"},
   {q:"Comment dit-on 2500 ?",opts:["duemillecinquecento","duemilacinquecento","duecentocinquanta","duemilacinquanta"],ans:"duemilacinquecento"},
-,
   {"q":"Comment dit-on 18 ?","opts":["ottanta","diciotto","dodici","diciassette"],"ans":"diciotto"},
   {"q":"'Quarantadue' = ?","opts":["24","42","44","22"],"ans":"42"},
   {"q":"Comment dit-on 76 ?","opts":["settantasei","sessantasette","settantasette","sessantasei"],"ans":"settantasei"},
@@ -2099,7 +2160,6 @@ lfam2:[
   {q:"'I gemelli' = ?",opts:["les jumeaux","les cousins","les fils","les frères"],ans:"les jumeaux"},
   {q:"Le frère de mon père est mon :",opts:["cugino","nonno","zio","cognato"],ans:"zio"},
   {q:"'I genitori' = ?",opts:["i parenti","i genitori","i familiari","gli antenati"],ans:"i genitori"},
-,
   {"q":"'Il cognato' = ?","opts":["le beau-père","le beau-frère","l'oncle","le cousin"],"ans":"le beau-frère"},
   {"q":"'La nuora' = ?","opts":["la belle-sœur","la belle-fille (épouse du fils)","la nièce","la cousine"],"ans":"la belle-fille (épouse du fils)"},
   {"q":"'Il genero' = ?","opts":["le beau-père","le beau-frère","le gendre","le neveu"],"ans":"le gendre"},
@@ -2134,7 +2194,6 @@ lscuola2:[
   {q:"Comment dit-on 'expliquer' ?",opts:["studiare","imparare","spiegare","leggere"],ans:"spiegare"},
   {q:"'I compiti' = ?",opts:["les notes","les devoirs","les examens","les cours"],ans:"les devoirs"},
   {q:"'L'aula' = ?",opts:["le couloir","le jardin","la salle de classe","le laboratoire"],ans:"la salle de classe"},
-,
   {"q":"Comment dit-on 'la récréation' ?","opts":["la lezione","la ricreazione","il compito","il voto"],"ans":"la ricreazione"},
   {"q":"'Il preside' = ?","opts":["le professeur","le directeur d'école","l'élève","le surveillant"],"ans":"le directeur d'école"},
   {"q":"Comment dit-on 'sécher les cours' ?","opts":["studiare molto","fare i compiti","marinare la scuola","andare in biblioteca"],"ans":"marinare la scuola"},
@@ -2207,7 +2266,6 @@ corps2:[
   {q:"'La schiena' = ?",opts:["la poitrine","le dos","le ventre","l'épaule"],ans:"le dos"},
   {q:"'Le dita' est le pluriel de ?",opts:["il dito","la dita","lo dito","il ditare"],ans:"il dito",explain:"Pluriel irrégulier féminin !"},
   {q:"'La fronte' = ?",opts:["le menton","le nez","le front","la joue"],ans:"le front"},
-,
   {"q":"Comment dit-on 'le poignet' ?","opts":["il gomito","il polso","la caviglia","il ginocchio"],"ans":"il polso"},
   {"q":"'Le labbra' = ?","opts":["les oreilles","les yeux","les lèvres","les sourcils"],"ans":"les lèvres"},
   {"q":"Comment dit-on 'les sourcils' ?","opts":["le sopracciglia","le ciglia","i capelli","le guance"],"ans":"le sopracciglia"},
@@ -2240,7 +2298,6 @@ tf1:[
   {sent:"Voi siete stranieri.",ans:true,explain:"Correct !"},
   {sent:"Io ho molto caldo.",ans:true,explain:"Correct ! avere caldo"},
   {sent:"Come sta il bambino?",ans:true,explain:"Correct ! stare (salute)"},
-,
   {"q":"Ogni studente devono studiare di più.","sent":"Ogni studente devono studiare di più.","ans":false,"correction":"Ogni studente deve studiare di più.","explain":"ogni + singulier → deve"},
   {"q":"Ci sono tre gatti in giardino.","sent":"Ci sono tre gatti in giardino.","ans":true,"explain":"Correct !"},
   {"q":"Ho qualche problemi con il computer.","sent":"Ho qualche problemi con il computer.","ans":false,"correction":"qualche problema","explain":"qualche + singulier"},
@@ -2273,7 +2330,6 @@ reg1:[
   {q:"Capitale de l'Émilie-Romagne ?",opts:["Parma","Modena","Ferrara","Bologna"],ans:"Bologna"},
   {q:"Capitale de la Sardaigne ?",opts:["Sassari","Nuoro","Cagliari","Oristano"],ans:"Cagliari"},
   {q:"Capitale des Pouilles ?",opts:["Lecce","Taranto","Foggia","Bari"],ans:"Bari"},
-,
   {"q":"Capitale de la Ligurie ?","opts":["Savona","La Spezia","Imperia","Genova"],"ans":"Genova"},
   {"q":"Capitale de l'Ombrie ?","opts":["Assisi","Orvieto","Perugia","Terni"],"ans":"Perugia"},
   {"q":"Capitale des Marches ?","opts":["Macerata","Ancona","Pesaro","Urbino"],"ans":"Ancona"},
@@ -2301,7 +2357,6 @@ reg2:[
   {q:"Dans quelle région se trouve Bari ?",opts:["Campania","Calabria","Puglia","Basilicata"],ans:"Puglia"},
   {q:"Dans quelle région se trouve Trento ?",opts:["Veneto","Friuli","Trentino-Alto Adige","Lombardia"],ans:"Trentino-Alto Adige"},
   {q:"Dans quelle région se trouve Perugia ?",opts:["Toscana","Lazio","Umbria","Marche"],ans:"Umbria"},
-,
   {"q":"Dans quelle région se trouve Matera ?","opts":["Puglia","Calabria","Campania","Basilicata"],"ans":"Basilicata"},
   {"q":"Dans quelle région se trouve Aosta ?","opts":["Piemonte","Liguria","Valle d'Aosta","Lombardia"],"ans":"Valle d'Aosta"},
   {"q":"Dans quelle région se trouve L'Aquila ?","opts":["Lazio","Molise","Umbria","Abruzzo"],"ans":"Abruzzo"},
@@ -2360,7 +2415,6 @@ vit2:[
   {q:"Que signifie 'il cortile' ?",opts:["la cour","le jardin","le balcon","la terrasse"],ans:"la cour"},
   {q:"Que signifie 'la soffitta' ?",opts:["le grenier","la cave","le garage","le sous-sol"],ans:"le grenier"},
   {q:"Que signifie 'il seminterrato' ?",opts:["le sous-sol","le grenier","la cave","le rez-de-chaussée"],ans:"le sous-sol"},
-,
   {"q":"Que signifie 'il ginocchio' ?","opts":["le coude","la cheville","le genou","le poignet"],"ans":"le genou"},
   {"q":"Que signifie 'la nuvola' ?","opts":["la brume","l'arc-en-ciel","le tonnerre","le nuage"],"ans":"le nuage"},
   {"q":"Que signifie 'il tramonto' ?","opts":["l'aurore","le lever du soleil","le coucher du soleil","la nuit"],"ans":"le coucher du soleil"},
@@ -2418,7 +2472,6 @@ vfr2:[
   {q:"Comment dit-on 'les jumeaux' ?",opts:["i fratelli","i cugini","i gemelli","i nipoti"],ans:"i gemelli"},
   {q:"Comment dit-on 'le couloir' ?",opts:["il salotto","la cucina","il corridoio","il bagno"],ans:"il corridoio"},
   {q:"Comment dit-on 'le miroir' ?",opts:["la lampada","il quadro","lo specchio","la finestra"],ans:"lo specchio"},
-,
   {"q":"Comment dit-on 'le genou' ?","opts":["il polso","il gomito","il ginocchio","la caviglia"],"ans":"il ginocchio"},
   {"q":"Comment dit-on 'le nuage' ?","opts":["il vento","la pioggia","la nuvola","la neve"],"ans":"la nuvola"},
   {"q":"Comment dit-on 'le pont' ?","opts":["il marciapiede","la strada","l'incrocio","il ponte"],"ans":"il ponte"},
@@ -2978,7 +3031,7 @@ pp6:[
   {q:"Forme correcte du participe passé de 'chiudere' ?",opts:["chiuduto","chiudito","chiuso","chiudeto"],ans:"chiuso"},
   {q:"Forme correcte du participe passé de 'aprire' ?",opts:["aprito","apruto","aperto","apreto"],ans:"aperto"},
   {q:"Forme correcte du participe passé de 'scrivere' ?",opts:["scrivuto","scrivito","scritto","scriveto"],ans:"scritto"},
-  {q:"Forme correcte du participe passé de 'vedere' ?",opts:["veduto","vedito","visto","vedeto"],ans:"visto",explain:"aussi 'veduto' mais 'visto' est plus courant"},
+  {q:"Forme correcte du participe passé de 'vedere' ?",opts:["vedato","vedito","visto","vedeto"],ans:"visto",explain:"'visto' — la variante 'veduto' existe aussi mais reste littéraire"},
   {q:"Forme correcte du participe passé de 'bere' ?",opts:["berito","beuto","bevuto","beto"],ans:"bevuto"},
   {q:"Forme correcte du participe passé de 'venire' ?",opts:["venito","venuto","vennuto","vento"],ans:"venuto"},
   {q:"Forme correcte du participe passé de 'chiedere' ?",opts:["chieduto","chiedito","chiesto","chiedeto"],ans:"chiesto"},
@@ -3399,8 +3452,8 @@ qual4:[
   {q:"È una ___ scuola. (buono, femminile davanti a consonante)",opts:["buon","buona","buon'","buone"],ans:"buona"},
   {q:"È uno ___ studio ben fatto. (buono, davanti a s+consonante)",opts:["buon","buono","buon'","buoni"],ans:"buono"},
   {q:"Sono ___ amici, li conosco da anni. (buono, plurale — mai apocope al plurale)",opts:["buon","buoni","buon'","buono"],ans:"buoni"},
-  {q:"È stato un ___ errore da parte sua. (grande, davanti a consonante)",opts:["gran","grande","grand'","grandi"],ans:"gran",explain:"'grande' forme complète reste toujours possible aussi"},
-  {q:"È un ___ uomo, molto rispettato. (grande, davanti a vocale)",opts:["gran","grande","grand'","grandi"],ans:"grand'",explain:"forme figée; 'grande' complet marche aussi"},
+  {q:"Quale forma APOCOPATA di 'grande' si usa davanti a consonante? (un ___ problema)",opts:["gran","grando","grandi","granda"],ans:"gran",explain:"apocope devant consonne ; la forme pleine 'un grande problema' reste correcte"},
+  {q:"Quale forma APOCOPATA di 'grande' si usa davanti a vocale? (un ___ uomo)",opts:["grand'","gran","grandi","grando"],ans:"grand'",explain:"'grand'uomo', forme figée ; la forme pleine 'un grande uomo' reste correcte"},
   {q:"È una ___ città, la più grande d'Italia. (grande, forma piena)",opts:["gran","grande","grand'","gran'"],ans:"grande"},
   {q:"Sono ___ giorni per la storia. (grande, plurale — sempre forma piena)",opts:["gran","grandi","grand'","grande"],ans:"grandi"},
   {q:"___ Pietro è la basilica più famosa di Roma. (santo, davanti a consonante)",opts:["San","Santo","Sant'","Santa"],ans:"San"},
@@ -3443,7 +3496,7 @@ qual5:[
   {q:"'La stessa persona' (prima del nome) significa:",opts:["la même personne","la personne elle-même","une personne différente","aucune personne"],ans:"la même personne"},
   {q:"'La persona stessa' (dopo il nome) significa invece:",opts:["la même personne (identité)","la personne en personne / elle-même","une autre personne","personne"],ans:"la personne en personne / elle-même"},
   {q:"Quale colore NON si accorda mai in genere e numero, per tradizione?",opts:["nero","marrone","rosso","bianco"],ans:"marrone",explain:"marrone est traditionnellement invariable, bien que 'marroni' soit toléré aujourd'hui"},
-  {q:"Le borse sono ___. (marrone, forma tradizionale invariabile)",opts:["marrone","marroni","marronе","marrona"],ans:"marrone",alt:"marroni"},
+  {q:"Le borse sono ___. (marrone, forma tradizionale invariabile)",opts:["marrone","marrona","marrono","marronei"],ans:"marrone",explain:"'marrone' est traditionnellement invariable ('marroni' est toléré aujourd'hui)"},
   {q:"Quale colore è invariabile perché deriva dal nome di un fiore?",opts:["rosa","rosso","verde","nero"],ans:"rosa",explain:"rosa vient du nom de la fleur, reste invariable"},
   {q:"Gli occhi ___. (turchese)",opts:["turchese","turchesi","turchesa","turchesse"],ans:"turchese",explain:"turchese, comme beige et lilla, est invariable"},
   {q:"Trova l'intruso (colore che SI accorda normalmente):",opts:["rosso","blu","viola","rosa"],ans:"rosso",explain:"rosso est un adjectif normal à 4 sorties : rossi/rosse"},
@@ -3470,7 +3523,7 @@ qual6:[
   {q:"Comment dit-on 'un homme pauvre' (financièrement) ?",opts:["un pover'uomo","un uomo povero","un povero uomo (avant)","un uomo pover"],ans:"un uomo povero"},
   {q:"Comment dit-on 'un vieil ami' (de longue date) ?",opts:["un amico vecchio","un vecchio amico","un amico antico","un ex amico"],ans:"un vecchio amico"},
   {q:"Comment dit-on 'un ami âgé' (vieux physiquement) ?",opts:["un vecchio amico","un amico vecchio","un amico anziano solamente","un amico giovane"],ans:"un amico vecchio"},
-  {q:"Comment dit-on 'des chaussures marron' (invariable) ?",opts:["scarpe marroni","scarpe marrone","scarpe marronesse","scarpe marroni e basta"],ans:"scarpe marrone",alt:"scarpe marroni"},
+  {q:"Comment dit-on 'des chaussures marron' (forme traditionnelle invariable) ?",opts:["scarpe marrone","scarpe marrona","scarpe marronesse","scarpe marronate"],ans:"scarpe marrone",explain:"'marrone' invariable ; 'scarpe marroni' est aujourd'hui toléré"},
   {q:"Comment dit-on 'des yeux bleus' ?",opts:["occhi blu","occhi blui","occhi blue","occhi blus"],ans:"occhi blu"},
   {q:"Trova la frase con un ERRORE di accordo:",opts:["Le ragazze sono alte.","I ragazzi sono alto.","I ragazzi sono alti.","Le ragazze sono alta (al singolare)"],ans:"I ragazzi sono alto."},
   {q:"Trova la frase con un ERRORE di accordo:",opts:["Sono begli amici.","Sono bei amici.","Sono belli amici (invece di begli).","Sono belle amiche."],ans:"Sono belli amici (invece di begli)."},
@@ -5984,6 +6037,348 @@ partadj6:[
   {q:"'Le porte vengono chiuse alle 20.' Qui 'vengono' sostituisce:",opts:["sono (essere)","hanno (avere)","stanno (stare)","fanno (fare)"],ans:"sono (essere)"},
 ],
 
+// ══ SINONIMI E CONTRARI (A1 → C2) ══
+sin1:[
+  {q:"Sinonimo di 'bello' :",opts:["carino","brutto","vecchio","piccolo"],ans:"carino"},
+  {q:"Sinonimo di 'grande' :",opts:["enorme","piccolo","stretto","basso"],ans:"enorme"},
+  {q:"Sinonimo di 'veloce' :",opts:["rapido","lento","pigro","calmo"],ans:"rapido"},
+  {q:"Sinonimo di 'felice' :",opts:["contento","triste","arrabbiato","stanco"],ans:"contento"},
+  {q:"Sinonimo di 'triste' :",opts:["infelice","allegro","felice","contento"],ans:"infelice"},
+  {q:"Sinonimo di 'iniziare' :",opts:["cominciare","finire","smettere","chiudere"],ans:"cominciare"},
+  {q:"Sinonimo di 'finire' :",opts:["terminare","iniziare","aprire","cominciare"],ans:"terminare"},
+  {q:"Sinonimo di 'casa' :",opts:["abitazione","strada","città","giardino"],ans:"abitazione"},
+  {q:"Sinonimo di 'macchina' :",opts:["automobile","bicicletta","treno","aereo"],ans:"automobile"},
+  {q:"Sinonimo di 'denaro' :",opts:["soldi","tempo","lavoro","casa"],ans:"soldi"},
+  {q:"Sinonimo di 'lavoro' :",opts:["impiego","vacanza","riposo","gioco"],ans:"impiego"},
+  {q:"Sinonimo di 'amico' :",opts:["compagno","nemico","estraneo","sconosciuto"],ans:"compagno"},
+  {q:"Sinonimo di 'stanco' :",opts:["affaticato","riposato","energico","sveglio"],ans:"affaticato"},
+  {q:"Sinonimo di 'difficile' :",opts:["complicato","facile","semplice","chiaro"],ans:"complicato"},
+  {q:"Sinonimo di 'facile' :",opts:["semplice","difficile","complesso","duro"],ans:"semplice"},
+  {q:"Sinonimo di 'brutto' :",opts:["orribile","bello","carino","grazioso"],ans:"orribile"},
+  {q:"Sinonimo di 'mangiare' :",opts:["nutrirsi","bere","dormire","correre"],ans:"nutrirsi"},
+  {q:"Sinonimo di 'guardare' :",opts:["osservare","ascoltare","toccare","parlare"],ans:"osservare"},
+  {q:"Sinonimo di 'capire' :",opts:["comprendere","ignorare","dimenticare","sbagliare"],ans:"comprendere"},
+  {q:"Sinonimo di 'certo' :",opts:["sicuro","dubbioso","incerto","forse"],ans:"sicuro"},
+  {q:"Sinonimo di 'sbagliato' :",opts:["errato","giusto","corretto","esatto"],ans:"errato"},
+  {q:"Sinonimo di 'bambino' :",opts:["ragazzino","adulto","anziano","vecchio"],ans:"ragazzino"},
+  {q:"Sinonimo di 'andare via' :",opts:["partire","arrivare","restare","tornare"],ans:"partire"},
+  {q:"Sinonimo di 'arrivare' :",opts:["giungere","partire","uscire","entrare"],ans:"giungere"},
+  {q:"Sinonimo di 'comprare' :",opts:["acquistare","vendere","regalare","perdere"],ans:"acquistare"},
+  {q:"Sinonimo di 'gentile' :",opts:["cortese","scortese","maleducato","cattivo"],ans:"cortese"},
+  {q:"Sinonimo di 'sporco' :",opts:["sudicio","pulito","lucido","ordinato"],ans:"sudicio"},
+  {q:"Sinonimo di 'vicino' :",opts:["accanto","lontano","distante","remoto"],ans:"accanto"},
+  {q:"Sinonimo di 'adesso' :",opts:["ora","dopo","ieri","domani"],ans:"ora"},
+  {q:"Sinonimo di 'parlare' :",opts:["chiacchierare","tacere","ascoltare","dormire"],ans:"chiacchierare"},
+],
+sin2:[
+  {q:"Sinonimo di 'arrabbiarsi' :",opts:["irritarsi","calmarsi","rilassarsi","sorridere"],ans:"irritarsi"},
+  {q:"Sinonimo di 'accorgersi' :",opts:["rendersi conto","ignorare","dimenticare","trascurare"],ans:"rendersi conto"},
+  {q:"Sinonimo di 'ottenere' :",opts:["conseguire","perdere","rifiutare","rinunciare"],ans:"conseguire"},
+  {q:"Sinonimo di 'migliorare' :",opts:["perfezionare","peggiorare","rovinare","danneggiare"],ans:"perfezionare"},
+  {q:"Sinonimo di 'evitare' :",opts:["schivare","affrontare","cercare","provocare"],ans:"schivare"},
+  {q:"Sinonimo di 'sostenere (un'idea)' :",opts:["appoggiare","contestare","negare","rifiutare"],ans:"appoggiare"},
+  {q:"Sinonimo di 'rinviare' :",opts:["posticipare","anticipare","accelerare","concludere"],ans:"posticipare"},
+  {q:"Sinonimo di 'affrontare' :",opts:["fronteggiare","fuggire","evitare","ignorare"],ans:"fronteggiare"},
+  {q:"Sinonimo di 'curioso' :",opts:["interessato","indifferente","annoiato","distratto"],ans:"interessato"},
+  {q:"Sinonimo di 'testardo' :",opts:["ostinato","flessibile","docile","arrendevole"],ans:"ostinato"},
+  {q:"Sinonimo di 'noioso' :",opts:["tedioso","divertente","avvincente","stimolante"],ans:"tedioso"},
+  {q:"Sinonimo di 'affidabile' :",opts:["fidato","inaffidabile","incerto","instabile"],ans:"fidato"},
+  {q:"Sinonimo di 'ricco' :",opts:["benestante","povero","misero","indigente"],ans:"benestante"},
+  {q:"Sinonimo di 'raccontare' :",opts:["narrare","tacere","nascondere","omettere"],ans:"narrare"},
+  {q:"Sinonimo di 'scegliere' :",opts:["selezionare","rifiutare","scartare","ignorare"],ans:"selezionare"},
+  {q:"Sinonimo di 'riuscire' :",opts:["farcela","fallire","arrendersi","rinunciare"],ans:"farcela"},
+  {q:"Sinonimo di 'permettere' :",opts:["consentire","vietare","proibire","impedire"],ans:"consentire"},
+  {q:"Sinonimo di 'vietare' :",opts:["proibire","permettere","consentire","autorizzare"],ans:"proibire"},
+  {q:"Sinonimo di 'sorprendente' :",opts:["stupefacente","prevedibile","banale","scontato"],ans:"stupefacente"},
+  {q:"Sinonimo di 'abitudine' :",opts:["consuetudine","eccezione","novità","rarità"],ans:"consuetudine"},
+  {q:"Sinonimo di 'scopo' :",opts:["obiettivo","caso","dubbio","ostacolo"],ans:"obiettivo"},
+  {q:"Sinonimo di 'motivo' :",opts:["ragione","effetto","risultato","conseguenza"],ans:"ragione"},
+  {q:"Sinonimo di 'minaccia' :",opts:["pericolo","sicurezza","protezione","garanzia"],ans:"pericolo"},
+  {q:"Sinonimo di 'sviluppare' :",opts:["elaborare","ridurre","limitare","bloccare"],ans:"elaborare"},
+  {q:"Sinonimo di 'accettare' :",opts:["acconsentire","respingere","rifiutare","negare"],ans:"acconsentire"},
+  {q:"Sinonimo di 'dimostrare' :",opts:["provare","smentire","confutare","negare"],ans:"provare"},
+  {q:"Sinonimo di 'frequente' :",opts:["ricorrente","raro","insolito","eccezionale"],ans:"ricorrente"},
+  {q:"Sinonimo di 'adatto' :",opts:["idoneo","inadeguato","inappropriato","sbagliato"],ans:"idoneo"},
+  {q:"Sinonimo di 'rimandare' :",opts:["differire","anticipare","concludere","iniziare"],ans:"differire"},
+  {q:"'Sorgere' (un problema) significa :",opts:["presentarsi","risolversi","sparire","concludersi"],ans:"presentarsi"},
+],
+sin3:[
+  {q:"Sinonimo di 'esiguo' :",opts:["scarso","abbondante","enorme","vasto"],ans:"scarso"},
+  {q:"Sinonimo di 'arduo' :",opts:["difficoltoso","agevole","semplice","banale"],ans:"difficoltoso"},
+  {q:"Sinonimo di 'peculiare' :",opts:["caratteristico","comune","ordinario","banale"],ans:"caratteristico"},
+  {q:"Sinonimo di 'eludere' :",opts:["aggirare","affrontare","risolvere","accettare"],ans:"aggirare"},
+  {q:"Sinonimo di 'reticente' :",opts:["evasivo","esplicito","diretto","franco"],ans:"evasivo"},
+  {q:"Sinonimo di 'ostentare' :",opts:["esibire","nascondere","celare","occultare"],ans:"esibire"},
+  {q:"Sinonimo di 'inopportuno' :",opts:["inappropriato","adeguato","tempestivo","idoneo"],ans:"inappropriato"},
+  {q:"Sinonimo di 'verosimile' :",opts:["plausibile","assurdo","impossibile","inverosimile"],ans:"plausibile"},
+  {q:"Sinonimo di 'esaustivo' :",opts:["completo","parziale","lacunoso","sommario"],ans:"completo"},
+  {q:"'Dirimere una questione' significa :",opts:["risolverla","complicarla","rinviarla","ignorarla"],ans:"risolverla"},
+  {q:"Sinonimo di 'annoverare' :",opts:["includere","escludere","omettere","trascurare"],ans:"includere"},
+  {q:"Sinonimo di 'avvalersi' :",opts:["servirsi","rinunciare","privarsi","astenersi"],ans:"servirsi"},
+  {q:"Sinonimo di 'ravvisare' :",opts:["riconoscere","ignorare","confondere","trascurare"],ans:"riconoscere"},
+  {q:"Sinonimo di 'precipuo' :",opts:["principale","secondario","marginale","accessorio"],ans:"principale"},
+  {q:"Sinonimo di 'cogente' :",opts:["vincolante","facoltativo","opzionale","libero"],ans:"vincolante"},
+  {q:"Sinonimo di 'procrastinare' :",opts:["rinviare","anticipare","accelerare","concludere"],ans:"rinviare"},
+  {q:"Sinonimo di 'esimersi' :",opts:["sottrarsi","impegnarsi","assumersi","accollarsi"],ans:"sottrarsi"},
+  {q:"Sinonimo di 'lungimirante' :",opts:["previdente","miope","avventato","imprudente"],ans:"previdente"},
+  {q:"Sinonimo di 'esacerbare' :",opts:["aggravare","attenuare","mitigare","alleviare"],ans:"aggravare"},
+  {q:"Sinonimo di 'corroborare' :",opts:["rafforzare","indebolire","smentire","confutare"],ans:"rafforzare"},
+  {q:"Sinonimo di 'disamina' :",opts:["analisi","sintesi","riassunto","omissione"],ans:"analisi"},
+  {q:"Sinonimo di 'perentorio' :",opts:["categorico","incerto","vago","ambiguo"],ans:"categorico"},
+  {q:"Sinonimo di 'propenso' :",opts:["incline","contrario","avverso","restio"],ans:"incline"},
+  {q:"Sinonimo di 'reiterare' :",opts:["ripetere","cessare","interrompere","abbandonare"],ans:"ripetere"},
+  {q:"Sinonimo di 'ineluttabile' :",opts:["inevitabile","evitabile","incerto","improbabile"],ans:"inevitabile"},
+  {q:"Sinonimo di 'sopperire' :",opts:["rimediare","aggravare","peggiorare","trascurare"],ans:"rimediare"},
+  {q:"Sinonimo di 'emblematico' :",opts:["significativo","insignificante","irrilevante","casuale"],ans:"significativo"},
+  {q:"Sinonimo di 'accorato' :",opts:["appassionato","indifferente","freddo","distaccato"],ans:"appassionato"},
+  {q:"Sinonimo di 'dimesso' :",opts:["modesto","appariscente","vistoso","sfarzoso"],ans:"modesto"},
+  {q:"Sinonimo di 'ragguardevole' :",opts:["notevole","trascurabile","irrisorio","minimo"],ans:"notevole"},
+],
+sin4:[
+  {q:"Il contrario di 'alto' è :",opts:["basso","grande","largo","lungo"],ans:"basso"},
+  {q:"Il contrario di 'caldo' è :",opts:["freddo","tiepido","bollente","mite"],ans:"freddo"},
+  {q:"Il contrario di 'aprire' è :",opts:["chiudere","entrare","uscire","girare"],ans:"chiudere"},
+  {q:"Il contrario di 'entrare' è :",opts:["uscire","salire","scendere","restare"],ans:"uscire"},
+  {q:"Il contrario di 'ricordare' è :",opts:["dimenticare","pensare","sapere","capire"],ans:"dimenticare"},
+  {q:"Il contrario di 'vincere' è :",opts:["perdere","giocare","correre","tentare"],ans:"perdere"},
+  {q:"Il contrario di 'partire' è :",opts:["arrivare","viaggiare","uscire","correre"],ans:"arrivare"},
+  {q:"Il contrario di 'accendere' è :",opts:["spegnere","illuminare","bruciare","scaldare"],ans:"spegnere"},
+  {q:"Il contrario di 'salire' è :",opts:["scendere","cadere","correre","saltare"],ans:"scendere"},
+  {q:"Il contrario di 'pieno' è :",opts:["vuoto","pesante","largo","colmo"],ans:"vuoto"},
+  {q:"Il contrario di 'presente' è :",opts:["assente","vicino","attuale","moderno"],ans:"assente"},
+  {q:"Il contrario di 'generoso' è :",opts:["avaro","gentile","ricco","buono"],ans:"avaro"},
+  {q:"Il contrario di 'coraggioso' è :",opts:["codardo","forte","deciso","audace"],ans:"codardo"},
+  {q:"Il contrario di 'permettere' è :",opts:["vietare","lasciare","aiutare","offrire"],ans:"vietare"},
+  {q:"Il contrario di 'aumentare' è :",opts:["diminuire","crescere","salire","alzare"],ans:"diminuire"},
+  {q:"Il contrario di 'accettare' è :",opts:["rifiutare","prendere","ricevere","ottenere"],ans:"rifiutare"},
+  {q:"Il contrario di 'silenzio' è :",opts:["rumore","calma","pace","quiete"],ans:"rumore"},
+  {q:"Il contrario di 'nemico' è :",opts:["amico","rivale","avversario","concorrente"],ans:"amico"},
+  {q:"Il contrario di 'colpevole' è :",opts:["innocente","responsabile","accusato","sospetto"],ans:"innocente"},
+  {q:"Il contrario di 'partenza' è :",opts:["arrivo","viaggio","ritardo","corsa"],ans:"arrivo"},
+  {q:"Il contrario di 'successo' è :",opts:["fallimento","vittoria","trionfo","risultato"],ans:"fallimento"},
+  {q:"Il contrario di 'aumento' è :",opts:["calo","crescita","rialzo","incremento"],ans:"calo"},
+  {q:"Il contrario di 'sincero' è :",opts:["bugiardo","onesto","leale","franco"],ans:"bugiardo"},
+  {q:"Il contrario di 'prudente' è :",opts:["avventato","cauto","attento","saggio"],ans:"avventato"},
+  {q:"Il contrario di 'utile' è :",opts:["inutile","pratico","efficace","valido"],ans:"inutile"},
+  {q:"Il contrario di 'chiaro' (una spiegazione) è :",opts:["confuso","limpido","evidente","ovvio"],ans:"confuso"},
+  {q:"Il contrario di 'economico' è :",opts:["costoso","conveniente","gratuito","scontato"],ans:"costoso"},
+  {q:"Il contrario di 'raro' è :",opts:["comune","insolito","unico","prezioso"],ans:"comune"},
+  {q:"Il contrario di 'ottimista' è :",opts:["pessimista","positivo","fiducioso","sereno"],ans:"pessimista"},
+  {q:"Il contrario di 'ampliare' è :",opts:["restringere","allargare","estendere","espandere"],ans:"restringere"},
+],
+sin5:[
+  {q:"Version FORMELLE de « Ciao ! » :",opts:["Buongiorno","Ciao ciao","Ehilà","Ciao a tutti"],ans:"Buongiorno"},
+  {q:"Version FORMELLE de « Come stai ? » :",opts:["Come sta?","Come va?","Che si dice?","Come butta?"],ans:"Come sta?"},
+  {q:"Version INFORMELLE de « La ringrazio » :",opts:["Grazie mille","La ringrazio molto","Le sono grato","Porgo i miei ringraziamenti"],ans:"Grazie mille"},
+  {q:"Registre de « Egregio Signore » :",opts:["formale","informale","colloquiale","gergale"],ans:"formale"},
+  {q:"Registre de « Ehi, che fai? » :",opts:["colloquiale","formale","burocratico","letterario"],ans:"colloquiale"},
+  {q:"FORMEL de « Scusa, puoi aiutarmi? » :",opts:["Mi scusi, potrebbe aiutarmi?","Scusa, mi aiuti?","Dai, aiutami","Aiutami un attimo"],ans:"Mi scusi, potrebbe aiutarmi?"},
+  {q:"FORMEL de « Ti mando la mail » :",opts:["Le invio l'email","Ti spedisco la mail","Ti giro la mail","Ti passo la mail"],ans:"Le invio l'email"},
+  {q:"INFORMEL de « Cordiali saluti » :",opts:["A presto!","Distinti saluti","Ossequi","In fede"],ans:"A presto!"},
+  {q:"FORMEL de « Voglio sapere… » :",opts:["Vorrei sapere…","Voglio sapere subito","Dimmi","Fammi sapere"],ans:"Vorrei sapere…"},
+  {q:"Quelle formule est la plus FORMELLE ?",opts:["Le sarei grato se potesse…","Puoi farmi un favore?","Dammi una mano","Fammi sapere"],ans:"Le sarei grato se potesse…"},
+  {q:"FORMEL de « Quanto costa? » :",opts:["Qual è il prezzo?","Quanto viene?","Quanto mi costa?","Quant'è?"],ans:"Qual è il prezzo?"},
+  {q:"Registre de « Sto una favola » :",opts:["colloquiale","formale","tecnico","letterario"],ans:"colloquiale"},
+  {q:"FORMEL de « Non ho capito » :",opts:["Non ho compreso bene","Non ci ho capito niente","Boh","Che vuol dire?"],ans:"Non ho compreso bene"},
+  {q:"« Gentile Dottoressa » s'emploie :",opts:["dans une lettre formelle","entre amis","dans un SMS","en famille"],ans:"dans une lettre formelle"},
+  {q:"FORMEL de « Ci vediamo! » :",opts:["Arrivederci","Ciao ciao","A dopo","Ci becchiamo"],ans:"Arrivederci"},
+  {q:"Quelle expression n'est PAS adaptée à un email professionnel ?",opts:["Ciao bella!","Cordiali saluti","La ringrazio","Distinti saluti"],ans:"Ciao bella!"},
+  {q:"FORMEL de « Mi dispiace » :",opts:["Mi rincresce","Che peccato","Mi spiace un sacco","Peccato"],ans:"Mi rincresce"},
+  {q:"Registre de « codesto documento » :",opts:["burocratico/formale","colloquiale","familiare","giovanile"],ans:"burocratico/formale"},
+  {q:"FORMEL de « Ti richiamo » :",opts:["La richiamerò","Ti risento","Ci sentiamo","Ti faccio uno squillo"],ans:"La richiamerò"},
+  {q:"Dans le langage des jeunes, « figo » signifie :",opts:["bello/interessante","brutto","noioso","costoso"],ans:"bello/interessante"},
+  {q:"FORMEL de « Va bene » :",opts:["D'accordo","Ok","Sì dai","Certo che sì"],ans:"D'accordo"},
+  {q:"Quel salut convient à un professeur ?",opts:["Buongiorno professore","Ehilà prof","Ciao","Bella!"],ans:"Buongiorno professore"},
+  {q:"« In allegato trova… » appartient au registre :",opts:["formale scritto","colloquiale","familiare","gergale"],ans:"formale scritto"},
+  {q:"INFORMEL de « Desidera altro? » :",opts:["Vuoi altro?","Desidera altro signore?","Gradisce altro?","Le serve altro?"],ans:"Vuoi altro?"},
+  {q:"FORMEL de « Mandami i documenti » :",opts:["Le chiedo di inviarmi i documenti","Mandameli","Girami i documenti","Passami i documenti"],ans:"Le chiedo di inviarmi i documenti"},
+  {q:"On utilise le « tu » avec :",opts:["amici e familiari","il direttore","un cliente sconosciuto","un funzionario"],ans:"amici e familiari"},
+  {q:"On utilise le « Lei » avec :",opts:["persone che non si conoscono","i propri figli","gli amici d'infanzia","i fratelli"],ans:"persone che non si conoscono"},
+  {q:"FORMEL de « Che ore sono? » :",opts:["Mi scusi, che ore sono?","Che ora è?","Ore?","Dimmi l'ora"],ans:"Mi scusi, che ore sono?"},
+  {q:"« Spett.le Ditta » sert à s'adresser :",opts:["a un'azienda","a un amico","a un familiare","a un bambino"],ans:"a un'azienda"},
+  {q:"Passer du « Lei » au « tu » avec quelqu'un se dit :",opts:["darsi del tu","dare del Lei","fare il formale","usare il voi"],ans:"darsi del tu"},
+],
+sin6:[
+  {sent:"'Iniziare' e 'cominciare' sono sinonimi.",ans:true,explain:"Correct ! Ils sont interchangeables."},
+  {sent:"'Grande' e 'piccolo' sono sinonimi.",ans:false,correction:"sono contrari",explain:"ce sont des antonymes, pas des synonymes"},
+  {sent:"'Comprare' e 'acquistare' hanno lo stesso significato.",ans:true,explain:"Correct ! 'acquistare' est un peu plus formel."},
+  {sent:"Il contrario di 'aprire' è 'chiudere'.",ans:true,explain:"Correct !"},
+  {sent:"'Ciao' è una formula formale.",ans:false,correction:"'Ciao' è informale ; la forma formale è 'Buongiorno'",explain:"'Ciao' est informel"},
+  {sent:"'Le sarei grato se potesse aiutarmi' appartiene al registro formale.",ans:true,explain:"Correct ! registre formel de politesse"},
+  {sent:"'Procrastinare' significa 'anticipare'.",ans:false,correction:"significa 'rinviare, rimandare'",explain:"procrastinare = repousser"},
+  {sent:"'Esaustivo' significa 'completo'.",ans:true,explain:"Correct !"},
+  {sent:"'Testardo' e 'ostinato' sono sinonimi.",ans:true,explain:"Correct !"},
+  {sent:"'Economico' e 'costoso' sono sinonimi.",ans:false,correction:"sono contrari",explain:"economico = bon marché, costoso = cher"},
+  {sent:"Si usa il 'Lei' con una persona che non si conosce.",ans:true,explain:"Correct ! c'est la forme de politesse"},
+  {sent:"'Eludere' significa 'affrontare direttamente'.",ans:false,correction:"significa 'aggirare, evitare'",explain:"eludere = contourner, esquiver"},
+],
+
+// ══ TEMPI E STRUTTURE AVANZATE (B1 → C2) ══
+avz1:[
+  {label:"Dante ___ la Divina Commedia. (scrivere, passato remoto)",ans:"scrisse"},
+  {label:"Io ___ a Roma nel 1999. (nascere)",ans:"nacqui"},
+  {label:"Colombo ___ l'America nel 1492. (scoprire)",ans:"scoprì"},
+  {label:"Loro ___ la guerra. (vincere)",ans:"vinsero"},
+  {label:"Noi ___ in Italia per dieci anni. (vivere)",ans:"vivemmo"},
+  {label:"Tu ___ la verità a tutti. (dire)",ans:"dicesti"},
+  {label:"Lui ___ molto giovane. (essere)",ans:"fu"},
+  {label:"Voi ___ una bella sorpresa. (avere)",ans:"aveste"},
+  {label:"Leonardo ___ la Gioconda. (dipingere)",ans:"dipinse"},
+  {label:"Io ___ la porta e uscii. (chiudere)",ans:"chiusi"},
+  {label:"Loro ___ a casa tutta la sera. (rimanere)",ans:"rimasero"},
+  {label:"Lei ___ una lunga lettera. (leggere)",ans:"lesse"},
+  {label:"Noi ___ la decisione insieme. (prendere)",ans:"prendemmo"},
+  {label:"Lui mi ___ un favore. (chiedere)",ans:"chiese"},
+  {label:"Io non ___ rispondere. (potere)",ans:"potei"},
+  {label:"Loro ___ tutto il giorno. (lavorare)",ans:"lavorarono"},
+  {label:"Tu ___ molto bene ieri sera. (cantare)",ans:"cantasti"},
+  {label:"Lei ___ la notizia solo dopo. (sapere)",ans:"seppe"},
+  {label:"Noi ___ i nostri amici al mare. (vedere)",ans:"vedemmo"},
+  {label:"Loro ___ a trovarci l'estate scorsa. (venire)",ans:"vennero"},
+],
+avz2:[
+  {q:"Passato remoto di 'essere' (io) :",opts:["fui","ero","sono stato","sarei"],ans:"fui"},
+  {q:"Passato remoto di 'avere' (io) :",opts:["ebbi","avevo","ho avuto","avrei"],ans:"ebbi"},
+  {q:"Passato remoto di 'fare' (lui) :",opts:["fece","faceva","ha fatto","farebbe"],ans:"fece"},
+  {q:"Passato remoto di 'dire' (loro) :",opts:["dissero","dicevano","hanno detto","direbbero"],ans:"dissero"},
+  {q:"Passato remoto di 'vedere' (io) :",opts:["vidi","vedevo","ho visto","vedrei"],ans:"vidi"},
+  {q:"Passato remoto di 'venire' (lui) :",opts:["venne","veniva","è venuto","verrebbe"],ans:"venne"},
+  {q:"Passato remoto di 'volere' (loro) :",opts:["vollero","volevano","hanno voluto","vorrebbero"],ans:"vollero"},
+  {q:"Passato remoto di 'sapere' (io) :",opts:["seppi","sapevo","ho saputo","saprei"],ans:"seppi"},
+  {q:"Passato remoto di 'prendere' (lui) :",opts:["prese","prendeva","ha preso","prenderebbe"],ans:"prese"},
+  {q:"Passato remoto di 'scrivere' (io) :",opts:["scrissi","scrivevo","ho scritto","scriverei"],ans:"scrissi"},
+  {q:"Passato remoto di 'leggere' (lei) :",opts:["lesse","leggeva","ha letto","leggerebbe"],ans:"lesse"},
+  {q:"Passato remoto di 'mettere' (io) :",opts:["misi","mettevo","ho messo","metterei"],ans:"misi"},
+  {q:"Passato remoto di 'nascere' (lui) :",opts:["nacque","nasceva","è nato","nascerebbe"],ans:"nacque"},
+  {q:"Passato remoto di 'vivere' (loro) :",opts:["vissero","vivevano","hanno vissuto","vivrebbero"],ans:"vissero"},
+  {q:"Passato remoto di 'conoscere' (io) :",opts:["conobbi","conoscevo","ho conosciuto","conoscerei"],ans:"conobbi"},
+  {q:"Passato remoto di 'rimanere' (lui) :",opts:["rimase","rimaneva","è rimasto","rimarrebbe"],ans:"rimase"},
+  {q:"Passato remoto di 'chiedere' (loro) :",opts:["chiesero","chiedevano","hanno chiesto","chiederebbero"],ans:"chiesero"},
+  {q:"Passato remoto di 'rispondere' (lei) :",opts:["rispose","rispondeva","ha risposto","risponderebbe"],ans:"rispose"},
+  {q:"Passato remoto di 'decidere' (io) :",opts:["decisi","decidevo","ho deciso","deciderei"],ans:"decisi"},
+  {q:"Passato remoto di 'parlare' (noi) :",opts:["parlammo","parlavamo","abbiamo parlato","parleremmo"],ans:"parlammo"},
+  {q:"Passato remoto de 'finire' (loro) :",opts:["finirono","finivano","hanno finito","finirebbero"],ans:"finirono"},
+  {q:"Passato remoto di 'dare' (lui) :",opts:["diede","dava","ha dato","darebbe"],ans:"diede"},
+  {q:"Passato remoto di 'stare' (io) :",opts:["stetti","stavo","sono stato","starei"],ans:"stetti"},
+  {q:"Beaucoup de verbes irréguliers au passato remoto suivent le schéma :",opts:["irrégulier à 1ª sing., 3ª sing. et 3ª plur.","irrégulier à toutes les personnes","irrégulier seulement au pluriel","toujours régulier"],ans:"irrégulier à 1ª sing., 3ª sing. et 3ª plur."},
+  {q:"Le passato remoto s'emploie surtout pour :",opts:["une action passée, conclue et sans lien avec le présent","une action habituelle","une action future","une action en cours"],ans:"une action passée, conclue et sans lien avec le présent"},
+  {q:"Dans quelle région d'Italie le passato remoto est-il le plus employé à l'oral ?",opts:["le Sud","le Nord","seulement à Milan","nulle part"],ans:"le Sud"},
+  {q:"Quale frase è corretta ?",opts:["Nel 1861 l'Italia divenne un regno.","Nel 1861 l'Italia è diventata un regno oggi.","Nel 1861 l'Italia diventa un regno.","Nel 1861 l'Italia diventava sempre un regno."],ans:"Nel 1861 l'Italia divenne un regno."},
+  {q:"Le passato remoto est très fréquent :",opts:["dans les romans et les textes historiques","dans les SMS","dans les emails de travail","à l'oral au Nord"],ans:"dans les romans et les textes historiques"},
+  {q:"Passato remoto di 'perdere' (io) :",opts:["persi","perdevo","ho perso","perderei"],ans:"persi"},
+  {q:"Passato remoto di 'vincere' (lui) :",opts:["vinse","vinceva","ha vinto","vincerebbe"],ans:"vinse"},
+],
+avz3:[
+  {q:"Quando arrivai, lui ___ già ___. (partire)",opts:["era / partito","fu / partito","è / partito","sarebbe / partito"],ans:"era / partito"},
+  {q:"Le trapassato prossimo exprime :",opts:["une action antérieure à une autre action passée","une action future","une action habituelle","une action en cours"],ans:"une action antérieure à une autre action passée"},
+  {q:"Le trapassato prossimo se forme avec :",opts:["imperfetto di avere/essere + participio passato","presente + participio","futuro + participio","condizionale + participio"],ans:"imperfetto di avere/essere + participio passato"},
+  {q:"Ho capito che tu ___ ragione. (avere, trapassato prossimo)",opts:["avevi avuto","hai avuto","avesti","avrai avuto"],ans:"avevi avuto"},
+  {q:"Quando ___ i compiti, uscii. (finire, trapassato prossimo, io)",opts:["ebbi finito","avevo finito","ho finito","finii"],ans:"avevo finito"},
+  {q:"Le trapassato remoto se forme avec :",opts:["passato remoto di avere/essere + participio","imperfetto + participio","presente + participio","futuro + participio"],ans:"passato remoto di avere/essere + participio"},
+  {q:"Le trapassato remoto s'emploie surtout après :",opts:["appena, dopo che, quando (+ passato remoto)","mentre","se","perché"],ans:"appena, dopo che, quando (+ passato remoto)"},
+  {q:"Appena ___ , uscì. (arrivare, trapassato remoto, lui)",opts:["fu arrivato","era arrivato","è arrivato","sarà arrivato"],ans:"fu arrivato"},
+  {q:"Dopo che ___ , partirono. (mangiare, trapassato remoto, loro)",opts:["ebbero mangiato","avevano mangiato","hanno mangiato","mangiarono"],ans:"ebbero mangiato"},
+  {q:"Trapassato prossimo di 'andare' (io) :",opts:["ero andato","fui andato","sono andato","sarò andato"],ans:"ero andato"},
+  {q:"Trapassato prossimo di 'fare' (noi) :",opts:["avevamo fatto","avemmo fatto","abbiamo fatto","avremo fatto"],ans:"avevamo fatto"},
+  {q:"'Mi disse che era già uscito' — 'era uscito' est :",opts:["trapassato prossimo","passato remoto","imperfetto","condizionale"],ans:"trapassato prossimo"},
+  {q:"Quale frase è corretta ?",opts:["Quando arrivai, era già partito.","Quando arrivai, è già partito.","Quando arrivai, parte già.","Quando arrivai, sarà già partito."],ans:"Quando arrivai, era già partito."},
+  {q:"Le trapassato remoto s'emploie aujourd'hui :",opts:["surtout à l'écrit littéraire","dans la langue courante","dans les SMS","jamais"],ans:"surtout à l'écrit littéraire"},
+  {q:"Non sapevo che ___ così tardi. (essere, trapassato)",opts:["fosse","era","è","sarà"],ans:"fosse"},
+  {q:"Trapassato prossimo di 'venire' (lei) :",opts:["era venuta","fu venuta","è venuta","sarà venuta"],ans:"era venuta"},
+  {q:"Quando ci conoscemmo, lui ___ già in Italia da 5 anni. (vivere)",opts:["viveva","visse","ha vissuto","vivrà"],ans:"viveva"},
+  {q:"Mi resi conto che ___ un errore. (fare, trapassato prossimo, io)",opts:["avevo fatto","ebbi fatto","ho fatto","feci"],ans:"avevo fatto"},
+  {q:"Trapassato prossimo di 'alzarsi' (io) :",opts:["mi ero alzato","mi fui alzato","mi sono alzato","mi sarò alzato"],ans:"mi ero alzato"},
+  {q:"Le participe du trapassato prossimo avec 'essere' s'accorde :",opts:["avec le sujet","avec le COD","jamais","seulement au pluriel"],ans:"avec le sujet"},
+  {q:"Era stanco perché ___ tutta la notte. (lavorare)",opts:["aveva lavorato","ebbe lavorato","ha lavorato","lavorò"],ans:"aveva lavorato"},
+  {q:"Quale sequenza è corretta ?",opts:["Appena ebbe finito, uscì.","Appena ha finito, uscì.","Appena finiva, uscì.","Appena finirà, uscì."],ans:"Appena ebbe finito, uscì."},
+  {q:"Trapassato prossimo di 'dire' (loro) :",opts:["avevano detto","ebbero detto","hanno detto","dissero"],ans:"avevano detto"},
+  {q:"'Quando tornammo, la festa era già finita.' Che tempo è 'era finita' ?",opts:["trapassato prossimo","trapassato remoto","passato remoto","imperfetto"],ans:"trapassato prossimo"},
+  {q:"Il trapassato prossimo si usa spesso con :",opts:["già, appena, dopo che","domani, fra poco","sempre, mai","forse, magari"],ans:"già, appena, dopo che"},
+  {q:"Ci disse che ___ la macchina. (vendere, trapassato prossimo, lui)",opts:["aveva venduto","ebbe venduto","ha venduto","vendette"],ans:"aveva venduto"},
+  {q:"Trapassato prossimo di 'essere' (voi) :",opts:["eravate stati","foste stati","siete stati","sarete stati"],ans:"eravate stati"},
+  {q:"Quale frase contiene un trapassato remoto ?",opts:["Dopo che ebbe parlato, tutti applaudirono.","Dopo che aveva parlato, tutti applaudivano.","Dopo che ha parlato, tutti applaudono.","Dopo che parlerà, tutti applaudiranno."],ans:"Dopo che ebbe parlato, tutti applaudirono."},
+  {q:"Il trapassato prossimo è il « plus-que-parfait » italiano :",opts:["vero","falso, è il futuro","falso, è il presente","falso, è il conditionnel"],ans:"vero"},
+  {q:"Avevo appena ___ quando suonò il telefono. (uscire, io)",opts:["ero appena uscito","avevo appena uscito","fui appena uscito","sono appena uscito"],ans:"ero appena uscito"},
+],
+avz4:[
+  {q:"Penso che lui ___ ragione. (concordanza: presente + presente)",opts:["abbia","avesse","avrà avuto","aveva"],ans:"abbia"},
+  {q:"Pensavo che lui ___ ragione. (concordanza: passato + …)",opts:["avesse","abbia","abbia avuto","ha"],ans:"avesse"},
+  {q:"Credo che ieri lui ___ tardi. (arrivare)",opts:["sia arrivato","arrivi","fosse arrivato","arrivasse"],ans:"sia arrivato"},
+  {q:"Credevo che lui ___ già ___. (partire)",opts:["fosse / partito","sia / partito","era / partito","fu / partito"],ans:"fosse / partito"},
+  {q:"Spero che tu ___ presto. (guarire, futur proche)",opts:["guarisca","guarissi","fossi guarito","guarivi"],ans:"guarisca"},
+  {q:"Speravo che tu ___ presto. (guarire)",opts:["guarissi","guarisca","sia guarito","guarirai"],ans:"guarissi"},
+  {q:"Mi ha detto che ___ il giorno dopo. (partire — futur dans le passé)",opts:["sarebbe partito","partirà","parte","partirebbe"],ans:"sarebbe partito"},
+  {q:"Mi dice che ___ domani. (partire)",opts:["partirà","sarebbe partito","partiva","partisse"],ans:"partirà"},
+  {q:"Se avessi tempo, ___ . (venire, io)",opts:["verrei","verrò","venivo","sarei venuto"],ans:"verrei"},
+  {q:"Se avessi avuto tempo, ___ . (venire, io)",opts:["sarei venuto","verrei","venivo","verrò"],ans:"sarei venuto"},
+  {q:"Dopo « Penso che » (présent), on emploie :",opts:["congiuntivo presente/passato","congiuntivo imperfetto seulement","indicativo futuro","condizionale"],ans:"congiuntivo presente/passato"},
+  {q:"Dopo « Pensavo che » (passé), on emploie :",opts:["congiuntivo imperfetto/trapassato","congiuntivo presente","indicativo presente","futuro"],ans:"congiuntivo imperfetto/trapassato"},
+  {q:"Voleva che io ___ subito. (partire)",opts:["partissi","parta","sia partito","partirò"],ans:"partissi"},
+  {q:"Vuole che io ___ subito. (partire)",opts:["parta","partissi","fossi partito","partirò"],ans:"parta"},
+  {q:"Non sapevo che tu ___ italiano. (parlare)",opts:["parlassi","parli","abbia parlato","parlerai"],ans:"parlassi"},
+  {q:"Era necessario che voi ___ presenti. (essere)",opts:["foste","siate","sarete","siete"],ans:"foste"},
+  {q:"È necessario che voi ___ presenti. (essere)",opts:["siate","foste","eravate","sarete"],ans:"siate"},
+  {q:"Disse che ___ studiato tutta la notte. (avere — antériorité dans le passé)",opts:["aveva","ha","abbia","avrà"],ans:"aveva"},
+  {q:"Dice che ___ studiato tutta la notte. (avere)",opts:["ha","aveva","abbia","avrà"],ans:"ha"},
+  {q:"« Sarebbe venuto » dans un récit au passé exprime :",opts:["un futur dans le passé","un regret uniquement","un présent","un ordre"],ans:"un futur dans le passé"},
+  {q:"Temevo che ___ troppo tardi. (essere)",opts:["fosse","sia","è","sarà"],ans:"fosse"},
+  {q:"Temo che ___ troppo tardi. (essere)",opts:["sia","fosse","era","sarà"],ans:"sia"},
+  {q:"Mi chiese se ___ venire. (potere, io)",opts:["potessi","possa","posso","potrò"],ans:"potessi"},
+  {q:"Mi chiede se ___ venire. (potere, io)",opts:["posso","potessi","potrò","possa"],ans:"posso"},
+  {q:"Quale frase respecte la concordance ?",opts:["Credevo che fosse partito.","Credevo che sia partito.","Credevo che è partito.","Credevo che sarà partito."],ans:"Credevo che fosse partito."},
+  {q:"Quale frase respecte la concordance ?",opts:["Penso che sia partito ieri.","Penso che fosse partito ieri.","Penso che era partito ieri.","Penso che sarà partito ieri."],ans:"Penso che sia partito ieri."},
+  {q:"Speravo che mi ___ . (chiamare, lui)",opts:["chiamasse","chiami","abbia chiamato","chiamerà"],ans:"chiamasse"},
+  {q:"Dubito che loro ___ la verità. (dire, présent)",opts:["dicano","dicessero","dicono","diranno"],ans:"dicano"},
+  {q:"Dubitavo che loro ___ la verità. (dire)",opts:["dicessero","dicano","dicono","diranno"],ans:"dicessero"},
+  {q:"Bisognava che tu ___ prima. (arrivare)",opts:["arrivassi","arrivi","sia arrivato","arriverai"],ans:"arrivassi"},
+],
+avz5:[
+  {q:"« In Italia ___ molto caffè. » (si passivante, bere)",opts:["si beve","si bevono","beve","bevono"],ans:"si beve"},
+  {q:"« In Italia ___ molti caffè al giorno. » (si passivante)",opts:["si bevono","si beve","beve","bevuto"],ans:"si bevono"},
+  {q:"Le « si passivante » s'accorde :",opts:["avec le nom qui suit (singulier/pluriel)","jamais","toujours au pluriel","toujours au singulier"],ans:"avec le nom qui suit (singulier/pluriel)"},
+  {q:"« ___ sempre tardi in questo ufficio. » (si impersonale, lavorare)",opts:["Si lavora","Si lavorano","Lavora","Si è lavorato"],ans:"Si lavora"},
+  {q:"Le « si impersonale » se construit avec :",opts:["si + 3ª persona singolare","si + 1ª persona plurale","si + infinito","si + participio"],ans:"si + 3ª persona singolare"},
+  {q:"« Qui ___ italiano. » (parlare, si passivante, singulier)",opts:["si parla","si parlano","parla","parlano"],ans:"si parla"},
+  {q:"« Qui ___ molte lingue. » (parlare, si passivante, pluriel)",opts:["si parlano","si parla","parla","parlano"],ans:"si parlano"},
+  {q:"« ___ che il museo sia chiuso. » (dire, si impersonale)",opts:["Si dice","Si dicono","Dice","Si è detto che"],ans:"Si dice"},
+  {q:"Avec le « si impersonale », l'adjectif attribut se met :",opts:["au masculin pluriel","au féminin singulier","au masculin singulier","il ne s'accorde jamais"],ans:"au masculin pluriel"},
+  {q:"« Quando si è stanchi, ___ meglio riposare. » (essere)",opts:["è","sono","si è","siamo"],ans:"è"},
+  {q:"Aux temps composés, le « si impersonale » utilise l'auxiliaire :",opts:["essere","avere","les deux indifféremment","aucun"],ans:"essere"},
+  {q:"« Ieri ___ molto. » (mangiare, si impersonale, passato prossimo)",opts:["si è mangiato","si ha mangiato","si mangiava","si mangiò"],ans:"si è mangiato"},
+  {q:"« ___ i biglietti alla cassa. » (vendere, si passivante, pluriel)",opts:["Si vendono","Si vende","Vendono","Si è venduto"],ans:"Si vendono"},
+  {q:"« ___ il pane fresco ogni mattina. » (vendere, singulier)",opts:["Si vende","Si vendono","Vende","Si è venduto"],ans:"Si vende"},
+  {q:"« Non ___ fumare qui. » (potere, si impersonale)",opts:["si può","si possono","può","si è potuto"],ans:"si può"},
+  {q:"Le « si passivante » équivaut à :",opts:["une forme passive","une forme active","un impératif","un conditionnel"],ans:"une forme passive"},
+  {q:"« Le regole ___ rispettare. » (dovere + si passivante)",opts:["si devono","si deve","devono","si è dovuto"],ans:"si devono"},
+  {q:"« In questo ristorante ___ bene. » (mangiare, si impersonale)",opts:["si mangia","si mangiano","mangia","si è mangiato"],ans:"si mangia"},
+  {q:"« ___ che l'esame sia difficile. » (pensare, si impersonale)",opts:["Si pensa","Si pensano","Pensa","Si è pensati"],ans:"Si pensa"},
+  {q:"Quale frase è corretta ?",opts:["Si affittano appartamenti.","Si affitta appartamenti.","Si affittano appartamento.","Affittano si appartamenti."],ans:"Si affittano appartamenti."},
+  {q:"Quale frase è corretta ?",opts:["Si cerca un impiegato.","Si cercano un impiegato.","Cerca si un impiegato.","Si cercato un impiegato."],ans:"Si cerca un impiegato."},
+  {q:"« Da qui ___ tutta la città. » (vedere, si passivante)",opts:["si vede","si vedono","vede","si è visto"],ans:"si vede"},
+  {q:"« Da qui ___ le montagne. » (vedere, pluriel)",opts:["si vedono","si vede","vedono","si è visto"],ans:"si vedono"},
+  {q:"Avec un verbe réfléchi, le « si impersonale » devient :",opts:["ci si","si si","se si","si ci"],ans:"ci si"},
+  {q:"« ___ sempre tardi la domenica. » (alzarsi, impersonale)",opts:["Ci si alza","Si si alza","Si alza si","Ci alza"],ans:"Ci si alza"},
+  {q:"« In quel periodo ___ molto. » (viaggiare, si impersonale, imperfetto)",opts:["si viaggiava","si viaggiavano","viaggiava","si è viaggiato"],ans:"si viaggiava"},
+  {q:"Le « si » impersonnel traduit le français :",opts:["« on »","« nous » uniquement","« je »","« vous »"],ans:"« on »"},
+  {q:"« ___ una soluzione rapida. » (cercare, si passivante, singulier)",opts:["Si cerca","Si cercano","Cerca","Si è cercati"],ans:"Si cerca"},
+  {q:"« ___ soluzioni rapide. » (cercare, pluriel)",opts:["Si cercano","Si cerca","Cerca","Si è cercato"],ans:"Si cercano"},
+  {q:"« Come si dice 'merci' in italiano? » — ici « si dice » est :",opts:["un si impersonale","un si passivante uniquement","un réfléchi","un pronom direct"],ans:"un si impersonale"},
+],
+avz6:[
+  {sent:"Dante scrisse la Divina Commedia.",ans:true,explain:"Correct ! passato remoto, fait historique conclu"},
+  {sent:"Ieri sera scrissi un'email al mio capo.",ans:false,correction:"Ieri sera ho scritto un'email al mio capo.",explain:"action récente liée au présent → passato prossimo"},
+  {sent:"Quando arrivai, lui era già partito.",ans:true,explain:"Correct ! trapassato prossimo pour l'antériorité"},
+  {sent:"Quando arrivai, lui è già partito.",ans:false,correction:"lui era già partito",explain:"il faut le trapassato prossimo après un passato remoto"},
+  {sent:"Appena ebbe finito, uscì.",ans:true,explain:"Correct ! trapassato remoto après 'appena' + passato remoto"},
+  {sent:"Pensavo che fosse partito.",ans:true,explain:"Correct ! concordance : passé + congiuntivo imperfetto/trapassato"},
+  {sent:"Pensavo che sia partito.",ans:false,correction:"Pensavo che fosse partito.",explain:"après un verbe au passé → congiuntivo imperfetto"},
+  {sent:"In Italia si bevono molti caffè.",ans:true,explain:"Correct ! si passivante accordé au pluriel"},
+  {sent:"In Italia si beve molti caffè.",ans:false,correction:"si bevono molti caffè",explain:"le si passivante s'accorde avec 'caffè' (pluriel)"},
+  {sent:"Quando si è stanchi, è meglio riposare.",ans:true,explain:"Correct ! si impersonale + adjectif au masculin pluriel"},
+  {sent:"Mi disse che sarebbe venuto il giorno dopo.",ans:true,explain:"Correct ! futur dans le passé = condizionale composto"},
+  {sent:"Mi disse che verrà il giorno dopo.",ans:false,correction:"che sarebbe venuto il giorno dopo",explain:"dans un récit au passé, le futur devient condizionale composto"},
+],
+
 };
 
 // ── SOUND ENGINE ──
@@ -6269,6 +6664,8 @@ var CATS={
   imperativo:{l:'📢 Imperativo',d:function(){return D.impv3.concat(D.impv5).concat(D.impv7);}},
   congiuntivo:{l:'🌀 Congiuntivo',d:function(){return D.cong3.concat(D.cong5).concat(D.cong7);}},
   ipotetico:{l:'🔀 Periodo Ipotetico',d:function(){return D.ipot4.concat(D.ipot5).concat(D.ipot7);}},
+  sinonimi:{l:'🔁 Sinonimi/Contrari',d:function(){return D.sin1.concat(D.sin2).concat(D.sin3).concat(D.sin4).concat(D.sin5);}},
+  avanzato:{l:'🎓 Tempi Avanzati',d:function(){return D.avz2.concat(D.avz3).concat(D.avz4).concat(D.avz5);}},
 };
 var MG={pl:[],sc:{},cats:[],qs:[],qi:0,pi:0,qT:15,qC:8,tm:null,mode:'hotseat'};
 function shuf(a){return[].concat(a).sort(function(){return Math.random()-.5;});}
@@ -6349,6 +6746,9 @@ function startMulti(){
   document.getElementById('hs-setup').style.display='none';
   document.getElementById('multi-game').style.display='block';
   document.getElementById('ol-answer-panel').style.display='none';
+  var ebar=document.getElementById('mg-emoji-bar');
+  if(ebar)ebar.style.display='none'; // réactions inutiles quand on partage un écran
+  _reactions={};MG.streak={};MG.best={};_sbCards={};
   cntDown(3,function(){showMQ();});
 }
 function showMQ(){
@@ -6361,7 +6761,15 @@ function showMQ(){
   document.getElementById('mg-q').textContent=q.q||q.sent||'';
   document.getElementById('mg-fb').style.display='none';
   var od=document.getElementById('mg-opts');od.innerHTML='';
-  shuf(q.opts).forEach(function(o){var b=document.createElement('button');b.className='mb';b.textContent=o;b.onclick=function(){answerMG(o,q.ans,pl,b);};od.appendChild(b);});
+  _optsArmedAt=Date.now();
+  shuf(q.opts).forEach(function(o){
+    var b=document.createElement('button');b.className='mb';b.textContent=o;
+    b.onclick=function(){
+      if(tapTooEarly())return; // évite la réponse fantôme au changement de question
+      answerMG(o,q.ans,pl,b);
+    };
+    od.appendChild(b);
+  });
   updateMGSc();startMGT();
 }
 function startMGT(){
@@ -6384,29 +6792,201 @@ function answerMG(chosen,correct,pl,btn){
   clearInterval(MG.tm);
   document.querySelectorAll('#mg-opts .mb').forEach(function(b){b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn&&chosen!==correct)b.classList.add('ko');});
   var ok=chosen===correct,fb=document.getElementById('mg-fb');
-  if(ok){MG.sc[pl]=(MG.sc[pl]||0)+10;SFX.correct();fb.style.cssText='display:block;background:#f0fdf4;color:var(--ok)';fb.textContent='✓ Correct ! +10 pts 🎉';}
-  else{SFX.wrong();fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='✗ Raté ! Réponse : '+correct;}
+  if(!MG.streak)MG.streak={};
+  if(ok){
+    MG.streak[pl]=(MG.streak[pl]||0)+1;
+    var bonus=streakBonus(MG.streak[pl]);
+    MG.sc[pl]=(MG.sc[pl]||0)+10+bonus;
+    SFX.correct();fb.style.cssText='display:block;background:#f0fdf4;color:var(--ok)';
+    fb.textContent='✓ Correct ! +'+(10+bonus)+' pts'+(bonus?' (🔥 série de '+MG.streak[pl]+' : +'+bonus+')':'')+' 🎉';
+  }
+  else{MG.streak[pl]=0;SFX.wrong();fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='✗ Raté ! Réponse : '+correct;}
   updateMGSc();setTimeout(function(){nextMQ();},1800);
 }
 function timeoutMG(){
   var q=MG.qs[MG.qi];
+  // Temps écoulé en hot-seat : la série du joueur en cours retombe à zéro
+  var _pl=MG.pl[MG.pi%MG.pl.length];
+  if(MG.streak&&_pl)MG.streak[_pl]=0;
   document.querySelectorAll('#mg-opts .mb').forEach(function(b){b.disabled=true;if(b.textContent===q.ans)b.classList.add('ok');});
   var fb=document.getElementById('mg-fb');fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='⏱ Temps ! Réponse : '+q.ans;
   setTimeout(function(){nextMQ();},1600);
 }
 function nextMQ(){MG.qi++;MG.pi++;if(MG.qi>=MG.qs.length)endMulti();else showMQ();}
+// ── ANTI-RÉPONSE FANTÔME ──
+// Quand la question change, les nouvelles options s'affichent exactement là où le
+// doigt du joueur se trouvait. Un tap en retard (ou un double-tap) atterrit alors
+// sur la question suivante et « choisit tout seul » une réponse. On ignore donc
+// les taps pendant les 400 ms qui suivent l'affichage des options.
+var _optsArmedAt=0;
+function tapTooEarly(){return Date.now()-_optsArmedAt<400;}
+
+// ── BONUS DE SÉRIE ──
+// 3 bonnes réponses d'affilée : +1 · 5 ou plus : +2. Jamais plus de 2 points,
+// pour que la série récompense sans écraser le score de base (10 pts).
+function streakBonus(n){return n>=5?2:(n>=3?1:0);}
+
+// Recalcule TOUS les scores à partir des réponses brutes de Firebase.
+// Le bonus de série est recalculé ici, en parcourant les questions dans l'ordre :
+// aucun compteur local n'est conservé, donc les 8 téléphones obtiennent forcément
+// le même résultat. Une mauvaise réponse remet la série à zéro ; ne pas avoir
+// répondu est neutre (ça n'ajoute rien et ça ne casse pas la série).
+function scoresFromAnswers(answers,scMap){
+  var sc={},streak={},best={};
+  Object.keys(scMap).forEach(function(k){sc[scMap[k]]=0;streak[k]=0;best[k]=0;});
+  var qKeys=Object.keys(answers||{}).sort(function(a,b){
+    return (parseInt(String(a).replace(/[^0-9]/g,''),10)||0)-(parseInt(String(b).replace(/[^0-9]/g,''),10)||0);
+  });
+  qKeys.forEach(function(qk){
+    var qa=answers[qk]||{};
+    Object.keys(scMap).forEach(function(pk){
+      var a=qa[pk];
+      if(!a||typeof a.correct==='undefined')return; // pas de réponse : neutre
+      if(a.correct){
+        streak[pk]++;
+        if(streak[pk]>best[pk])best[pk]=streak[pk];
+        sc[scMap[pk]]+=10+streakBonus(streak[pk]);
+      }else{
+        streak[pk]=0;
+      }
+    });
+  });
+  var byName={},bestByName={};
+  Object.keys(scMap).forEach(function(k){byName[scMap[k]]=streak[k];bestByName[scMap[k]]=best[k];});
+  return {sc:sc,streak:byName,best:bestByName};
+}
+
+// ── CLASSEMENT ANIMÉ (FLIP) ──
+// Les cartes ne sont créées qu'une fois puis réordonnées : on ne peut pas animer
+// un innerHTML reconstruit à chaque tick, car les nœuds seraient détruits.
+// FLIP = on mesure la position AVANT, on réordonne, on remet visuellement les
+// cartes à leur ancienne place par transform, puis on laisse la transition jouer.
+var _sbCards={};
+var SB_COLORS=['#3b5bdb','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#0ea5e9','#14b8a6'];
+
+function renderScoreboard(boxId,names,getScore,getExtra){
+  var box=document.getElementById(boxId);if(!box)return;
+  var board=box.querySelector('.sc-board');
+  var cards=_sbCards[boxId];
+  // Reconstruction seulement si la liste des joueurs a changé
+  var stale=!board||!cards||Object.keys(cards).length!==names.length||names.some(function(n){return !cards[n];});
+  if(stale){
+    box.innerHTML='<div class="sc-board"></div>';
+    board=box.querySelector('.sc-board');
+    cards={};
+    names.forEach(function(n){
+      var el=document.createElement('div');
+      el.className='sc-card';
+      el.innerHTML='<div class="sc-name"></div><div class="sc-pts"></div>';
+      board.appendChild(el);cards[n]=el;
+    });
+    _sbCards[boxId]=cards;
+  }
+
+  // FIRST — position actuelle (éventuellement en cours d'animation)
+  var before={};
+  names.forEach(function(n){before[n]=cards[n].getBoundingClientRect();});
+
+  // LAST — nouvel ordre + contenu
+  var sorted=names.slice().sort(function(a,b){
+    var d=(getScore(b)||0)-(getScore(a)||0);
+    return d!==0?d:names.indexOf(a)-names.indexOf(b); // égalité : ordre stable
+  });
+  var medals=['🥇','🥈','🥉'];
+  sorted.forEach(function(n,i){
+    var el=cards[n],c=SB_COLORS[i%SB_COLORS.length];
+    el.className='sc-card'+(i===0&&(getScore(n)||0)>0?' leader':'');
+    var nameEl=el.querySelector('.sc-name'),ptsEl=el.querySelector('.sc-pts');
+    var rank=(getScore(n)||0)>0&&medals[i]?medals[i]+' ':'';
+    nameEl.style.color=c;
+    nameEl.innerHTML=rank+n+(getExtra?getExtra(n):'');
+    var pts=String(getScore(n)||0);
+    if(ptsEl.textContent!==''&&ptsEl.textContent!==pts){
+      ptsEl.classList.remove('pop');void ptsEl.offsetWidth;ptsEl.classList.add('pop');
+    }
+    ptsEl.style.color=c;ptsEl.textContent=pts;
+    board.appendChild(el); // réordonne dans le DOM
+  });
+
+  if(stale)return; // premier rendu : rien à animer
+  var reduce=typeof window!=='undefined'&&window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(reduce)return;
+  // Repli si requestAnimationFrame n'existe pas (vieux navigateur, environnement de test)
+  var raf=(typeof requestAnimationFrame==='function')?requestAnimationFrame:function(f){setTimeout(f,16);};
+
+  // INVERT + PLAY
+  names.forEach(function(n){
+    var el=cards[n],b=before[n],a=el.getBoundingClientRect();
+    var dx=b.left-a.left,dy=b.top-a.top;
+    if(!dx&&!dy)return;
+    el.style.transition='none';
+    el.style.transform='translate('+dx+'px,'+dy+'px)';
+    el.style.zIndex='2';
+    raf(function(){
+      el.style.transition='transform .55s cubic-bezier(.22,1,.36,1)';
+      el.style.transform='';
+      setTimeout(function(){el.style.zIndex='';el.style.transition='';},600);
+    });
+  });
+}
+
 function updateMGSc(){
-  var colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
-  var sorted=[].concat(MG.pl).sort(function(a,b){return (MG.sc[b]||0)-(MG.sc[a]||0);});
-  document.getElementById('mg-scores').innerHTML='<div class="sc-board">'+MG.pl.map(function(p,i){
-    var isL=p===sorted[0]&&(MG.sc[p]||0)>0;
-    var c=colors[i%colors.length]; // au-delà de 4 joueurs, colors[i] serait undefined
-    return '<div class="sc-card'+(isL?' leader':'')+'"><div class="sc-name" style="color:'+c+'">'+p+(isL?' 👑':'')+'</div><div class="sc-pts" style="color:'+c+'">'+(MG.sc[p]||0)+'</div></div>';
-  }).join('')+'</div>';
+  renderScoreboard('mg-scores',MG.pl,function(p){return MG.sc[p]||0;},function(p){
+    return streakBadge((MG.streak||{})[p])+reactionFor(p);
+  });
+}
+
+// Badge 🔥 à partir de 3 bonnes réponses d'affilée, avec la longueur de la série
+function streakBadge(n){
+  if(!n||n<3)return '';
+  return ' <span title="série en cours" style="font-size:11px;font-weight:900;color:#ea580c">🔥'+n+'</span>';
+}
+
+// ── QUI A DÉJÀ RÉPONDU ──
+// Pendant la question, on montre qui a validé sa réponse — SANS dire si elle est
+// juste (sinon on donnerait la réponse aux autres). Ça évite le silence gênant
+// où personne ne sait si on attend encore quelqu'un.
+function renderAnsweredStrip(qA,scMap){
+  var box=document.getElementById('mg-answered');if(!box)return;
+  if(MG.mode!=='online'||_gameEnded){box.style.display='none';return;}
+  var done=0;
+  var chips=MG.pl.map(function(n){
+    var a=qA[sanitize(n)];
+    var has=!!(a&&typeof a.correct!=='undefined');
+    if(has)done++;
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;'
+      +(has?'background:var(--al);color:var(--ac);border:1px solid #c7d2fe':'background:var(--bg);color:var(--mu);border:1px solid var(--bo)')
+      +'">'+(has?'✔':'⏳')+' '+n+'</span>';
+  }).join(' ');
+  box.style.display='block';
+  box.innerHTML='<div class="card" style="padding:9px"><div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:6px">'
+    +'Réponses reçues '+done+'/'+MG.pl.length+'</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+chips+'</div></div>';
+}
+
+// ── RÉVÉLATION DE FIN DE QUESTION ──
+// Juste avant de passer à la suivante : qui a répondu quoi, et qui avait juste.
+function renderReveal(qA,correctAns){
+  var box=document.getElementById('mg-reveal');if(!box)return;
+  if(MG.mode!=='online'){box.style.display='none';return;}
+  var rows=MG.pl.map(function(n){
+    var a=qA[sanitize(n)];
+    var chosen=a&&typeof a.chosen!=='undefined'?a.chosen:null;
+    var ok=!!(a&&a.correct);
+    var txt=chosen===null?'<em style="color:var(--mu)">pas de réponse</em>':chosen;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;margin-bottom:4px;background:'
+      +(chosen===null?'var(--bg)':(ok?'#f0fdf4':'#fef2f2'))+'">'
+      +'<span style="font-size:12px;font-weight:800">'+(chosen===null?'⬜':(ok?'✅':'❌'))+' '+n+'</span>'
+      +'<span style="font-size:12px;color:'+(chosen===null?'var(--mu)':(ok?'var(--ok)':'var(--ko)'))+';font-weight:700;text-align:right">'+txt+'</span></div>';
+  }).join('');
+  box.style.display='block';
+  box.innerHTML='<div class="card" style="padding:11px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--ok);margin-bottom:7px">✅ Réponse : '+correctAns+'</div>'+rows+'</div>';
 }
 function endMulti(){
   if(MG.tm)clearInterval(MG.tm);
   SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
+  var _eb=document.getElementById('mg-emoji-bar');if(_eb)_eb.style.display='none';
+  var _ab2=document.getElementById('mg-answered');if(_ab2)_ab2.style.display='none';
+  var _rv2=document.getElementById('mg-reveal');if(_rv2)_rv2.style.display='none';
   document.getElementById('multi-game').style.display='none';
   document.getElementById('multi-results').style.display='block';
 
@@ -6475,6 +7055,7 @@ function endMulti(){
         +'<div style="display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:'+(isTop3?'18':'14')+'px">'+rankIcon+'</span>'
         +'<span style="font-size:13px">'+p+'</span>'
+        +(((MG.best||{})[p]||0)>=3?'<span style="font-size:11px;font-weight:900;color:#ea580c" title="meilleure série">🔥'+MG.best[p]+'</span>':'')
         +'</div>'
         +'<div style="text-align:right">'
         +'<div style="font-size:14px;font-weight:900;color:'+(i===0?'var(--wa)':'var(--ac)')+'">'+(MG.sc[p]||0)+' pts</div>'
@@ -6548,6 +7129,48 @@ var _qDeadline=0;
 // voit « +10 pts » à l'écran mais ses points n'arrivent jamais dans le classement.
 var _pendingAnswers=[];
 var _spectatorPoll=null;
+var _specRevealTimer=null; // révélation de la réponse côté spectateur
+var _specRenderId=0;       // jeton anti-révélation périmée quand la question change
+var _specStreak={};        // séries en cours vues par le spectateur
+
+// ── RÉACTIONS EMOJI (multijoueur en ligne) ──
+var EMOJIS=['😂','🔥','😱','👏','💪','🤯','😭','🇮🇹'];
+var _reactions={};          // nom du joueur → {emoji, ts}
+var REACTION_TTL=6000;      // durée d'affichage d'une réaction (ms)
+var _lastReactionSent=0;    // anti-spam local
+var _reactionTick=0;        // cadence de relecture des réactions
+
+function buildEmojiBar(){
+  var box=document.getElementById('mg-emoji-btns');if(!box)return;
+  if(box.children.length)return;
+  EMOJIS.forEach(function(e){
+    var b=document.createElement('button');
+    b.className='mb';b.textContent=e;
+    b.style.cssText='font-size:20px;padding:5px 10px;line-height:1.2';
+    b.onclick=function(){sendReaction(e);};
+    box.appendChild(b);
+  });
+}
+
+function sendReaction(emoji){
+  if(!OL.roomCode||!OL.myName)return;
+  var nowTs=Date.now();
+  if(nowTs-_lastReactionSent<700)return; // évite le matraquage du bouton
+  _lastReactionSent=nowTs;
+  SFX.click();
+  // Affichage immédiat en local, sans attendre l'aller-retour réseau
+  _reactions[OL.myName]={emoji:emoji,ts:nowTs};
+  updateMGSc();
+  fbSet('rooms/'+OL.roomCode+'/reactions/'+sanitize(OL.myName),{emoji:emoji,ts:nowTs}).catch(function(){});
+}
+
+// Renvoie le suffixe emoji à coller après un nom, si la réaction est encore fraîche
+function reactionFor(name){
+  var r=_reactions[name];
+  if(!r||!r.emoji)return '';
+  if(Date.now()-(r.ts||0)>REACTION_TTL)return '';
+  return ' <span style="font-size:17px">'+r.emoji+'</span>';
+}
 var _specQi=-1; // last question spectator rendered
 
 function genCode(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},function(){return c[Math.floor(Math.random()*c.length)];}).join('');}
@@ -6724,6 +7347,14 @@ function olStartSpectatorPoll(){
           _specQi=qi;
           specRenderQuestion(qs,qi,room.settings&&room.settings.qT||15);
         }
+        // Réactions emoji des joueurs, visibles aussi par les spectateurs
+        var _rxS=room.reactions||{};var _byKey={};
+        players.forEach(function(p){_byKey[sanitize(p.name)]=p.name;});
+        var _fr={};
+        Object.keys(_rxS).forEach(function(k){
+          var nm=_byKey[k];if(nm&&_rxS[k]&&_rxS[k].emoji)_fr[nm]=_rxS[k];
+        });
+        _reactions=_fr;
         // Update live scores
         specUpdateScores(players,room.answers||{},qs.length);
       } else if(room.status==='ended'){
@@ -6747,6 +7378,23 @@ function specRenderQuestion(qs,qi,qT){
   optsEl.innerHTML=q.opts.map(function(o){
     return '<button class="mb" disabled style="cursor:default;opacity:.85">'+o+'</button>';
   }).join('');
+  // ── Révélation de la réponse 3 s avant la fin du décompte ──
+  // Réservé aux spectateurs : les joueurs ne voient jamais ça.
+  var rev=document.getElementById('ol-spec-reveal');
+  if(rev){rev.style.display='none';rev.textContent='';}
+  if(_specRevealTimer){clearTimeout(_specRevealTimer);_specRevealTimer=null;}
+  var myRender=++_specRenderId;
+  var delay=Math.max(0,((qT||15)-3)*1000);
+  _specRevealTimer=setTimeout(function(){
+    if(myRender!==_specRenderId)return;      // question déjà changée : révélation périmée
+    if(!_isSpectator)return;                 // garde-fou : jamais pour un joueur
+    var btns=document.querySelectorAll('#ol-spec-opts .mb');
+    for(var i=0;i<btns.length;i++){
+      if(btns[i].textContent===q.ans)btns[i].classList.add('ok');
+      else btns[i].style.opacity='.45';
+    }
+    if(rev){rev.style.display='block';rev.textContent='✅ Réponse : '+q.ans;}
+  },delay);
   // Animate timer bar (visual only, resets each question)
   var bar=document.getElementById('ol-spec-tbar');
   bar.style.transition='none';bar.style.width='100%';bar.style.background='var(--ok)';
@@ -6757,35 +7405,30 @@ function specRenderQuestion(qs,qi,qT){
 }
 
 function specUpdateScores(players,answers,totalQ){
-  var sc={};var scMap={};
-  players.forEach(function(p){sc[p.name]=0;scMap[sanitize(p.name)]=p.name;});
-  Object.values(answers).forEach(function(qA){
-    Object.keys(qA).forEach(function(key){
-      var ans=qA[key];if(ans&&ans.correct&&scMap[key])sc[scMap[key]]=(sc[scMap[key]]||0)+10;
-    });
-  });
-  var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
-  var colors=['#3b5bdb','#10b981','#f59e0b','#ef4444'];
-  document.getElementById('ol-spec-scores').innerHTML='<div class="sc-board">'+sorted.map(function(p,i){
-    var isL=i===0&&sc[p.name]>0;
-    return '<div class="sc-card'+(isL?' leader':'')+'"><div class="sc-name" style="color:'+colors[i%4]+'">'+p.name+(isL?' 👑':'')+'</div><div class="sc-pts" style="color:'+colors[i%4]+'">'+(sc[p.name]||0)+'</div></div>';
-  }).join('')+'</div>';
+  var scMap={};
+  players.forEach(function(p){scMap[sanitize(p.name)]=p.name;});
+  var _r=scoresFromAnswers(answers,scMap);
+  var sc=_r.sc;_specStreak=_r.streak;
+  // Même classement animé que chez les joueurs : le spectateur voit les cartes
+  // se doubler en direct.
+  renderScoreboard('ol-spec-scores',players.map(function(p){return p.name;}),
+    function(n){return sc[n]||0;},
+    function(n){return streakBadge((_specStreak||{})[n])+reactionFor(n);});
 }
 
 function specShowFinalScores(players,answers,totalQ){
-  var sc={};var scMap={};
-  players.forEach(function(p){sc[p.name]=0;scMap[sanitize(p.name)]=p.name;});
-  Object.values(answers).forEach(function(qA){
-    Object.keys(qA).forEach(function(key){
-      var ans=qA[key];if(ans&&ans.correct&&scMap[key])sc[scMap[key]]=(sc[scMap[key]]||0)+10;
-    });
-  });
+  var scMap={};
+  players.forEach(function(p){scMap[sanitize(p.name)]=p.name;});
+  var _r=scoresFromAnswers(answers,scMap);
+  var sc=_r.sc,best=_r.best;
   var sorted=[].concat(players).sort(function(a,b){return (sc[b.name]||0)-(sc[a.name]||0);});
-  var medals=['🥇','🥈','🥉','4️⃣'];
+  var medals=['🥇','🥈','🥉'];
   var h='<div class="card" style="text-align:center"><h3 style="margin-bottom:12px">🏆 Résultats finaux</h3>';
   sorted.forEach(function(p,i){
+    var rank=medals[i]||((i+1)+'.'); // au-delà du podium : 4., 5., 6.…
+    var bs=(best[p.name]||0)>=3?' <span style="font-size:11px;color:#ea580c">🔥'+best[p.name]+'</span>':'';
     h+='<div style="display:flex;justify-content:space-between;padding:8px 12px;background:'+(i===0?'#fffbeb':'var(--bg)')+';border-radius:9px;margin-bottom:6px;font-weight:800">'
-      +'<span>'+medals[i]+' '+p.name+'</span><span>'+(sc[p.name]||0)+' pts</span></div>';
+      +'<span>'+rank+' '+p.name+bs+'</span><span>'+(sc[p.name]||0)+' pts</span></div>';
   });
   h+='</div>';
   document.getElementById('ol-spec-game').innerHTML=h;
@@ -6837,6 +7480,8 @@ function showOlError(msg){
 function olLeaveSpectate(){
   SFX.click();
   if(_spectatorPoll){clearInterval(_spectatorPoll);_spectatorPoll=null;}
+  if(_specRevealTimer){clearTimeout(_specRevealTimer);_specRevealTimer=null;}
+  _specRenderId++; // annule toute révélation encore programmée
   if(OL.roomCode&&OL.myName)fbDel('rooms/'+OL.roomCode+'/spectators/'+sanitize(OL.myName)).catch(function(){});
   OL={roomCode:null,isHost:false,myName:'',pollInterval:null};
   _isSpectator=false;_specQi=-1;
@@ -6923,6 +7568,12 @@ function olStartAsGuest(room){
   MG.sc={};MG.pl.forEach(function(p){MG.sc[p]=0;});
   MG.qs=room.questions||[];MG.qT=(room.settings&&room.settings.qT)||15;MG.qC=(room.settings&&room.settings.qC)||8;
   MG.qi=0;MG.pi=0;MG.mode='online';_gameEnded=false;_localAnswers={};_qDeadline=0;_pendingAnswers=[];
+  _reactions={};_reactionTick=0;MG.streak={};MG.best={};_sbCards={};
+  // Barre d'emojis : uniquement en ligne (en hot-seat tout le monde est devant le même écran)
+  var ebar=document.getElementById('mg-emoji-bar');
+  if(ebar){ebar.style.display='block';buildEmojiBar();}
+  // L'hôte purge les réactions de la partie précédente
+  if(OL.isHost)fbSet('rooms/'+OL.roomCode+'/reactions',null).catch(function(){});
   document.getElementById('ol-lobby').style.display='none';
   document.getElementById('ol-waiting').style.display='none';
   document.getElementById('multi-game').style.display='block';
@@ -6939,6 +7590,8 @@ function olShowQ(){
   _timerExpired=false; // reset for each new question
   // Échéance absolue : +2.5s de marge pour l'écriture réseau de la dernière réponse.
   _qDeadline=Date.now()+((MG.qT||15)*1000)+2500;
+  var _rv=document.getElementById('mg-reveal');if(_rv)_rv.style.display='none';
+  var _an=document.getElementById('mg-answered');if(_an)_an.style.display='none';
   // Update Firebase qi so spectators can follow
   if(OL.isHost)fbSet('rooms/'+OL.roomCode+'/qi',MG.qi).catch(function(){});
   var q=MG.qs[MG.qi];
@@ -6954,9 +7607,14 @@ function olShowQ(){
   document.getElementById('ol-ap-fb').style.display='none';
   var apO=document.getElementById('ol-ap-opts');apO.innerHTML='';
   var _answered=false;
+  _optsArmedAt=Date.now();
   shuf(q.opts).forEach(function(o){
     var b=document.createElement('button');b.className='mb';b.textContent=o;
-    b.onclick=function(){if(_answered)return;_answered=true;olAnswer(o,q.ans,b);};
+    b.onclick=function(){
+      if(_answered)return;
+      if(tapTooEarly())return; // évite la réponse fantôme au changement de question
+      _answered=true;olAnswer(o,q.ans,b);
+    };
     apO.appendChild(b);
   });
   updateMGSc();startMGT();
@@ -7044,13 +7702,9 @@ function olPollAnswers(){
           // Fetch scores only — not full room
           var allAnswers=await fbGet('rooms/'+OL.roomCode+'/answers')||{};
           var scMap={};
-          MG.pl.forEach(function(n){scMap[sanitize(n)]=n;MG.sc[n]=0;});
-          Object.values(allAnswers).forEach(function(qAnswers){
-            Object.keys(qAnswers).forEach(function(key){
-              var a=qAnswers[key];
-              if(a&&a.correct&&scMap[key])MG.sc[scMap[key]]=(MG.sc[scMap[key]]||0)+10;
-            });
-          });
+          MG.pl.forEach(function(n){scMap[sanitize(n)]=n;});
+          var _r=scoresFromAnswers(allAnswers,scMap);
+          MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;
           endMulti();
           _pollBusy=false;return;
         }
@@ -7058,13 +7712,26 @@ function olPollAnswers(){
         // cache. Sans ça, une réponse écrite juste avant le changement de question n'est
         // jamais vue par les autres clients et ses 10 points manquent au tableau des
         // scores jusqu'à la fin de la partie.
-        var _allA=await fbGet('rooms/'+OL.roomCode+'/answers')||{};
-        var _rebuilt={};
-        Object.keys(_allA).forEach(function(qk){
-          var qAns=_allA[qk]||{};
-          Object.keys(qAns).forEach(function(pk){if(qAns[pk])_rebuilt[qk+'_'+pk]=qAns[pk];});
-        });
-        _localAnswers=_rebuilt;
+        _localAnswers=await fbGet('rooms/'+OL.roomCode+'/answers')||{};
+      }
+
+      // Réactions emoji : petit nœud, relu un tick sur deux (≈3 s) pour rester vivant
+      // sans doubler le nombre de lectures Firebase.
+      _reactionTick=(_reactionTick||0)+1;
+      if(_reactionTick%2===0){
+        try{
+          var _rx=await fbGet('rooms/'+OL.roomCode+'/reactions')||{};
+          var _nameByKey={};MG.pl.forEach(function(n){_nameByKey[sanitize(n)]=n;});
+          var _fresh={};
+          Object.keys(_rx).forEach(function(k){
+            var nm=_nameByKey[k];if(!nm)return;
+            if(_rx[k]&&_rx[k].emoji)_fresh[nm]=_rx[k];
+          });
+          // On garde la réaction locale si elle est plus récente que celle du serveur
+          if(_reactions[OL.myName]&&(!_fresh[OL.myName]||_fresh[OL.myName].ts<_reactions[OL.myName].ts))
+            _fresh[OL.myName]=_reactions[OL.myName];
+          _reactions=_fresh;
+        }catch(_e){}
       }
 
       // FIX: only fetch current question's answers — tiny payload regardless of player count
@@ -7077,24 +7744,22 @@ function olPollAnswers(){
       }).length;
 
       // Recompute scores from ALL questions answered so far — authoritative, no drift
-      // We fetch allAnswers once per advance (not every tick) to keep reads low
       var scMap={};
-      MG.pl.forEach(function(n){scMap[sanitize(n)]=n;MG.sc[n]=0;});
-      // Only recompute from what we know locally — add current question results
-      // Use _localAnswers cache to avoid re-fetching previous questions
+      MG.pl.forEach(function(n){scMap[sanitize(n)]=n;});
       if(!_localAnswers)_localAnswers={};
-      // Merge current question answers into local cache
-      Object.keys(qA).forEach(function(key){if(qA[key])_localAnswers[('q'+MG.qi)+'_'+key]=qA[key];});
-      // Recompute from cache — correct answers only
-      Object.keys(_localAnswers).forEach(function(cacheKey){
-        var parts=cacheKey.split('_');
-        var playerKey=parts.slice(1).join('_'); // handle names with underscores
-        var ans=_localAnswers[cacheKey];
-        if(ans&&ans.correct&&scMap[playerKey]){
-          MG.sc[scMap[playerKey]]=(MG.sc[scMap[playerKey]]||0)+10;
-        }
-      });
-      updateMGSc();
+      // Cache imbriqué, même forme que Firebase : indispensable pour recalculer la
+      // série dans l'ordre des questions.
+      if(!_localAnswers[qKey])_localAnswers[qKey]={};
+      Object.keys(qA).forEach(function(key){if(qA[key])_localAnswers[qKey][key]=qA[key];});
+      var _res=scoresFromAnswers(_localAnswers,scMap);
+      MG.sc=_res.sc;MG.streak=_res.streak;
+      // Affichage isolé : une erreur de rendu (animation, DOM inattendu…) ne doit
+      // JAMAIS empêcher la partie d'avancer. Sans ce try/catch, la moindre exception
+      // ici renverrait au catch général et bloquerait la partie pour de bon.
+      try{
+        renderAnsweredStrip(qA,scMap); // qui a répondu, sans révéler si c'est juste
+        updateMGSc();
+      }catch(_uiErr){}
 
       // On avance si tout le monde a répondu, si le décompte est fini, OU si l'échéance
       // absolue est dépassée. Ce dernier cas est le filet de sécurité anti-blocage :
@@ -7109,6 +7774,13 @@ function olPollAnswers(){
         _advancingQ=true;
         _timerExpired=false;
         if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
+        // On montre qui a répondu quoi pendant la pause avant la question suivante
+        // (également isolé : l'avancement ne doit pas dépendre de l'affichage)
+        try{
+          var _cq=MG.qs[MG.qi];
+          if(_cq)renderReveal(qA,_cq.ans);
+          var _ab=document.getElementById('mg-answered');if(_ab)_ab.style.display='none';
+        }catch(_uiErr2){}
         setTimeout(function(){
           // FIX: always reset _advancingQ regardless of _gameEnded
           _advancingQ=false;
@@ -7126,7 +7798,7 @@ function olPollAnswers(){
           }finally{
             _pollBusy=false;
           }
-        },1800);
+        },2600); // 1.8 s → 2.6 s : le temps de lire qui a répondu quoi
         return; // don't reset _pollBusy here — setTimeout will do it
       }
     }catch(e){
@@ -7189,15 +7861,10 @@ async function olEndGame(){try{await fbSet('rooms/'+OL.roomCode+'/status','ended
 function olShowResults(room){
   if(_gameEnded)return;
   var players=Object.values(room.players||{});
-  var allAnswers=room.answers||{};
   var scMap={};
-  players.forEach(function(p){scMap[sanitize(p.name)]=p.name;MG.sc[p.name]=0;});
-  Object.values(allAnswers).forEach(function(qAnswers){
-    Object.keys(qAnswers).forEach(function(key){
-      var ans=qAnswers[key];
-      if(ans&&ans.correct&&scMap[key])MG.sc[scMap[key]]=(MG.sc[scMap[key]]||0)+10;
-    });
-  });
+  players.forEach(function(p){scMap[sanitize(p.name)]=p.name;});
+  var _r=scoresFromAnswers(room.answers||{},scMap);
+  MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;
   MG.pl=players.map(function(p){return p.name;});endMulti();
 }
 
@@ -7280,7 +7947,7 @@ function renderAll(){
    ['cond1',D.cond1],['cond2',D.cond2],['cond4',D.cond4],
    ['impv1',D.impv1],['impv2',D.impv2],['impv4',D.impv4],
    ['cong1',D.cong1],['cong2',D.cong2],['cong4',D.cong4],
-   ['ipot1',D.ipot1],['ipot2',D.ipot2],['ipot3',D.ipot3],
+   ['ipot1',D.ipot1],['ipot2',D.ipot2],['ipot3',D.ipot3],['avz1',D.avz1],
   ].forEach(function(x){bF(x[0],x[1]);});
   // MCQ exercises — ess3 is MCQ only (removed duplicate bF call)
   [['ess2',D.ess2],['ess3',D.ess3],['ess4',D.ess4],['av2',D.av2],
@@ -7317,10 +7984,12 @@ function renderAll(){
    ['lfam3',D.lfam3],['lscuola3',D.lscuola3],['corps3',D.corps3],['reg3',D.reg3],
    ['ger5',D.ger5],['ger6',D.ger6],['rifl5',D.rifl5],['rifl6',D.rifl6],
    ['partadj5',D.partadj5],['partadj6',D.partadj6],
+   ['sin1',D.sin1],['sin2',D.sin2],['sin3',D.sin3],['sin4',D.sin4],['sin5',D.sin5],
+   ['avz2',D.avz2],['avz3',D.avz3],['avz4',D.avz4],['avz5',D.avz5],
   ].forEach(function(x){bM(x[0],x[1]);});
   // True/False
   bT('tf1',D.tf1);bT('tf2',D.tf2);bT('qual8',D.qual8);
-  bT('imf6',D.imf6);bT('pro6',D.pro6);bT('fut6',D.fut6);bT('cond6',D.cond6);bT('impv6',D.impv6);bT('cong6',D.cong6);bT('ipot6',D.ipot6);
+  bT('sin6',D.sin6);bT('avz6',D.avz6);bT('imf6',D.imf6);bT('pro6',D.pro6);bT('fut6',D.fut6);bT('cond6',D.cond6);bT('impv6',D.impv6);bT('cong6',D.cong6);bT('ipot6',D.ipot6);
   buildReg();buildCatSelect();renderXP();
 }
 
