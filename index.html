@@ -113,7 +113,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 /* Le temps verbal / thème est affiché DANS la carte de la question :
    plus besoin de remonter en haut de l'écran pour savoir de quoi il s'agit. */
 .qcat{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--ac);background:var(--al);border:1px solid #c7d2fe;border-radius:20px;padding:3px 11px;margin-bottom:9px}
-.qcat:empty{display:none}
+.qcat:empty{visibility:hidden}
+/* En-tête de la carte question : thème à gauche, décompte à droite. */
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px;text-align:left}
+.qhead .qcat{margin-bottom:9px}
+/* Décompte : juste le nombre, dans une petite case. Largeur fixe pour que le
+   passage de 10 à 9 ne fasse pas bouger la mise en page. */
+.qtime{flex-shrink:0;min-width:38px;height:30px;padding:0 8px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;font-variant-numeric:tabular-nums;color:var(--ok);background:#f0fdf4;border:2px solid var(--ok);transition:color .3s,background .3s,border-color .3s}
+.qtime.warn{color:var(--wa);background:#fffbeb;border-color:var(--wa)}
+.qtime.danger{color:var(--ko);background:#fef2f2;border-color:var(--ko)}
 .sc-card{will-change:transform}
 @keyframes scpop{0%{transform:scale(1)}40%{transform:scale(1.38)}100%{transform:scale(1)}}
 .sc-pts.pop{animation:scpop .5s ease}
@@ -1570,20 +1579,17 @@ Irréguliers fréquents : essere→fui · avere→ebbi · fare→feci · dire→
     <button id="mg-cancel-btn" onclick="cancelGame()" style="display:none;padding:4px 10px;border:2px solid var(--ko);background:#fef2f2;color:var(--ko);border-radius:8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Arrêter</button>
   </div>
   <div style="text-align:center;margin-bottom:6px" id="mg-turn"></div>
-  <div class="t-lbl" id="mg-tlabel" style="font-size:22px">⏱ 15</div>
-  <div class="t-wrap" style="height:8px;margin-bottom:12px"><div class="t-bar" id="mg-tbar" style="width:100%;background:var(--ok)"></div></div>
   <div class="card" id="mg-qcard">
-    <div id="mg-cat-label" class="qcat"></div>
+    <div class="qhead"><div id="mg-cat-label" class="qcat"></div><div id="mg-qtime" class="qtime">15</div></div>
     <div id="mg-q" style="font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.5"></div>
     <div id="mg-opts" class="mopts"></div>
     <div id="mg-fb" style="display:none;text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:800;font-size:14px"></div>
   </div>
-  <div id="mg-answered" style="display:none;margin-bottom:10px"></div>
   <div id="mg-scores" style="margin-top:10px"></div>
   <div id="ol-answer-panel" style="display:none">
     <div class="card" style="text-align:center;background:var(--al)">
       <div style="font-size:13px;font-weight:800;color:var(--ac);margin-bottom:6px" id="ol-ap-title">📱 Ta réponse</div>
-      <div id="ol-ap-cat" class="qcat" style="justify-content:center;display:flex"></div>
+      <div class="qhead"><div id="ol-ap-cat" class="qcat"></div><div id="ol-ap-time" class="qtime">15</div></div>
       <div id="ol-ap-q" style="font-size:14px;font-weight:700;margin-bottom:10px;line-height:1.5"></div>
       <div id="ol-ap-opts" class="mopts" style="justify-content:center"></div>
       <div id="ol-ap-fb" style="display:none;padding:8px;border-radius:9px;margin-top:8px;font-weight:800;font-size:14px"></div>
@@ -6780,12 +6786,17 @@ function showMQ(){
 function startMGT(){
   if(MG.tm)clearInterval(MG.tm);var r=MG.qT;
   if(typeof _timerExpired!=='undefined')_timerExpired=false; // reset for new question
-  var lb=document.getElementById('mg-tlabel'),bar=document.getElementById('mg-tbar');
-  bar.style.width='100%';bar.style.background='var(--ok)';lb.className='t-lbl';
+  // Le décompte s'affiche dans la carte de la question (et dans le panneau de
+  // réponse en ligne) : le joueur n'a plus à regarder en haut de l'écran.
+  var boxes=['mg-qtime','ol-ap-time'].map(function(id){return document.getElementById(id);}).filter(Boolean);
+  function paint(v){
+    var cls='qtime'+(v<=3?' danger':(v<=7?' warn':''));
+    boxes.forEach(function(b){b.textContent=Math.max(0,v);b.className=cls;});
+  }
+  paint(r);
   MG.tm=setInterval(function(){
-    r--;lb.textContent='⏱ '+r;bar.style.width=(r/MG.qT*100)+'%';
-    if(r<=3){SFX.tick();bar.style.background='var(--ko)';lb.className='t-lbl danger';}
-    else if(r<=7){bar.style.background='var(--wa)';lb.className='t-lbl warn';}
+    r--;paint(r);
+    if(r<=3&&r>0)SFX.tick();
     if(r<=0){
       clearInterval(MG.tm);MG.tm=null;SFX.timesup();
       if(typeof _timerExpired!=='undefined')_timerExpired=true; // signal poll to advance
@@ -6947,27 +6958,6 @@ function streakBadge(n){
   return ' <span title="série en cours" style="font-size:11px;font-weight:900;color:#ea580c">🔥'+n+'</span>';
 }
 
-// ── QUI A DÉJÀ RÉPONDU ──
-// Pendant la question, on montre qui a validé sa réponse — SANS dire si elle est
-// juste (sinon on donnerait la réponse aux autres). Ça évite le silence gênant
-// où personne ne sait si on attend encore quelqu'un.
-function renderAnsweredStrip(qA,scMap){
-  var box=document.getElementById('mg-answered');if(!box)return;
-  if(MG.mode!=='online'||_gameEnded){box.style.display='none';return;}
-  var done=0;
-  var chips=MG.pl.map(function(n){
-    var a=qA[sanitize(n)];
-    var has=!!(a&&typeof a.correct!=='undefined');
-    if(has)done++;
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;'
-      +(has?'background:var(--al);color:var(--ac);border:1px solid #c7d2fe':'background:var(--bg);color:var(--mu);border:1px solid var(--bo)')
-      +'">'+(has?'✔':'⏳')+' '+n+'</span>';
-  }).join(' ');
-  box.style.display='block';
-  box.innerHTML='<div class="card" style="padding:9px"><div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:6px">'
-    +'Réponses reçues '+done+'/'+MG.pl.length+'</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+chips+'</div></div>';
-}
-
 // ── QUI A RÉPONDU QUOI — VUE SPECTATEUR UNIQUEMENT ──
 // Les joueurs ne voient jamais ce détail : ça déplaçait le contenu de l'écran et
 // cassait leur concentration. Le spectateur, lui, ne joue pas : c'est justement ce
@@ -6997,7 +6987,6 @@ function endMulti(){
   if(MG.tm)clearInterval(MG.tm);
   SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
   var _eb=document.getElementById('mg-emoji-bar');if(_eb)_eb.style.display='none';
-  var _ab2=document.getElementById('mg-answered');if(_ab2)_ab2.style.display='none';
   document.getElementById('multi-game').style.display='none';
   document.getElementById('multi-results').style.display='block';
 
@@ -7607,8 +7596,6 @@ function olShowQ(){
   _timerExpired=false; // reset for each new question
   // Échéance absolue : +2.5s de marge pour l'écriture réseau de la dernière réponse.
   _qDeadline=Date.now()+((MG.qT||15)*1000)+2500;
-  // La bande « qui a répondu » n'est pas masquée entre deux questions : la laisser
-  // en place évite que le reste de l'écran saute au changement de question.
   // Update Firebase qi so spectators can follow
   if(OL.isHost)fbSet('rooms/'+OL.roomCode+'/qi',MG.qi).catch(function(){});
   var q=MG.qs[MG.qi];
@@ -7775,7 +7762,6 @@ function olPollAnswers(){
       // JAMAIS empêcher la partie d'avancer. Sans ce try/catch, la moindre exception
       // ici renverrait au catch général et bloquerait la partie pour de bon.
       try{
-        renderAnsweredStrip(qA,scMap); // qui a répondu, sans révéler si c'est juste
         updateMGSc();
       }catch(_uiErr){}
 
@@ -7792,10 +7778,8 @@ function olPollAnswers(){
         _advancingQ=true;
         _timerExpired=false;
         if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
-        // Côté joueur on n'affiche PAS qui a répondu quoi : ça fait bouger l'écran
-        // au moment où les autres se concentrent. Ce récapitulatif est réservé au
-        // spectateur (voir specRenderAnswers). La bande « qui a répondu » reste en
-        // place pendant la pause, pour ne pas provoquer de saut de mise en page.
+        // Côté joueur : ni « qui a répondu » ni « qui a répondu quoi » — ça faisait
+        // bouger l'écran. Ce suivi est réservé au spectateur (specRenderAnswers).
         setTimeout(function(){
           // FIX: always reset _advancingQ regardless of _gameEnded
           _advancingQ=false;
