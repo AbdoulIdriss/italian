@@ -129,9 +129,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 @media(prefers-reduced-motion:reduce){.sc-pts.pop{animation:none}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:14px 0}
 .pod{text-align:center;border-radius:12px 12px 0 0;padding:10px 8px;min-width:65px}
-.pod-1{background:linear-gradient(135deg,#ffd700,#ffb700);height:110px;order:2}
-.pod-2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);height:80px;order:1}
-.pod-3{background:linear-gradient(135deg,#cd7f32,#b06820);height:60px;order:3}
+.pod-1{background:linear-gradient(135deg,#ffd700,#ffb700);min-height:110px;order:2}
+.pod-2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);min-height:80px;order:1}
+.pod-3{background:linear-gradient(135deg,#cd7f32,#b06820);min-height:60px;order:3}
 .pod-name{font-size:11px;font-weight:800;color:#fff;margin-bottom:3px;word-break:break-word}
 .pod-pts{font-size:16px;font-weight:900;color:#fff}.pod-rank{font-size:22px}
 .cnt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
@@ -6759,7 +6759,7 @@ function startMulti(){
   document.getElementById('ol-answer-panel').style.display='none';
   var ebar=document.getElementById('mg-emoji-bar');
   if(ebar)ebar.style.display='none'; // réactions inutiles quand on partage un écran
-  _reactions={};MG.streak={};MG.best={};_sbCards={};
+  _reactions={};MG.streak={};MG.best={};MG.ok={};MG.ko={};MG.none={};_sbCards={};
   cntDown(3,function(){showMQ();});
 }
 function showMQ(){
@@ -6809,6 +6809,8 @@ function answerMG(chosen,correct,pl,btn){
   document.querySelectorAll('#mg-opts .mb').forEach(function(b){b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn&&chosen!==correct)b.classList.add('ko');});
   var ok=chosen===correct,fb=document.getElementById('mg-fb');
   if(!MG.streak)MG.streak={};
+  if(!MG.ok)MG.ok={};if(!MG.ko)MG.ko={};
+  if(ok)MG.ok[pl]=(MG.ok[pl]||0)+1;else MG.ko[pl]=(MG.ko[pl]||0)+1;
   if(ok){
     MG.streak[pl]=(MG.streak[pl]||0)+1;
     var bonus=streakBonus(MG.streak[pl]);
@@ -6824,6 +6826,8 @@ function timeoutMG(){
   // Temps écoulé en hot-seat : la série du joueur en cours retombe à zéro
   var _pl=MG.pl[MG.pi%MG.pl.length];
   if(MG.streak&&_pl)MG.streak[_pl]=0;
+  if(!MG.none)MG.none={};
+  if(_pl)MG.none[_pl]=(MG.none[_pl]||0)+1; // temps écoulé = question sans réponse
   document.querySelectorAll('#mg-opts .mb').forEach(function(b){b.disabled=true;if(b.textContent===q.ans)b.classList.add('ok');});
   var fb=document.getElementById('mg-fb');fb.style.cssText='display:block;background:#fef2f2;color:var(--ko)';fb.textContent='⏱ Temps ! Réponse : '+q.ans;
   setTimeout(function(){nextMQ();},1600);
@@ -6848,8 +6852,8 @@ function streakBonus(n){return n>=5?2:(n>=3?1:0);}
 // le même résultat. Une mauvaise réponse remet la série à zéro ; ne pas avoir
 // répondu est neutre (ça n'ajoute rien et ça ne casse pas la série).
 function scoresFromAnswers(answers,scMap){
-  var sc={},streak={},best={};
-  Object.keys(scMap).forEach(function(k){sc[scMap[k]]=0;streak[k]=0;best[k]=0;});
+  var sc={},streak={},best={},ok={},ko={};
+  Object.keys(scMap).forEach(function(k){sc[scMap[k]]=0;streak[k]=0;best[k]=0;ok[scMap[k]]=0;ko[scMap[k]]=0;});
   var qKeys=Object.keys(answers||{}).sort(function(a,b){
     return (parseInt(String(a).replace(/[^0-9]/g,''),10)||0)-(parseInt(String(b).replace(/[^0-9]/g,''),10)||0);
   });
@@ -6862,14 +6866,16 @@ function scoresFromAnswers(answers,scMap){
         streak[pk]++;
         if(streak[pk]>best[pk])best[pk]=streak[pk];
         sc[scMap[pk]]+=10+streakBonus(streak[pk]);
+        ok[scMap[pk]]++;
       }else{
         streak[pk]=0;
+        ko[scMap[pk]]++;
       }
     });
   });
   var byName={},bestByName={};
   Object.keys(scMap).forEach(function(k){byName[scMap[k]]=streak[k];bestByName[scMap[k]]=best[k];});
-  return {sc:sc,streak:byName,best:bestByName};
+  return {sc:sc,streak:byName,best:bestByName,ok:ok,ko:ko};
 }
 
 // ── CLASSEMENT ANIMÉ (FLIP) ──
@@ -6983,6 +6989,26 @@ function specRenderAnswers(names,qA,revealed){
   box.style.display='block';
   box.innerHTML='<div class="card" style="padding:11px"><div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:7px">👁️ Réponses des joueurs '+done+'/'+names.length+'</div>'+rows+'</div>';
 }
+// Bilan d'un joueur pour l'écran final : bonnes, fausses, sans réponse.
+// En ligne tout le monde voit les mêmes questions (total = nb de questions) ;
+// en hot-seat chacun n'a répondu qu'à ses propres tours.
+function playerStats(p,totalQ){
+  var ok=(MG.ok||{})[p]||0,ko=(MG.ko||{})[p]||0,none,asked;
+  if(MG.mode==='online'){asked=totalQ;none=Math.max(0,asked-ok-ko);}
+  else{none=(MG.none||{})[p]||0;asked=ok+ko+none;}
+  // % calculé sur les réponses, pas sur les points : le bonus de série
+  // gonflait l'ancien calcul (points ÷ 10) au-delà de 100 %.
+  return {ok:ok,ko:ko,none:none,asked:asked,pct:asked?Math.round(ok/asked*100):0};
+}
+function statsLine(st,compact){
+  var sep=compact?' ':' · ';
+  return '<div style="font-size:'+(compact?'10.5':'11.5')+'px;font-weight:800;margin-top:2px;white-space:nowrap">'
+    +'<span style="color:var(--ok)">✅ '+st.ok+'</span>'+sep
+    +'<span style="color:var(--ko)">❌ '+st.ko+(compact?'':' faux')+'</span>'
+    +(st.none?sep+'<span style="color:var(--mu)">⏳ '+st.none+'</span>':'')
+    +'</div>';
+}
+
 function endMulti(){
   if(MG.tm)clearInterval(MG.tm);
   SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
@@ -7012,12 +7038,10 @@ function endMulti(){
     var podCls=['pod pod-2','pod pod-1','pod pod-3'];
     var podMedals=['🥈','🥇','🥉'];
     podOrder.forEach(function(p,i){
-      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
       h+='<div class="'+podCls[i]+'">'
         +'<div class="pod-rank">'+podMedals[i]+'</div>'
         +'<div class="pod-name">'+p+'</div>'
         +'<div class="pod-pts">'+(MG.sc[p]||0)+' pts</div>'
-        +(pct>0?'<div style="font-size:10px;color:var(--mu);margin-top:2px">'+pct+'% correct</div>':'')
         +'</div>';
     });
     h+='</div>';
@@ -7034,7 +7058,7 @@ function endMulti(){
           +'</div>';
       });
     } else if(top3.length===1){
-      h+='<div class="pod pod-1"><div class="pod-rank">🥇</div><div class="pod-name">'+top3[0]+'</div><div class="pod-pts">'+(MG.sc[top3[0]]||0)+' pts</div></div>';
+      h+='<div class="pod pod-1"><div class="pod-rank">🥇</div><div class="pod-name">'+top3[0]+'</div><div class="pod-pts">'+(MG.sc[top3[0]]||0)+' pts</div>'+'</div>';
     }
     h+='</div>';
   }
@@ -7046,7 +7070,7 @@ function endMulti(){
     sorted.forEach(function(p,i){
       var isTop3=i<3;
       var rankIcon=i===0?'🥇':i===1?'🥈':i===2?'🥉':('<span style="display:inline-block;width:22px;text-align:center;font-weight:900;color:var(--mu)">'+(i+1)+'</span>');
-      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
+      var st=playerStats(p,totalQ),pct=st.pct;
       h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;'
         +'background:'+(isTop3?'linear-gradient(90deg,var(--al),var(--bg))':'var(--bg)')+';'
         +'border-radius:10px;'
@@ -7054,12 +7078,12 @@ function endMulti(){
         +'font-weight:'+(isTop3?'800':'700')+';">'
         +'<div style="display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:'+(isTop3?'18':'14')+'px">'+rankIcon+'</span>'
-        +'<span style="font-size:13px">'+p+'</span>'
+        +'<div><span style="font-size:13px">'+p+'</span>'+statsLine(st)+'</div>'
         +(((MG.best||{})[p]||0)>=3?'<span style="font-size:11px;font-weight:900;color:#ea580c" title="meilleure série">🔥'+MG.best[p]+'</span>':'')
         +'</div>'
         +'<div style="text-align:right">'
         +'<div style="font-size:14px;font-weight:900;color:'+(i===0?'var(--wa)':'var(--ac)')+'">'+(MG.sc[p]||0)+' pts</div>'
-        +(pct>0?'<div style="font-size:10px;color:var(--mu)">'+pct+'% ✓</div>':'<div style="font-size:10px;color:var(--mu)">0%</div>')
+        +'<div style="font-size:10px;color:var(--mu)">'+pct+'% ✓</div>'
         +'</div>'
         +'</div>';
     });
@@ -7068,10 +7092,10 @@ function endMulti(){
     // Show all players in a simple list even when ≤3
     h+='<div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">';
     sorted.forEach(function(p,i){
-      var pct=totalQ>0?Math.round(((MG.sc[p]||0)/totalQ/10)*100):0;
+      var st=playerStats(p,totalQ),pct=st.pct;
       h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:10px;font-weight:700">'
-        +'<span>'+(i===0?'🥇':i===1?'🥈':'🥉')+' '+p+'</span>'
-        +'<span style="font-weight:900">'+(MG.sc[p]||0)+' pts'+(pct>0?' <span style="font-size:11px;color:var(--mu)">'+pct+'%</span>':'')+'</span>'
+        +'<div><span>'+(i===0?'🥇':i===1?'🥈':'🥉')+' '+p+'</span>'+statsLine(st)+'</div>'
+        +'<span style="font-weight:900">'+(MG.sc[p]||0)+' pts <span style="font-size:11px;color:var(--mu)">'+pct+'%</span></span>'
         +'</div>';
     });
     h+='</div>';
@@ -7433,8 +7457,10 @@ function specShowFinalScores(players,answers,totalQ){
   sorted.forEach(function(p,i){
     var rank=medals[i]||((i+1)+'.'); // au-delà du podium : 4., 5., 6.…
     var bs=(best[p.name]||0)>=3?' <span style="font-size:11px;color:#ea580c">🔥'+best[p.name]+'</span>':'';
-    h+='<div style="display:flex;justify-content:space-between;padding:8px 12px;background:'+(i===0?'#fffbeb':'var(--bg)')+';border-radius:9px;margin-bottom:6px;font-weight:800">'
-      +'<span>'+rank+' '+p.name+bs+'</span><span>'+(sc[p.name]||0)+' pts</span></div>';
+    var ok=_r.ok[p.name]||0,ko=_r.ko[p.name]||0;
+    var st={ok:ok,ko:ko,none:Math.max(0,(totalQ||0)-ok-ko)};
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:'+(i===0?'#fffbeb':'var(--bg)')+';border-radius:9px;margin-bottom:6px;font-weight:800;text-align:left">'
+      +'<div><span>'+rank+' '+p.name+bs+'</span>'+statsLine(st)+'</div><span>'+(sc[p.name]||0)+' pts</span></div>';
   });
   h+='</div>';
   document.getElementById('ol-spec-game').innerHTML=h;
@@ -7574,7 +7600,7 @@ function olStartAsGuest(room){
   MG.sc={};MG.pl.forEach(function(p){MG.sc[p]=0;});
   MG.qs=room.questions||[];MG.qT=(room.settings&&room.settings.qT)||15;MG.qC=(room.settings&&room.settings.qC)||8;
   MG.qi=0;MG.pi=0;MG.mode='online';_gameEnded=false;_localAnswers={};_qDeadline=0;_pendingAnswers=[];
-  _reactions={};_reactionTick=0;MG.streak={};MG.best={};_sbCards={};
+  _reactions={};_reactionTick=0;MG.streak={};MG.best={};MG.ok={};MG.ko={};MG.none={};_sbCards={};
   // Barre d'emojis : uniquement en ligne (en hot-seat tout le monde est devant le même écran)
   var ebar=document.getElementById('mg-emoji-bar');
   if(ebar){ebar.style.display='block';buildEmojiBar();}
@@ -7709,7 +7735,7 @@ function olPollAnswers(){
           var scMap={};
           MG.pl.forEach(function(n){scMap[sanitize(n)]=n;});
           var _r=scoresFromAnswers(allAnswers,scMap);
-          MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;
+          MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;MG.ok=_r.ok;MG.ko=_r.ko;
           endMulti();
           _pollBusy=false;return;
         }
@@ -7757,7 +7783,7 @@ function olPollAnswers(){
       if(!_localAnswers[qKey])_localAnswers[qKey]={};
       Object.keys(qA).forEach(function(key){if(qA[key])_localAnswers[qKey][key]=qA[key];});
       var _res=scoresFromAnswers(_localAnswers,scMap);
-      MG.sc=_res.sc;MG.streak=_res.streak;
+      MG.sc=_res.sc;MG.streak=_res.streak;MG.best=_res.best;MG.ok=_res.ok;MG.ko=_res.ko;
       // Affichage isolé : une erreur de rendu (animation, DOM inattendu…) ne doit
       // JAMAIS empêcher la partie d'avancer. Sans ce try/catch, la moindre exception
       // ici renverrait au catch général et bloquerait la partie pour de bon.
@@ -7863,7 +7889,7 @@ function olShowResults(room){
   var scMap={};
   players.forEach(function(p){scMap[sanitize(p.name)]=p.name;});
   var _r=scoresFromAnswers(room.answers||{},scMap);
-  MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;
+  MG.sc=_r.sc;MG.streak=_r.streak;MG.best=_r.best;MG.ok=_r.ok;MG.ko=_r.ko;
   MG.pl=players.map(function(p){return p.name;});endMulti();
 }
 
