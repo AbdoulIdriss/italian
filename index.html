@@ -110,6 +110,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--tx);min-he
 .sc-card.leader{border-color:var(--wa);background:#fffbeb}
 /* Le classement se réordonne en direct : les cartes glissent à leur nouvelle place
    (technique FLIP, transform piloté en JS) et le score « pompe » quand il change. */
+/* Le temps verbal / thème est affiché DANS la carte de la question :
+   plus besoin de remonter en haut de l'écran pour savoir de quoi il s'agit. */
+.qcat{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--ac);background:var(--al);border:1px solid #c7d2fe;border-radius:20px;padding:3px 11px;margin-bottom:9px}
+.qcat:empty{display:none}
 .sc-card{will-change:transform}
 @keyframes scpop{0%{transform:scale(1)}40%{transform:scale(1.38)}100%{transform:scale(1)}}
 .sc-pts.pop{animation:scpop .5s ease}
@@ -1553,6 +1557,7 @@ Irréguliers fréquents : essere→fui · avere→ebbi · fare→feci · dire→
       <div id="ol-spec-opts" class="mopts"></div>
       <div id="ol-spec-reveal" style="display:none;margin-top:9px;padding:8px 11px;border-radius:9px;background:#f0fdf4;border:1px solid var(--ok);font-size:12.5px;font-weight:800;color:var(--ok)"></div>
     </div>
+    <div id="ol-spec-answers" style="display:none;margin-top:10px"></div>
     <div id="ol-spec-scores" style="margin-top:10px"></div>
   </div>
   <div style="margin-top:10px">
@@ -1561,7 +1566,6 @@ Irréguliers fréquents : essere→fui · avere→ebbi · fare→feci · dire→
 </div>
 <div id="multi-game" style="display:none">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
-    <div id="mg-cat-label" style="font-size:11.5px;font-weight:700;color:var(--mu)"></div>
     <div id="mg-progress" style="font-size:12px;font-weight:800;color:var(--ac)"></div>
     <button id="mg-cancel-btn" onclick="cancelGame()" style="display:none;padding:4px 10px;border:2px solid var(--ko);background:#fef2f2;color:var(--ko);border-radius:8px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Arrêter</button>
   </div>
@@ -1569,16 +1573,17 @@ Irréguliers fréquents : essere→fui · avere→ebbi · fare→feci · dire→
   <div class="t-lbl" id="mg-tlabel" style="font-size:22px">⏱ 15</div>
   <div class="t-wrap" style="height:8px;margin-bottom:12px"><div class="t-bar" id="mg-tbar" style="width:100%;background:var(--ok)"></div></div>
   <div class="card" id="mg-qcard">
+    <div id="mg-cat-label" class="qcat"></div>
     <div id="mg-q" style="font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.5"></div>
     <div id="mg-opts" class="mopts"></div>
     <div id="mg-fb" style="display:none;text-align:center;padding:10px;border-radius:10px;margin-top:10px;font-weight:800;font-size:14px"></div>
   </div>
   <div id="mg-answered" style="display:none;margin-bottom:10px"></div>
-  <div id="mg-reveal" style="display:none;margin-bottom:10px"></div>
   <div id="mg-scores" style="margin-top:10px"></div>
   <div id="ol-answer-panel" style="display:none">
     <div class="card" style="text-align:center;background:var(--al)">
       <div style="font-size:13px;font-weight:800;color:var(--ac);margin-bottom:6px" id="ol-ap-title">📱 Ta réponse</div>
+      <div id="ol-ap-cat" class="qcat" style="justify-content:center;display:flex"></div>
       <div id="ol-ap-q" style="font-size:14px;font-weight:700;margin-bottom:10px;line-height:1.5"></div>
       <div id="ol-ap-opts" class="mopts" style="justify-content:center"></div>
       <div id="ol-ap-fb" style="display:none;padding:8px;border-radius:9px;margin-top:8px;font-weight:800;font-size:14px"></div>
@@ -6963,30 +6968,36 @@ function renderAnsweredStrip(qA,scMap){
     +'Réponses reçues '+done+'/'+MG.pl.length+'</div><div style="display:flex;flex-wrap:wrap;gap:5px">'+chips+'</div></div>';
 }
 
-// ── RÉVÉLATION DE FIN DE QUESTION ──
-// Juste avant de passer à la suivante : qui a répondu quoi, et qui avait juste.
-function renderReveal(qA,correctAns){
-  var box=document.getElementById('mg-reveal');if(!box)return;
-  if(MG.mode!=='online'){box.style.display='none';return;}
-  var rows=MG.pl.map(function(n){
+// ── QUI A RÉPONDU QUOI — VUE SPECTATEUR UNIQUEMENT ──
+// Les joueurs ne voient jamais ce détail : ça déplaçait le contenu de l'écran et
+// cassait leur concentration. Le spectateur, lui, ne joue pas : c'est justement ce
+// qui rend le suivi intéressant pour lui.
+function specRenderAnswers(names,qA,revealed){
+  var box=document.getElementById('ol-spec-answers');if(!box)return;
+  var done=0;
+  var rows=names.map(function(n){
     var a=qA[sanitize(n)];
     var chosen=a&&typeof a.chosen!=='undefined'?a.chosen:null;
     var ok=!!(a&&a.correct);
-    var txt=chosen===null?'<em style="color:var(--mu)">pas de réponse</em>':chosen;
-    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;margin-bottom:4px;background:'
-      +(chosen===null?'var(--bg)':(ok?'#f0fdf4':'#fef2f2'))+'">'
-      +'<span style="font-size:12px;font-weight:800">'+(chosen===null?'⬜':(ok?'✅':'❌'))+' '+n+'</span>'
-      +'<span style="font-size:12px;color:'+(chosen===null?'var(--mu)':(ok?'var(--ok)':'var(--ko)'))+';font-weight:700;text-align:right">'+txt+'</span></div>';
+    if(chosen!==null)done++;
+    // Avant la révélation on montre seulement CE QUI a été répondu, sans dire si
+    // c'est juste : le spectateur garde le suspense comme les joueurs.
+    var bg=chosen===null?'var(--bg)':(revealed?(ok?'#f0fdf4':'#fef2f2'):'var(--al)');
+    var mark=chosen===null?'⏳':(revealed?(ok?'✅':'❌'):'✔');
+    var col=chosen===null?'var(--mu)':(revealed?(ok?'var(--ok)':'var(--ko)'):'var(--ac)');
+    var txt=chosen===null?'<em style="color:var(--mu)">en attente…</em>':chosen;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;margin-bottom:4px;background:'+bg+'">'
+      +'<span style="font-size:12px;font-weight:800">'+mark+' '+n+'</span>'
+      +'<span style="font-size:12px;color:'+col+';font-weight:700;text-align:right">'+txt+'</span></div>';
   }).join('');
   box.style.display='block';
-  box.innerHTML='<div class="card" style="padding:11px"><div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--ok);margin-bottom:7px">✅ Réponse : '+correctAns+'</div>'+rows+'</div>';
+  box.innerHTML='<div class="card" style="padding:11px"><div style="font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--mu);margin-bottom:7px">👁️ Réponses des joueurs '+done+'/'+names.length+'</div>'+rows+'</div>';
 }
 function endMulti(){
   if(MG.tm)clearInterval(MG.tm);
   SFX.win();addXP(50);showBadge('🏆 Partie terminée ! +50 XP');
   var _eb=document.getElementById('mg-emoji-bar');if(_eb)_eb.style.display='none';
   var _ab2=document.getElementById('mg-answered');if(_ab2)_ab2.style.display='none';
-  var _rv2=document.getElementById('mg-reveal');if(_rv2)_rv2.style.display='none';
   document.getElementById('multi-game').style.display='none';
   document.getElementById('multi-results').style.display='block';
 
@@ -7131,6 +7142,7 @@ var _pendingAnswers=[];
 var _spectatorPoll=null;
 var _specRevealTimer=null; // révélation de la réponse côté spectateur
 var _specRenderId=0;       // jeton anti-révélation périmée quand la question change
+var _specRevealed=false;   // vrai une fois la réponse révélée au spectateur
 var _specStreak={};        // séries en cours vues par le spectateur
 
 // ── RÉACTIONS EMOJI (multijoueur en ligne) ──
@@ -7355,6 +7367,9 @@ function olStartSpectatorPoll(){
           var nm=_byKey[k];if(nm&&_rxS[k]&&_rxS[k].emoji)_fr[nm]=_rxS[k];
         });
         _reactions=_fr;
+        // Récapitulatif « qui a répondu quoi » — réservé au spectateur
+        var _qa=(room.answers||{})['q'+qi]||{};
+        specRenderAnswers(players.map(function(p){return p.name;}),_qa,_specRevealed);
         // Update live scores
         specUpdateScores(players,room.answers||{},qs.length);
       } else if(room.status==='ended'){
@@ -7383,6 +7398,7 @@ function specRenderQuestion(qs,qi,qT){
   var rev=document.getElementById('ol-spec-reveal');
   if(rev){rev.style.display='none';rev.textContent='';}
   if(_specRevealTimer){clearTimeout(_specRevealTimer);_specRevealTimer=null;}
+  _specRevealed=false;
   var myRender=++_specRenderId;
   var delay=Math.max(0,((qT||15)-3)*1000);
   _specRevealTimer=setTimeout(function(){
@@ -7394,6 +7410,7 @@ function specRenderQuestion(qs,qi,qT){
       else btns[i].style.opacity='.45';
     }
     if(rev){rev.style.display='block';rev.textContent='✅ Réponse : '+q.ans;}
+    _specRevealed=true; // à partir d'ici on peut colorer juste/faux dans le récap
   },delay);
   // Animate timer bar (visual only, resets each question)
   var bar=document.getElementById('ol-spec-tbar');
@@ -7590,8 +7607,8 @@ function olShowQ(){
   _timerExpired=false; // reset for each new question
   // Échéance absolue : +2.5s de marge pour l'écriture réseau de la dernière réponse.
   _qDeadline=Date.now()+((MG.qT||15)*1000)+2500;
-  var _rv=document.getElementById('mg-reveal');if(_rv)_rv.style.display='none';
-  var _an=document.getElementById('mg-answered');if(_an)_an.style.display='none';
+  // La bande « qui a répondu » n'est pas masquée entre deux questions : la laisser
+  // en place évite que le reste de l'écran saute au changement de question.
   // Update Firebase qi so spectators can follow
   if(OL.isHost)fbSet('rooms/'+OL.roomCode+'/qi',MG.qi).catch(function(){});
   var q=MG.qs[MG.qi];
@@ -7603,6 +7620,7 @@ function olShowQ(){
   document.getElementById('mg-fb').style.display='none';
   var ap=document.getElementById('ol-answer-panel');ap.style.display='block';
   document.getElementById('ol-ap-title').textContent='📱 Ta réponse — '+OL.myName;
+  var apc=document.getElementById('ol-ap-cat');if(apc)apc.textContent=q._cat||'';
   document.getElementById('ol-ap-q').textContent=q.q||'';
   document.getElementById('ol-ap-fb').style.display='none';
   var apO=document.getElementById('ol-ap-opts');apO.innerHTML='';
@@ -7774,13 +7792,10 @@ function olPollAnswers(){
         _advancingQ=true;
         _timerExpired=false;
         if(MG.tm){clearInterval(MG.tm);MG.tm=null;}
-        // On montre qui a répondu quoi pendant la pause avant la question suivante
-        // (également isolé : l'avancement ne doit pas dépendre de l'affichage)
-        try{
-          var _cq=MG.qs[MG.qi];
-          if(_cq)renderReveal(qA,_cq.ans);
-          var _ab=document.getElementById('mg-answered');if(_ab)_ab.style.display='none';
-        }catch(_uiErr2){}
+        // Côté joueur on n'affiche PAS qui a répondu quoi : ça fait bouger l'écran
+        // au moment où les autres se concentrent. Ce récapitulatif est réservé au
+        // spectateur (voir specRenderAnswers). La bande « qui a répondu » reste en
+        // place pendant la pause, pour ne pas provoquer de saut de mise en page.
         setTimeout(function(){
           // FIX: always reset _advancingQ regardless of _gameEnded
           _advancingQ=false;
